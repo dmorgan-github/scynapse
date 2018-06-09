@@ -301,7 +301,7 @@ view: {arg objName, envir, util;
 			var env = ('c' ++ i ++ 'env').asSymbol.kr(defaultEnv.asArray);
 			var amp = ('c' ++ i ++ 'amp').asSymbol.kr(1);
 			var ts = ('c' ++ i ++ 'env_ts').asSymbol.kr(1);
-			[freq * ('c' ++ i).asSymbol.kr(1), 0, EnvGen.kr(env, gate:trig, timeScale:ts) * amp]
+			[freq * ('c' ++ i).asSymbol.kr(1) + LFNoise2.kr(0.01).range(-10,10), 0, EnvGen.kr(env, gate:trig, timeScale:ts) * amp]
 		});
 
 		var mods = Array.fill2D(6, 6, {arg r, c;
@@ -311,6 +311,7 @@ view: {arg objName, envir, util;
 			var ts = ('m' ++ r ++ '_' ++ c ++ 'env_ts').asSymbol.kr(1);
 			var envgen = EnvGen.kr(env, gate:trig, timeScale:ts);
 			mod * envgen;
+
 		}) * 2pi; // in radians
 
 		var sig = FM7.ar(ctrls, mods) * (0..5).collect({arg i; ('chan' ++ i).asSymbol.kr(0.1)});
@@ -386,17 +387,15 @@ view: {arg objName, envir, util;
 	};
 
 	var specs = (
-		/*
-		trig: \set,
-		freq: \set,
+		//trig: \set,
+		//freq: \set,
 		vrate: [0, 10, \lin, 0, 6],
 		vdepth: [0, 1, \lin, 0, 0],
 		vdelay: [0, 1, \lin, 0, 0],
 		vonset: [0, 1, \lin, 0, 0],
 		vrateVar: [0, 1, \lin, 0, 0.04],
 		vdepthVar: [0, 1, \lin, 0, 0.1],
-		susLevel: [0,1,\lin,0,0.5]
-		*/
+		//susLevel: [0,1,\lin,0,0.5]
 	);
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
@@ -428,7 +427,7 @@ view: {arg objName, envir, util;
 				.minHeight_(15)
 				.minWidth_(30)
 				.clipLo_(0)
-				.clipHi_(6)
+				.clipHi_(14)
 				.decimals_(2)
 				.action_({arg ctrl;
 					var key = ('c' ++ i).asSymbol;
@@ -465,7 +464,7 @@ view: {arg objName, envir, util;
 								if (i < 6) {
 									key = ('c' ++ i ++ 'env');
 								} {
-									var r = (i/6).floor;
+									var r = ((i-6)/6).floor;
 									var c = i%6;
 									key = ('m' ++ r ++ '_' ++ c ++ 'env').asSymbol;
 								};
@@ -479,7 +478,7 @@ view: {arg objName, envir, util;
 									if (i < 6) {
 										key = ('c' ++ i ++ 'env_ts');
 									} {
-										var r = (i/6).floor;
+										var r = ((i-6)/6).floor;
 										var c = i%6;
 										key = ('m' ++ r ++ '_' ++ c ++ 'env_ts').asSymbol;
 									};
