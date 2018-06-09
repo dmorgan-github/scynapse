@@ -5,7 +5,7 @@ func: {arg in;
 	var sig = LADSPA.ar(1, 1211,
 
 		\tape_speed.kr(1),
-		\dry.kr(0).ampdb,
+		0.ampdb, //-70
 
 		\tap1_distance.kr(1),
 		\tap1_level.kr(0).ampdb,
@@ -26,7 +26,6 @@ func: {arg in;
 },
 specs: (
 	tape_speed: [0,10,\lin,0,1],
-	dry: [0,1,\lin,0,0],
 	tap1_distance: [0,4,\lin,0,1],
 	tap1_level: [0,1,\lin,0,0],
 	tap2_distance: [0,4,\lin,0,2],

@@ -1,5 +1,5 @@
 (
-var rootpath = PathName(Document.current.path).parentPath;//"/Users/david/projects/droptableuser/apps/surface/";
+var rootpath = PathName(Document.current.path).parentPath;
 var viewsPath = rootpath ++ "_views/";
 var recorders = List.new;
 
@@ -282,11 +282,7 @@ var show = {arg path;
 	draw.(path, cv);
 };
 
-~main = {
-	show.(rootpath);
-};
-
-~main.();
+show.(rootpath);
 
 )
 

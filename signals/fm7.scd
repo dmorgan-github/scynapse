@@ -7,282 +7,284 @@ view: {arg objName, envir, util;
 
 			// 0
 			[0, 2] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[3, 4, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[3, 4, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 1
 			[0, 2] -> [
-				[0, 1, 1],
-				[1, 1, 1],
-				[2, 3, 1],
-				[3, 4, 1],
-				[4, 5, 1]
+				[0, 1, 0.15],
+				[1, 1, 0.15],
+				[2, 3, 0.15],
+				[3, 4, 0.15],
+				[4, 5, 0.15]
 			],
 
 			// 2
 			[0, 3] -> [
-				[0, 1, 1],
-				[1, 2, 1],
-				[3, 4, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[1, 2, 0.15],
+				[3, 4, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 3
 			[0, 3] -> [
-				[0, 1, 1],
-				[1, 2, 1],
-				[3, 4, 1],
-				[4, 5, 1],
-				[5, 3, 1]
+				[0, 1, 0.15],
+				[1, 2, 0.15],
+				[3, 4, 0.15],
+				[4, 5, 0.15],
+				[5, 3, 0.15]
 			],
 
 			// 4
 			[0, 2, 4] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 5
 			[0, 2, 4] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[5, 4, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[5, 4, 0.15]
 			],
 
 			// 6
 			[0, 2] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[2, 4, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[2, 4, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 7
 			[0, 2] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[2, 4, 1],
-				[4, 5, 1],
-				[3, 3, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[2, 4, 0.15],
+				[4, 5, 0.15],
+				[3, 3, 0.15]
 			],
 
 			// 8
 			[0, 2] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[2, 4, 1],
-				[4, 5, 1],
-				[1, 1, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[2, 4, 0.15],
+				[4, 5, 0.15],
+				[1, 1, 0.15]
 			],
 
 			// 9
 			[0, 3] -> [
-				[0, 1, 1],
-				[1, 2, 1],
-				[3, 4, 1],
-				[3, 5, 1],
-				[2, 2, 1]
+				[0, 1, 0.15],
+				[1, 2, 0.15],
+				[3, 4, 0.15],
+				[3, 5, 0.15],
+				[2, 2, 0.15]
 			],
 
 			// 10
 			[0, 3] -> [
-				[0, 1, 1],
-				[1, 2, 1],
-				[3, 4, 1],
-				[3, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[1, 2, 0.15],
+				[3, 4, 0.15],
+				[3, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 11
 			[0, 2] -> [
-				[0, 1, 1],
-				[1, 2, 1],
-				[2, 3, 1],
-				[2, 4, 1],
-				[2, 5, 1],
-				[2, 2, 1]
+				[0, 1, 0.15],
+				[1, 2, 0.15],
+				[2, 3, 0.15],
+				[2, 4, 0.15],
+				[2, 5, 0.15],
+				[2, 2, 0.15]
 			],
 
 			// 12
 			[0, 2] -> [
-				[0, 1, 1],
-				[1, 2, 1],
-				[2, 3, 1],
-				[2, 4, 1],
-				[2, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[1, 2, 0.15],
+				[2, 3, 0.15],
+				[2, 4, 0.15],
+				[2, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 13
 			[0, 2] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[2, 3, 1],
-				[3, 4, 1],
-				[3, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[2, 3, 0.15],
+				[3, 4, 0.15],
+				[3, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 14
 			[0, 2] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[2, 3, 1],
-				[3, 4, 1],
-				[3, 5, 1],
-				[1, 1, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[2, 3, 0.15],
+				[3, 4, 0.15],
+				[3, 5, 0.15],
+				[1, 1, 0.15]
 			],
 
 			// 15
 			[0] -> [
-				[0, 1, 1],
-				[0, 2, 1],
-				[0, 4, 1],
-				[2, 3, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[0, 2, 0.15],
+				[0, 4, 0.15],
+				[2, 3, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 16
 			[0] -> [
-				[0, 1, 1],
-				[0, 2, 1],
-				[0, 4, 1],
-				[2, 3, 1],
-				[4, 5, 1],
-				[1, 1, 1]
+				[0, 1, 0.15],
+				[0, 2, 0.15],
+				[0, 4, 0.15],
+				[2, 3, 0.15],
+				[4, 5, 0.15],
+				[1, 1, 0.15]
 			],
 
 			// 17
 			[0] -> [
-				[0, 1, 1],
-				[0, 2, 1],
-				[0, 3, 1],
-				[3, 4, 1],
-				[4, 5, 1],
-				[2, 2, 1]
+				[0, 1, 0.15],
+				[0, 2, 0.15],
+				[0, 3, 0.15],
+				[3, 4, 0.15],
+				[4, 5, 0.15],
+				[2, 2, 0.15]
 			],
 
 			// 18
 			[0, 3, 4] -> [
-				[0, 1, 1],
-				[1, 2, 1],
-				[3, 5, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[1, 2, 0.15],
+				[3, 5, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 19
 			[0, 1, 3] -> [
-				[0, 2, 1],
-				[1, 2, 1],
-				[3, 4, 1],
-				[3, 5, 1],
-				[2, 2, 1]
+				[0, 2, 0.15],
+				[1, 2, 0.15],
+				[3, 4, 0.15],
+				[3, 5, 0.15],
+				[2, 2, 0.15]
 			],
 
 			// 20
 			[0, 1, 3, 4] -> [
-				[0, 2, 1],
-				[1, 2, 1],
-				[3, 5, 1],
-				[4, 5, 1],
-				[2, 2, 1]
+				[0, 2, 0.15],
+				[1, 2, 0.15],
+				[3, 5, 0.15],
+				[4, 5, 0.15],
+				[2, 2, 0.15]
 			],
 
 			// 21
 			[0, 2, 3, 4] -> [
-				[0, 1, 1],
-				[2, 5, 1],
-				[3, 5, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[0, 1, 0.15],
+				[2, 5, 0.15],
+				[3, 5, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 22
 			[0, 1, 3, 4] -> [
-				[1, 2, 1],
-				[3, 5, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[1, 2, 0.15],
+				[3, 5, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 23
 			[0, 1, 2, 3, 4] -> [
-				[2, 5, 1],
-				[3, 5, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[2, 5, 0.15],
+				[3, 5, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 24
 			[0, 1, 2, 3, 4] -> [
-				[3, 5, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[3, 5, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 25
 			[0, 1, 3] -> [
-				[1, 2, 1],
-				[3, 4, 1],
-				[3, 5, 1],
-				[5, 5, 1]
+				[1, 2, 0.15],
+				[3, 4, 0.15],
+				[3, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 26
 			[0, 1, 3] -> [
-				[1, 2, 1],
-				[3, 4, 1],
-				[3, 5, 1],
-				[2, 2, 1]
+				[1, 2, 0.15],
+				[3, 4, 0.15],
+				[3, 5, 0.15],
+				[2, 2, 0.15]
 			],
 
 			// 27
 			[0, 2, 5] -> [
-				[0, 1, 1],
-				[2, 3, 1],
-				[3, 4, 1],
-				[4, 4, 1]
+				[0, 1, 0.15],
+				[2, 3, 0.15],
+				[3, 4, 0.15],
+				[4, 4, 0.15]
 			],
 
 			// 28
 			[0, 1, 2, 4] -> [
-				[2, 3, 1],
-				[4, 5, 1],
-				[5, 5, 1]
+				[2, 3, 0.15],
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 29
 			[0, 1, 2, 5] -> [
-				[2, 3, 1],
-				[3, 4, 1],
-				[4, 4, 1]
+				[2, 3, 0.15],
+				[3, 4, 0.15],
+				[4, 4, 0.15]
 			],
 
 			// 30
 			[0, 1, 2, 3, 4] -> [
-				[4, 5, 1],
-				[5, 5, 1]
+				[4, 5, 0.15],
+				[5, 5, 0.15]
 			],
 
 			// 31
 			[0, 1, 2, 3, 4, 5] -> [
-				[5, 5, 1]
+				[5, 5, 0.15]
 			]
 		];
 
 		algos[num];
 	};
 
-	var node = NodeProxy.audio(s, 1).source_({
+	var defaultEnv = Env([0,1,0.5,0.5,0],[0.001,0.1,0.6,0.299],\sin);
+
+	var node = NodeProxy.audio(s, 2).source_({
 
 		var trig = \trig.tr(0);
 
@@ -295,32 +297,31 @@ view: {arg objName, envir, util;
 			\vdepthVar.kr(0.1)
 		);
 
-		var curve = \curve.kr(-4);
-		var atk = \atk.kr(0.001);
-		var decay = \decay.kr(0);
-		var sus = \sus.kr(0);
-		var rel = \rel.kr(1);
-
-		var fenv = Env([0,1,0.7,0.7,0],[atk,decay,sus,rel], curve);
-
 		var ctrls = Array.fill(6, {arg i;
-			[freq * ('f' ++ i).asSymbol.kr(1), 0, EnvGen.kr(fenv, gate:trig) * ('f' ++ i ++ 'amp').asSymbol.kr(1)]
+			var env = ('c' ++ i ++ 'env').asSymbol.kr(defaultEnv.asArray);
+			var amp = ('c' ++ i ++ 'amp').asSymbol.kr(1);
+			var ts = ('c' ++ i ++ 'env_ts').asSymbol.kr(1);
+			[freq * ('c' ++ i).asSymbol.kr(1), 0, EnvGen.kr(env, gate:trig, timeScale:ts) * amp]
 		});
 
 		var mods = Array.fill2D(6, 6, {arg r, c;
-			var key = ('mod' ++ r ++ '_' ++ c);
-			key.asSymbol.kr(0)
-		});
+			var key = ('m' ++ r ++ '_' ++ c);
+			var mod = key.asSymbol.kr(0);
+			var env = ('m' ++ r ++ '_' ++ c ++ 'env').asSymbol.kr(defaultEnv.asArray);
+			var ts = ('m' ++ r ++ '_' ++ c ++ 'env_ts').asSymbol.kr(1);
+			var envgen = EnvGen.kr(env, gate:trig, timeScale:ts);
+			mod * envgen;
+		}) * 2pi; // in radians
 
 		var sig = FM7.ar(ctrls, mods) * (0..5).collect({arg i; ('chan' ++ i).asSymbol.kr(0.1)});
 
 		sig = sig * AmpCompA.kr(freq);
 
-		Mix.ar(sig)
+		Pan2.ar(Mix.ar(sig), \pan.kr(0));
 	});
 
 	var setMod = {arg row, col, val;
-		var key = ('mod' ++ row ++ '_' ++ col).asSymbol;
+		var key = ('m' ++ row ++ '_' ++ col).asSymbol;
 		node.set(key, val);
 	};
 
@@ -335,6 +336,8 @@ view: {arg objName, envir, util;
 		})
 	});
 
+	var stack = StackLayout();
+
 	var gridBoxes = Array.fill2D(6, 6, {arg r, c;
 		NumberBox().minHeight_(15).minWidth_(30)
 		.action_({arg ctrl;
@@ -343,7 +346,11 @@ view: {arg objName, envir, util;
 		.clipLo_(0)
 		.clipHi_(2)
 		.decimals_(2)
-		.normalColor_(Color.white);
+		.normalColor_(Color.white)
+		.mouseDownAction_({
+			var result = 6 * r + c;
+			stack.index = result + 6;
+		});
 	});
 
 	var grid = GridLayout.rows(
@@ -374,11 +381,12 @@ view: {arg objName, envir, util;
 
 		chans.do({arg i; channels[i].valueAction_(1)});
 		vals.do({arg val;
-			gridBoxes[val[0]][val[1]].valueAction_(1).background_(Color.gray);
+			gridBoxes[val[0]][val[1]].valueAction_(0.15).background_(Color.gray);
 		});
 	};
 
 	var specs = (
+		/*
 		trig: \set,
 		freq: \set,
 		vrate: [0, 10, \lin, 0, 6],
@@ -386,7 +394,9 @@ view: {arg objName, envir, util;
 		vdelay: [0, 1, \lin, 0, 0],
 		vonset: [0, 1, \lin, 0, 0],
 		vrateVar: [0, 1, \lin, 0, 0.04],
-		vdepthVar: [0, 1, \lin, 0, 0.1]
+		vdepthVar: [0, 1, \lin, 0, 0.1],
+		susLevel: [0,1,\lin,0,0.5]
+		*/
 	);
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
@@ -394,18 +404,24 @@ view: {arg objName, envir, util;
 	var specsView = util[\specsView].(objName, specs, node, envir, view);
 
 	view.layout.add(playView);
+
 	view.layout.add(HLayout(
+
 		VLayout(*channels),
+
 		VLayout(*(0..5).collect({arg i;
 			Knob().fixedSize_(20).value_(1).action_({arg ctrl;
-				var key = ('f' ++ i ++ 'amp').asSymbol;
+
+				var key = ('c' ++ i ++ 'amp').asSymbol;
 				var val = ctrl.value;
-				[key, val].postln;
-				node.set(key, val)
+				var result = i;
+				stack.index = result;
+				node.set(key, val);
 			})
 			.valueAction_(1)
 			.value_(1)
 		})),
+
 		VLayout(
 			*(0..5).collect({arg i;
 				NumberBox()
@@ -415,7 +431,7 @@ view: {arg objName, envir, util;
 				.clipHi_(6)
 				.decimals_(2)
 				.action_({arg ctrl;
-					var key = ('f' ++ i).asSymbol;
+					var key = ('c' ++ i).asSymbol;
 					var val = ctrl.value;
 					node.set(key, val);
 				})
@@ -426,52 +442,63 @@ view: {arg objName, envir, util;
 		grid
 	));
 
-
 	view.layout.add(
-		HLayout(
 
-			VLayout(PopUpMenu()
+		VLayout(
+			stack = StackLayout(
+				*(0..41).collect({arg i;
+					View().layout_(
+						VLayout(
+							StaticText().string_("bobo" ++ i),
+							EnvelopeView()
+							.minHeight_(100)
+							.drawLines_(true)
+							.selectionColor_(Color.red)
+							.drawRects_(true)
+							.resize_(5)
+							.step_(0.0)
+							.thumbSize_(10)
+							.keepHorizontalOrder_(true)
+							.setEnv(defaultEnv)
+							.action_({arg ctrl;
+								var key;
+								if (i < 6) {
+									key = ('c' ++ i ++ 'env');
+								} {
+									var r = (i/6).floor;
+									var c = i%6;
+									key = ('m' ++ r ++ '_' ++ c ++ 'env').asSymbol;
+								};
+								node.set(key, ctrl.asEnv);
+							}),
+							HLayout(
+								StaticText().string_("time scale").fixedWidth_(65),
+								Slider().orientation_(\horizontal).value_(1)
+								.action_({arg ctrl;
+									var key;
+									if (i < 6) {
+										key = ('c' ++ i ++ 'env_ts');
+									} {
+										var r = (i/6).floor;
+										var c = i%6;
+										key = ('m' ++ r ++ '_' ++ c ++ 'env_ts').asSymbol;
+									};
+									node.set(key, ctrl.value);
+								})
+							)
+						).margins_(1).spacing_(1)
+					)
+				})
+			),
+
+			HLayout(
+				StaticText().string_("algo"),
+				PopUpMenu()
 				.items_([""] ++ Array.fill(32, {arg i; i + 1}))
 				.action_({arg ctrl;
 					loadAlgo.(ctrl.value)
-				}),
-				StaticText().string_("algo")
-			),
-
-			VLayout(Knob().fixedSize_(25).action_({arg ctrl;
-				var val = ctrl.value.linlin(0,1,0,10);
-				node.set(\atk, val);
-			})
-			.value_(0.001.linlin(0,10,0,1)),
-			StaticText().string_("A").align_(\center)),
-
-			VLayout(Knob().fixedSize_(25).action_({arg ctrl;
-				var val = ctrl.value.linlin(0,1,0,10);
-				node.set(\decay, val);
-			})
-			.value_(0.linlin(0,10,0,1)),
-			StaticText().string_("D").align_(\center)),
-
-			VLayout(Knob().fixedSize_(25).action_({arg ctrl;
-				var val = ctrl.value.linlin(0,1,0,10);
-				node.set(\sus, val);
-			})
-			.value_(0.linlin(0,10,0,1)),
-			StaticText().string_("S").align_(\center)),
-
-			VLayout(Knob().fixedSize_(25).action_({arg ctrl;
-				var val = ctrl.value.linlin(0,1,0,10);
-				node.set(\rel, val);
-			})
-			.value_(1.linlin(0,10,0,1)),
-			StaticText().string_("R").align_(\center)),
-
-			VLayout(Knob().fixedSize_(25).action_({arg ctrl;
-				var val = ctrl.value.linlin(0,1,-24,24);
-				node.set(\curve, val);
-			})
-			.value_(-4.linlin(-24,24,0,1)),
-			StaticText().string_("curve").align_(\center))
+				})
+			)
 		)
 	);
 
@@ -488,5 +515,3 @@ view: {arg objName, envir, util;
 	});
 };
 )
-
-
