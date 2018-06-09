@@ -282,7 +282,25 @@ view: {arg objName, envir, util;
 		algos[num];
 	};
 
-	var defaultEnv = Env([0,1,0.5,0.5,0],[0.001,0.1,0.6,0.299],\sin);
+	//1 - [0.001,0.1,0.8091,0.0899].sum
+
+	//0.899 * 0.9
+
+	var defaultAmp = 0.5;
+
+	var defaultAtk = 0.001;
+
+	var defaultSusLevel = 0.7;
+
+	var defaultDecay = 0.1;
+
+	var defaultSus = 0.8091;
+
+	var defaultRel = 0.0899;
+
+	var controllerEnv = Env([0,1,defaultSusLevel,defaultSusLevel,0],[defaultAtk,defaultDecay,defaultSus,defaultRel],\sin);
+
+	var modEnv = Env([1,1,1,1,1],[0.25,0.25,0.25,0.25],\lin);
 
 	var node = NodeProxy.audio(s, 2).source_({
 
@@ -297,26 +315,29 @@ view: {arg objName, envir, util;
 			\vdepthVar.kr(0.1)
 		);
 
+		var susLevel = \susLevel.kr(defaultSusLevel);
+		var atk = \atk.kr(defaultAtk);
+		var decay = \decay.kr(defaultDecay);
+		var sus = \sus.kr(defaultSus);
+		var rel = \rel.kr(defaultRel);
+		var env = Env([0,1,susLevel,susLevel,0],[atk,decay,sus,rel],\sin).kr(gate:trig);
+
 		var ctrls = Array.fill(6, {arg i;
-			var env = ('c' ++ i ++ 'env').asSymbol.kr(defaultEnv.asArray);
+			var env = ('c' ++ i ++ 'env').asSymbol.kr(controllerEnv.asArray);
 			var amp = ('c' ++ i ++ 'amp').asSymbol.kr(1);
 			var ts = ('c' ++ i ++ 'env_ts').asSymbol.kr(1);
-			[freq * ('c' ++ i).asSymbol.kr(1) + LFNoise2.kr(0.01).range(-10,10), 0, EnvGen.kr(env, gate:trig, timeScale:ts) * amp]
+			var envgen = EnvGen.kr(env, gate:trig, levelScale:amp, timeScale:ts);
+			[freq * ('c' ++ i).asSymbol.kr(1) + LFNoise2.kr(0.01).range(-10,10), 0, envgen]
 		});
 
 		var mods = Array.fill2D(6, 6, {arg r, c;
 			var key = ('m' ++ r ++ '_' ++ c);
-			var mod = key.asSymbol.kr(0);
-			var env = ('m' ++ r ++ '_' ++ c ++ 'env').asSymbol.kr(defaultEnv.asArray);
-			var ts = ('m' ++ r ++ '_' ++ c ++ 'env_ts').asSymbol.kr(1);
-			var envgen = EnvGen.kr(env, gate:trig, timeScale:ts);
-			mod * envgen;
-
+			key.asSymbol.kr(0);
 		}) * 2pi; // in radians
 
-		var sig = FM7.ar(ctrls, mods) * (0..5).collect({arg i; ('chan' ++ i).asSymbol.kr(0.1)});
+		var sig = FM7.ar(ctrls, mods) * (0..5).collect({arg i; ('chan' ++ i).asSymbol.kr(0)});
 
-		sig = sig * AmpCompA.kr(freq);
+		sig = sig * AmpCompA.kr(freq) * env * \amp.kr(defaultAmp);
 
 		Pan2.ar(Mix.ar(sig), \pan.kr(0));
 	});
@@ -337,8 +358,6 @@ view: {arg objName, envir, util;
 		})
 	});
 
-	var stack = StackLayout();
-
 	var gridBoxes = Array.fill2D(6, 6, {arg r, c;
 		NumberBox().minHeight_(15).minWidth_(30)
 		.action_({arg ctrl;
@@ -348,10 +367,6 @@ view: {arg objName, envir, util;
 		.clipHi_(2)
 		.decimals_(2)
 		.normalColor_(Color.white)
-		.mouseDownAction_({
-			var result = 6 * r + c;
-			stack.index = result + 6;
-		});
 	});
 
 	var grid = GridLayout.rows(
@@ -363,6 +378,25 @@ view: {arg objName, envir, util;
 			})
 		})
 	).margins_(1).spacing_(0);
+
+	var envViews = (0..5).collect({arg i;
+
+		EnvelopeView()
+		.minHeight_(50)
+		.drawLines_(true)
+		.selectionColor_(Color.red)
+		.drawRects_(true)
+		.resize_(5)
+		.step_(0.0)
+		.thumbSize_(10)
+		.keepHorizontalOrder_(true)
+		.setEnv(modEnv)
+		.action_({arg ctrl;
+			var key = ('c' ++ i ++ 'env').asSymbol;
+			node.set(key,ctrl.asEnv);
+		})
+		.fillColor_(Color.blue);
+	});
 
 	var loadAlgo = {arg num;
 
@@ -380,7 +414,19 @@ view: {arg objName, envir, util;
 			});
 		});
 
-		chans.do({arg i; channels[i].valueAction_(1)});
+		envViews.do({arg v, i;
+			var key = ('c' ++ i ++ 'env').asSymbol;
+			v.setEnv(modEnv);
+			v.valueAction_(modEnv.asArray);
+		});
+		chans.do({arg i;
+			var key = ('c' ++ i ++ 'env').asSymbol;
+			channels[i].valueAction_(1);
+			envViews[i].setEnv(controllerEnv);
+			envViews[i].valueAction_(modEnv.asArray);
+		});
+
+
 		vals.do({arg val;
 			gridBoxes[val[0]][val[1]].valueAction_(0.15).background_(Color.gray);
 		});
@@ -398,12 +444,153 @@ view: {arg objName, envir, util;
 		//susLevel: [0,1,\lin,0,0.5]
 	);
 
-	var view = View().layout_(VLayout().spacing_(2).margins_(2));
+	var view = View().layout_(VLayout().spacing_(2).margins_(2)).minWidth_(400);
 	var playView = util[\playView].(objName, node, view);
 	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var controllersView = View().layout_(VLayout().margins_(3).spacing_(3));
 
 	view.layout.add(playView);
 
+	2.do({arg r;
+
+		if (r > 0) {
+			controllersView.layout.add(
+				StaticText().string_(" ").background_(Color.black).maxHeight_(2)
+			);
+		};
+
+		controllersView.layout.add(
+			HLayout(
+				*(0..2).collect({arg c;
+
+					var num = (3 * r + c);
+					VLayout(
+						HLayout(
+							channels[num],
+							StaticText().string_("#" ++ (num+1)),
+							nil
+						),
+						// controller freq ratio
+						NumberBox()
+						.minHeight_(15)
+						.minWidth_(30)
+						.clipLo_(0)
+						.clipHi_(14)
+						.decimals_(4)
+						.action_({arg ctrl;
+							var key = ('c' ++ num).asSymbol;
+							var val = ctrl.value;
+							node.set(key, val);
+						})
+						.value_(1)
+						.normalColor_(Color.white),
+
+						/*
+						EnvelopeView()
+						.minHeight_(50)
+						.drawLines_(true)
+						.selectionColor_(Color.red)
+						.drawRects_(true)
+						.resize_(5)
+						.step_(0.0)
+						.thumbSize_(10)
+						.keepHorizontalOrder_(true)
+						.setEnv(modEnv)
+						.action_({arg ctrl;
+							var key = ('c' ++ num ++ 'env').asSymbol;
+							node.set(key,ctrl.asEnv);
+						})
+						.fillColor_(Color.blue),
+						*/
+						envViews[num],
+						HLayout(
+							StaticText().string_("Level Scale"),
+							Slider().orientation_(\horizontal).value_(1).maxHeight_(15).maxWidth_(50)
+							.action_({arg ctrl;
+								var key = ('c' ++ num ++ 'amp').asSymbol;
+								node.set(key,ctrl.value);
+							})
+						),
+						HLayout(
+							StaticText().string_("Time Scale"),
+							Slider().orientation_(\horizontal).value_(1).maxHeight_(15).maxWidth_(50)
+							.action_({arg ctrl;
+								var key = ('c' ++ num ++ 'env_ts').asSymbol;
+								node.set(key, ctrl.value);
+							})
+						)
+					)
+				});
+			);
+		);
+	});
+
+	view.layout.add(
+		HLayout(
+			StaticText().string_("algo"),
+			PopUpMenu()
+			.items_([""] ++ Array.fill(32, {arg i; i + 1}))
+			.action_({arg ctrl;
+				loadAlgo.(ctrl.value)
+			}).maxHeight_(15),
+			nil
+		).spacing_(5)
+	);
+
+	view.layout.add(StaticText().string_(" ").background_(Color.black).maxHeight_(2));
+	view.layout.add(controllersView);
+	view.layout.add(StaticText().string_(" ").background_(Color.black).maxHeight_(2));
+	view.layout.add(grid);
+	view.layout.add(StaticText().string_(" ").background_(Color.black).maxHeight_(2));
+
+	view.layout.add(
+		HLayout(
+			VLayout(
+				Knob().value_(defaultAtk).action_({arg ctrl;
+					var key = \atk;
+					node.set(key,ctrl.value);
+				}),
+				StaticText().string_("A").align_(\center)
+			),
+			VLayout(
+				Knob().value_(defaultDecay).action_({arg ctrl;
+					var key = \decay;
+					node.set(key,ctrl.value);
+				}),
+				StaticText().string_("D").align_(\center)
+			),
+			VLayout(
+				HLayout(
+					Knob().value_(defaultSus).action_({arg ctrl;
+					var key = \sus;
+					node.set(key,ctrl.value);
+				}),
+					Slider().maxHeight_(35).maxWidth_(15).thumbSize_(10).value_(defaultSusLevel)
+					.action_({arg ctrl;
+						var key = \susLevel;
+						node.set(key,ctrl.value);
+					})
+				),
+				StaticText().string_("S").align_(\center)
+			),
+			VLayout(
+				Knob().value_(defaultRel).action_({arg ctrl;
+					var key = \rel;
+					node.set(key,ctrl.value);
+				}),
+				StaticText().string_("R").align_(\center)
+			),
+			VLayout(
+				Knob().value_(defaultAmp).action_({arg ctrl;
+					var key = \amp;
+					node.set(key,ctrl.value);
+				}),
+				StaticText().string_("Output").align_(\center)
+			)
+		)
+	);
+
+	/*
 	view.layout.add(HLayout(
 
 		VLayout(*channels),
@@ -440,7 +627,9 @@ view: {arg objName, envir, util;
 		),
 		grid
 	));
+	*/
 
+	/*
 	view.layout.add(
 
 		VLayout(
@@ -500,6 +689,7 @@ view: {arg objName, envir, util;
 			)
 		)
 	);
+	*/
 
 	view.layout.add(specsView);
 
