@@ -14,7 +14,10 @@ view: {arg objName, envir, util;
 		var pulse = Impulse.ar(0.33);
 		var chain = FFT(buf, in, 0.25);
 		chain = PV_BinDelay(chain, maxdel, \dels.kr, \fb.kr, 0.25);
-		Pan2.ar(in + IFFT(chain), \pan.kr(0));
+
+		//Pan2.ar(in + IFFT(chain), \pan.kr(0));
+		Pan2.ar(IFFT(chain), \pan.kr(0));
+
 	})
 	.set(\dels, dels, \fb, fb);
 
