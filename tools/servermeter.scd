@@ -1,9 +1,7 @@
 (
 view: {arg name, envir;
 
-	var font = Font("Courrier new", 10);
 	var view = View().layout_(VLayout().margins_(0).spacing_(0))
-	.font_(font)
 	.minWidth_(400)
 	.minHeight_(245);
 
@@ -18,5 +16,3 @@ view: {arg name, envir;
 }
 )
 //[\view].("", ()).front;
-
-

@@ -2,9 +2,9 @@
 func: {arg in;
 
 	var sig = JPverb.ar(in,
-		t60: \t60.kr(1),
+		t60: \t60.kr(1).lag(0.1),
 		damp: \damp.kr(0),
-		size: \size.kr(1),
+		size: \size.kr(1).lag(0.1),
 		earlyDiff: \earlyDiff.kr(0.707),
 		modDepth: \modDepth.kr,
 		modFreq: \modFreq.kr(1),

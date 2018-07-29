@@ -6,7 +6,7 @@ func: {arg in;
 		\delay.kr(1).lag(0.1),
 		-70, // dry
 		0, // wet
-		\feedback.kr(0.5),
+		\feedback.kr(0.5).lag(0.1),
 		\crossfade.kr(20)
 	);
 

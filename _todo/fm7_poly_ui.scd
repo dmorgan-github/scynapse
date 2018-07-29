@@ -678,6 +678,8 @@ SynthDef(\fm7_poly, {
 
 ~fm7Node = NodeProxy.audio(s, 2);
 
+~durs = ~combo.(8, [0.5,1,2,3], []).postln;
+
 
 (
 Pdef(\fm7, Pproto({
@@ -690,19 +692,12 @@ Pdef(\fm7, Pproto({
 }, ~fm7.set(
 
 	// rhythm
-	\delta, 8,
+	\delta, Pseq( ~durs, inf),
 	\beatDur, Pfunc({thisThread.clock.beatDur}),
 
-	\scale, Scale.chromatic,
-	\degree, Pseq([
-
-		Pn([-1, 2, 6], 1),
-		Pn([-5, -1, 2],1),
-		Pn([0,4,7,11,14],1),
-		Pn([6,9,12,16], 1)
-
-	], inf),
-	\octave, 4
+	\scale, Scale.minor,
+	\degree, Pseq(Array.fill(~durs.size, { [0,3,5,7].choose }), inf),
+	\octave, Pbjorklund(5, 8, inf).collect({arg val; if (val == 1) {5}{4} })
 
 )))
 )

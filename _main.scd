@@ -107,7 +107,7 @@ var findView = {arg path;
 var loadView = {arg file;
 
 	var view, count = 1, viewPath;
-	var envir = currentEnvironment;
+	var envir = ~p.envir ? currentEnvironment;
 	var objName = PathName(file).fileNameWithoutExtension;
 	var util = File.open(rootpath ++ "_funcs.scd", "r").readAllString.interpret;
 	var win;

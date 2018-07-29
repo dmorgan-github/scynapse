@@ -32,16 +32,12 @@ view: {arg objName, envir, util;
 		Silence.ar;
 	}).set(\buf, buf);
 
-	//--buffer
-	//s.sync;
-
 	//--main loop
 	uv.drawFunc = {
 
 		//uncomment framerate display in the two lines below to gain some speed
 		Pen.color= Color.white;
 		Pen.stringAtPoint("" ++ uv.frameRate, Point(10, 10));
-
 
 		//--
 		buf.getn(0, buf.numFrames-1, {|data| arr= data});
