@@ -7,8 +7,8 @@ func: {arg in;
 	);
 },
 
-specs: (
-	\spread: [0, 1, \lin, 0, 1],
-	\center: [-1, 1, \lin, 0, 0]
-)
+specs: [
+	\spread -> [0, 1, \lin, 0, 1],
+	\center -> [-1, 1, \lin, 0, 0]
+]
 )

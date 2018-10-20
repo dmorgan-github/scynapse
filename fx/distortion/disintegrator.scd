@@ -11,11 +11,11 @@ func: {arg in;
 	);
 	sig;
 },
-specs: (
-	probL: [0, 1, \lin, 0, 0.5],
-	probR: [0, 1, \lin, 0, 0.5],
+specs: [
+	\probL -> [0, 1, \lin, 0, 0.5],
+	\probR -> [0, 1, \lin, 0, 0.5],
 
-	multL: [-1, 1, \lin, 0, 0],
-	multR: [-1, 1, \lin, 0, 0]
-)
+	\multL -> [-1, 1, \lin, 0, 0],
+	\multR -> [-1, 1, \lin, 0, 0]
+]
 )

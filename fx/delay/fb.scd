@@ -8,12 +8,12 @@ func: {arg in;
 	var sig = FbC({arg fb; fb * fblevel + in}, [delL/16, delR/16] * speed);
 	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0));
 },
-specs: (
-	fb: [0.0, 0.99, \lin, 0.0, 0.3],
-	delL: [1, 16, \lin, 1, 6],
-	delR: [1, 16, \lin, 1, 10],
-	speed: [0.001, 16, \lin, 0.0, 1],
-	spread: [0,1,\lin,0, 1],
-	center: [-1,1,\lin,0,0]
-)
+specs: [
+	\fb -> [0.0, 0.99, \lin, 0.0, 0.3],
+	\delL -> [1, 16, \lin, 1, 6],
+	\delR -> [1, 16, \lin, 1, 10],
+	\speed -> [0.001, 16, \lin, 0.0, 1],
+	\spread -> [0,1,\lin,0, 1],
+	\center -> [-1,1,\lin,0,0]
+]
 )

@@ -24,15 +24,15 @@ func: {arg in;
 
 	Pan2.ar(sig, 0);
 },
-specs: (
-	tape_speed: [0,10,\lin,0,1],
-	tap1_distance: [0,4,\lin,0,1],
-	tap1_level: [0,1,\lin,0,0],
-	tap2_distance: [0,4,\lin,0,2],
-	tap2_level: [0,1,\lin,0,0],
-	tap3_distance: [0,4,\lin,0,3],
-	tap3_level: [0,1,\lin,0,0],
-	tap4_distance: [0,4,\lin,0,4],
-	tap4_level: [0,1,\lin,0,0]
-)
+specs: [
+	\tape_speed -> [0,10,\lin,0,1],
+	\tap1_distance -> [0,4,\lin,0,1],
+	\tap1_level -> [0,1,\lin,0,0],
+	\tap2_distance -> [0,4,\lin,0,2],
+	\tap2_level -> [0,1,\lin,0,0],
+	\tap3_distance -> [0,4,\lin,0,3],
+	\tap3_level -> [0,1,\lin,0,0],
+	\tap4_distance -> [0,4,\lin,0,4],
+	\tap4_level -> [0,1,\lin,0,0]
+]
 )

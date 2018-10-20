@@ -16,11 +16,11 @@ func: {arg in;
 
 	LeakDC.ar(sig) * 0.1
 },
-specs: (
-	decayL: [2, 30, \lin, 0, 10],
-	decayR: [2, 30, \lin, 0, 10],
+specs: [
+	\decayL -> [2, 30, \lin, 0, 10],
+	\decayR -> [2, 30, \lin, 0, 10],
 
-	kneepointL: [-90, 1, \lin, 0, -10],
-	kneepointR: [-90, 1, \lin, 0, -10]
-)
+	\kneepointL -> [-90, 1, \lin, 0, -10],
+	\kneepointR -> [-90, 1, \lin, 0, -10]
+]
 )

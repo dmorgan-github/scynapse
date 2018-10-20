@@ -6,7 +6,7 @@ func: {arg in;
 	LeakDC.ar(sig);
 	//sig;
 },
-specs: (
-	gain: [1, 20, \lin, 0, 1]
-)
+specs: [
+	\gain -> [1, 20, \lin, 0, 1]
+]
 )

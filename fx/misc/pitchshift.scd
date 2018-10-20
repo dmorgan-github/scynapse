@@ -10,9 +10,9 @@ func: {arg in;
 
 	Splay.ar(sig);
 },
-specs: (
-	pitchRatio: [0.0, 4.0, \lin, 0.0, 1],
-	pitchDispersion: [0, 1, \lin, 0.0, 0.1],
-	timeDispersion: [0.0, 0.1, \lin, 0, 0.1]
-)
+specs: [
+	\pitchRatio -> [0.0, 4.0, \lin, 0.0, 1],
+	\pitchDispersion -> [0, 1, \lin, 0.0, 0.1],
+	\timeDispersion -> [0.0, 0.1, \lin, 0, 0.1]
+]
 )

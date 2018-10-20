@@ -31,24 +31,24 @@ func: {arg in;
 		center:\center.kr(0)
 	);
 },
-specs: (
+specs: [
 
-	tap1_delay: [0, 6, \lin, 0, 0.2],
-	tap2_delay: [0, 6, \lin, 0, 0.5],
-	tap3_delay: [0, 6, \lin, 0, 0.7],
-	tap4_delay: [0, 6, \lin, 0, 1],
+	\tap1_delay -> [0, 6, \lin, 0, 0.2],
+	\tap2_delay -> [0, 6, \lin, 0, 0.5],
+	\tap3_delay -> [0, 6, \lin, 0, 0.7],
+	\tap4_delay -> [0, 6, \lin, 0, 1],
 
-	tap1_mul: [0, 1, \lin, 0, 1],
-	tap2_mul: [0, 1, \lin, 0, 0.7],
-	tap3_mul: [0, 1, \lin, 0, 0.5],
-	tap4_mul: [0, 1, \lin, 0, 0.2],
+	\tap1_mul -> [0, 1, \lin, 0, 1],
+	\tap2_mul -> [0, 1, \lin, 0, 0.7],
+	\tap3_mul -> [0, 1, \lin, 0, 0.5],
+	\tap4_mul -> [0, 1, \lin, 0, 0.2],
 
-	tap1_fb: [0, 1, \lin, 0, 0],
-	tap2_fb: [0, 1, \lin, 0, 0],
-	tap3_fb: [0, 1, \lin, 0, 0],
-	tap4_fb: [0, 1, \lin, 0, 0],
+	\tap1_fb -> [0, 1, \lin, 0, 0],
+	\tap2_fb -> [0, 1, \lin, 0, 0],
+	\tap3_fb -> [0, 1, \lin, 0, 0],
+	\tap4_fb -> [0, 1, \lin, 0, 0],
 
-	spread: [0, 1, \lin, 0, 1],
-	center: [-1, 1, \lin, 0, 0]
-)
+	\spread -> [0, 1, \lin, 0, 1],
+	\center -> [-1, 1, \lin, 0, 0]
+]
 )

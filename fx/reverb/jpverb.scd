@@ -17,19 +17,19 @@ func: {arg in;
 
 	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0));
 },
-specs: (
-	t60: [0.1, 60, \lin, 0.0, 1],
-	damp: [0, 1, \lin, 0.0, 0],
-	size: [0.5, 5, \lin, 0, 1],
-	earlyDiff: [0, 1, \lin, 0, 0.707],
-	modDepth: [0, 1, \lin, 0, 0.1],
-	modFreq: [0, 10, \lin, 0, 2],
-	low: [0, 1, \lin, 0, 1],
-	mid: [0, 1, \lin, 0, 1],
-	high: [0, 1, \lin, 0, 1],
-	lowcut: [100, 6000, \exp, 1, 500],
-	highcut: [1000, 10000, \exp, 1, 2000],
-	spread: [0, 1, \lin, 0, 1],
-	center: [-1, 1, \lin, 0, 0]
-)
+specs: [
+	\t60 -> [0.1, 60, \lin, 0.0, 1],
+	\damp -> [0, 1, \lin, 0.0, 0],
+	\size -> [0.5, 5, \lin, 0, 1],
+	\earlyDiff -> [0, 1, \lin, 0, 0.707],
+	\modDepth -> [0, 1, \lin, 0, 0.1],
+	\modFreq -> [0, 10, \lin, 0, 2],
+	\low -> [0, 1, \lin, 0, 1],
+	\mid -> [0, 1, \lin, 0, 1],
+	\high -> [0, 1, \lin, 0, 1],
+	\lowcut -> [100, 6000, \exp, 1, 500],
+	\highcut -> [1000, 10000, \exp, 1, 2000],
+	\spread -> [0, 1, \lin, 0, 1],
+	\center -> [-1, 1, \lin, 0, 0]
+]
 )

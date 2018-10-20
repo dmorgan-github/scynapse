@@ -7,7 +7,7 @@ func: {arg in;
 
 	sig;
 },
-specs: (
-	freq: [20, 20000, \lin, 0, 1000]
-)
+specs: [
+	\freq -> [20, 20000, \lin, 0, 1000]
+]
 )

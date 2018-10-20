@@ -42,65 +42,30 @@ func: {arg in;
 
 	var sig = LADSPA.ar(1, 1402,
 		RandSeed.ir(1000),
-		[\inputgainL.kr(0),
-			\inputgainR.kr(0)
-		],
-		[\feedbackL.kr(30),
-			\feedbackR.kr(30)
-		],
-		[\numtapsL.kr(1),
-			\numtapsR.kr(1)
-		],
-		[\firstdelayL.kr(1),
-			\firstdelayR.kr(1)
-		],
-		[\delayrangeL.kr(1),
-			\delayrangeR.kr(1)
-		],
-		[\delaychangeL.kr(1),
-			\delaychangeR.kr(1)
-		],
-		[\delayrandomL.kr(30),
-			\delayrandomR.kr(30)
-		],
-		[\ampchangeL.kr(0.5),
-			\ampchangeR.kr(0.5)
-		],
-		[\amprandL.kr(50),
-			\amprandR.kr(50)
-		],
+		\inputgain.kr(0),
+		\feedback.kr(30),
+		\numtaps.kr(1),
+		\firstdelay.kr(1),
+		\delayrange.kr(1),
+		\delaychange.kr(1),
+		\delayrandom.kr(30),
+		\ampchange.kr(0.5),
+		\amprand.kr(50),
 		/*dry/wet*/1,
 		in
 	);
 
-	LeakDC.ar(sig);
+	sig;
 },
-specs: (
-	inputgainL: [-96, 24, \lin, 0, 0],
-	inputgainR: [-96, 24, \lin, 0, 0],
-
-	feedbackL: [0, 100, \lin, 0, 30],
-	feedbackR: [0, 100, \lin, 0, 30],
-
-	numtapsL: [2, 128, \lin, 0, 1],
-	numtapsR: [2, 128, \lin, 0, 1],
-
-	firstdelayL: [0, 5, \lin, 0, 1],
-	firstdelayR: [0, 5, \lin, 0, 1],
-
-	delayrangeL: [0.0001, 6, \lin, 0, 1],
-	delayrangeR: [0.0001, 6, \lin, 0, 1],
-
-	delaychangeL: [0.2, 5, \lin, 0, 1],
-	delaychangeR: [0.2, 5, \lin, 0, 1],
-
-	delayrandomL: [0, 100, \lin, 0, 30],
-	delayrandomR: [0, 100, \lin, 0, 30],
-
-	ampchangeL: [0.2, 5, \lin, 0, 0.5],
-	ampchangeR: [0.2, 5, \lin, 0, 0.5],
-
-	amprandL: [0, 100, \lin, 0, 50],
-	amprandR: [0, 100, \lin, 0, 50]
-)
+specs: [
+	\inputgain -> [-96, 24, \lin, 0, 0],
+	\feedback -> [0, 100, \lin, 0, 30],
+	\numtaps -> [2, 128, \lin, 0, 1],
+	\firstdelay -> [0, 5, \lin, 0, 1],
+	\delayrange -> [0.0001, 6, \lin, 0, 1],
+	\delaychange -> [0.2, 5, \lin, 0, 1],
+	\delayrandom -> [0, 100, \lin, 0, 30],
+	\ampchange -> [0.2, 5, \lin, 0, 0.5],
+	\amprand -> [0, 100, \lin, 0, 50]
+]
 )

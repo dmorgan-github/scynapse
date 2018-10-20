@@ -132,7 +132,7 @@ var loadView = {arg file;
 		view = viewObj[\view].(objName, envir, obj, util);
 	};
 
-	win = View().layout_(VLayout().spacing_(1).margins_(1)).palette_(QPalette.dark).name_(objName);
+	win = View().layout_(VLayout().spacing_(1).margins_(1)).palette_(QPalette.dark).name_(objName).minWidth_(275);
 
 	NotificationCenter.register(view, \status, win, {arg msg;
 		status.string_(msg);

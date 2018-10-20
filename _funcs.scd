@@ -62,7 +62,10 @@
 				});
 			});
 
-			specs.sortedKeysValuesDo({arg k,v;
+			specs.do({arg assoc;
+
+				var k = assoc.key;
+				var v = assoc.value;
 
 				var specKey = k.asSymbol;
 				var spec = if (v == \set) {\set} {v.asSpec};
@@ -232,22 +235,6 @@
 			);
 
 			view.layout.add(
-				Slider()
-				.orientation_(\horizontal)
-				.thumbSize_(10)
-				.fixedSize_(50@height)
-				.alt_scale_(0.01)
-				.ctrl_scale_(0.1)
-				.shift_scale_(1)
-				.value_(1.linlin(0.1, 8, 0, 1))
-				.action_({arg ctrl;
-					var val = ctrl.value.linlin(0, 1, 0.1, 8);
-					node.fadeTime = val;
-					NotificationCenter.notify(containerView, \status, "fadetime: " ++ val.asString);
-				})
-			);
-
-			view.layout.add(
 
 				Slider()
 				.orientation_(\horizontal)
@@ -264,9 +251,24 @@
 			);
 
 			view.layout.add(
+				NumberBox()
+				.fixedSize_(30@height)
+				.alt_scale_(0.01)
+				.ctrl_scale_(0.1)
+				.shift_scale_(1)
+				.value_(1)
+				.normalColor_(Color.grey)
+				.action_({arg ctrl;
+					var val = ctrl.value;
+					node.fadeTime = val;
+					NotificationCenter.notify(containerView, \status, "fadetime: " ++ val.asString);
+				})
+			);
+
+			view.layout.add(
 				Button()
 				.fixedSize_(30@height)
-				.states_([ ["play"], ["stop"] ])
+				.states_([ ["play", Color.white], ["stop", Color.white, Color.blue] ])
 				.string_("play")
 				.action_({arg ctrl;
 					if (ctrl.value == 1) {
@@ -274,6 +276,15 @@
 					} {
 						node.stop(fadeTime:node.fadeTime);
 					}
+				})
+			);
+
+			view.layout.add(
+				Button()
+				.fixedSize_(30@height)
+				.states_([ ["scope"] ])
+				.action_({arg ctrl;
+					node.scope;
 				})
 			);
 

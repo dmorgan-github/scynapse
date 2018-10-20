@@ -30,14 +30,13 @@ func: {arg in;
 
 	sig;
 },
-specs: (
-
-	revtime: [0.1, 1000, \lin, 0, 3],
-	damping: [0, 1, \lin, 0, 0.9],
-	inputbw: [0, 1, \lin, 0, 0.75],
-	spread: [0, 100, \lin, 0, 50],
-	earlyreflevel: [0.1, 1, \lin, 0, 0.07943282347242],
-	taillevel: [0.1, 1, \lin, 0, 0.5],
-)
+specs: [
+	\revtime -> [0.1, 1000, \lin, 0, 3],
+	\damping -> [0, 1, \lin, 0, 0.9],
+	\inputbw -> [0, 1, \lin, 0, 0.75],
+	\spread -> [0, 100, \lin, 0, 50],
+	\earlyreflevel -> [0.1, 1, \lin, 0, 0.07943282347242],
+	\taillevel -> [0.1, 1, \lin, 0, 0.5],
+]
 )
 

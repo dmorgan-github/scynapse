@@ -12,9 +12,9 @@ func: {arg in;
 
 	sig;
 },
-specs: (
-	delay: [0, 5, \lin, 0, 1],
-	feedback: [0, 1, \lin, 0, 0.5],
-	crossfade: [0, 100, \lin, 0, 20]
-)
+specs: [
+	\delay -> [0, 5, \lin, 0, 1],
+	\feedback -> [0, 1, \lin, 0, 0.5],
+	\crossfade -> [0, 100, \lin, 0, 20]
+]
 )

@@ -16,12 +16,12 @@ func: {arg in;
 
 	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0));
 },
-specs: (
-	revTime: [0.1, 60, \lin, 0.0, 3],
-	hfDamping: [0, 1, \lin, 0.0, 0.1],
-	predelay: [0, 30, \lin, 0, 0.02],
-	inFilter: [0, 1, \lin, 0, 0.6],
-	combScale: [0.1, 10, \lin, 0, 1],
-	apScale: [0.1, 10, \lin, 0, 1]
-)
+specs: [
+	\revTime -> [0.1, 60, \lin, 0.0, 3],
+	\hfDamping -> [0, 1, \lin, 0.0, 0.1],
+	\predelay -> [0, 30, \lin, 0, 0.02],
+	\inFilter -> [0, 1, \lin, 0, 0.6],
+	\combScale -> [0.1, 10, \lin, 0, 1],
+	\apScale -> [0.1, 10, \lin, 0, 1]
+]
 )

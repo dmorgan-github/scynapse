@@ -9,7 +9,7 @@ func: {
 	sig = sig * env * \amp.kr(0.1);
 	Pan2.ar(sig, \pan.kr(0));
 },
-specs: (
-	trig: \set
-)
+specs: [
+	\trig -> \set
+[
 )

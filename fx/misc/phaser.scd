@@ -9,10 +9,10 @@ func: {arg in;
 		in
 	);
 },
-specs: (
-	rate: [0, 100, \lin, 0, 1],
-	depth: [0, 1, \lin, 0, 0.5],
-	feedback: [-1, 1, \lin, 0, 0],
-	spread: [0, 2, \lin, 0, 0.1]
-)
+specs: [
+	\rate -> [0, 100, \lin, 0, 1],
+	\depth -> [0, 1, \lin, 0, 0.5],
+	\feedback -> [-1, 1, \lin, 0, 0],
+	\spread -> [0, 2, \lin, 0, 0.1]
+]
 )
