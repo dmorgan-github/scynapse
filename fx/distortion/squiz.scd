@@ -1,20 +1,15 @@
 (
 func: {arg in;
 	var sig = Squiz.ar(in,
-		pitchratio: [\pitchratioL.kr(2),
-			\pitchratioR.kr(2)
-		],
-		zcperchunk: [\zcperchunkL.kr(1),
-			\zcperchunkR.kr(1)
-		]
+		pitchratio: \pitchratio.kr(2),
+		zcperchunk: \zcperchunk.kr(1)
 	);
-	sig;
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0));
 },
 specs: (
-	pitchratioL: [1, 6, \lin, 0, 2],
-	pitchratioR: [1, 6, \lin, 0, 2],
-
-	zcperchunkL: [1, 6, \lin, 0, 1],
-	zcperchunkR: [1, 6, \lin, 0, 1]
+	pitchratio: [1, 6, \lin, 0, 2],
+	zcperchunk: [1, 100, \lin, 0, 1],
+	spread: [0,1,\lin,0, 1],
+	center: [-1,1,\lin,0,0]
 )
 )

@@ -64,14 +64,21 @@
 
 			specs.sortedKeysValuesDo({arg k,v;
 
-				var layout = HLayout().margins_(1).spacing_(1);
-				var rs = RangeSlider().orientation_(\horizontal).enabled_(false);
-				var slider = Slider();
-				var stack = StackLayout();
-				var height = 20;
-
 				var specKey = k.asSymbol;
 				var spec = if (v == \set) {\set} {v.asSpec};
+
+				var layout = HLayout().margins_(1).spacing_(1);
+				var rs = RangeSlider().orientation_(\horizontal)
+				.enabled_(false)
+				.alt_scale_(0.01)
+				.ctrl_scale_(0.1)
+				.shift_scale_(1);
+				var slider = Slider()
+				.alt_scale_(0.01)
+				.ctrl_scale_(0.1)
+				.shift_scale_(1);
+				var stack = StackLayout();
+				var height = 20;
 
 				if (mappers[k].isNil) {
 					mappers[k] = NodeProxy();
@@ -212,6 +219,9 @@
 				.orientation_(\horizontal)
 				.thumbSize_(10)
 				.fixedSize_(50@height)
+				.alt_scale_(0.01)
+				.ctrl_scale_(0.1)
+				.shift_scale_(1)
 				.value_(1.linlin(0,4,0,1))
 				.action_({arg ctrl;
 
@@ -226,6 +236,9 @@
 				.orientation_(\horizontal)
 				.thumbSize_(10)
 				.fixedSize_(50@height)
+				.alt_scale_(0.01)
+				.ctrl_scale_(0.1)
+				.shift_scale_(1)
 				.value_(1.linlin(0.1, 8, 0, 1))
 				.action_({arg ctrl;
 					var val = ctrl.value.linlin(0, 1, 0.1, 8);
@@ -240,27 +253,15 @@
 				.orientation_(\horizontal)
 				.thumbSize_(10)
 				.fixedSize_(50@height)
+				.alt_scale_(0.01)
+				.ctrl_scale_(0.1)
+				.shift_scale_(1)
 				.value_(1)
 				.action_({arg ctrl;
 					node.set(wetKey, ctrl.value);
 					NotificationCenter.notify(containerView, \status, "wet: " ++ ctrl.value.asString);
 				})
 			);
-
-			/*
-			view.layout.add(
-				NumberBox().action_({arg ctrl;
-					outBus = ctrl.value.asInt;
-					if (node.isPlaying) {
-						node.play(out:outBus);
-					}
-				})
-				.decimals_(0)
-				.value_(0)
-				.minWidth_(25)
-				.normalColor_(Color.white)
-			);
-			*/
 
 			view.layout.add(
 				Button()
@@ -276,13 +277,6 @@
 				})
 			);
 
-			//view.layout.add(
-			//	Button()
-			//	.fixedSize_(30@height)
-			//	.string_("doc")
-			//	.mouseDownAction_({arg ctrl; node.document; })
-			//);
-
 			view;
 		},
 
@@ -290,16 +284,11 @@
 
 			var view = View().layout_(VLayout().spacing_(1).margins_(1));
 
-			//~bobo.objects.indices.lastIndexForWhich({arg i; i < 100;})
-
 			var addRow = {
 
 				var row = View().layout_(HLayout().spacing_(1).margins_(1));
-
 				var dragSink;
-
 				var num = -1;
-
 				var name;
 
 				dragSink = DragSink()

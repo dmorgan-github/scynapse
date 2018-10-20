@@ -8,12 +8,13 @@ view: {arg objName, envir, util;
 
 		var node = NodeProxy.audio(s, 2).play(out:val);
 		var myView = View().layout_(VLayout().spacing_(0).margins_(0));
+
 		var specs = (
 			vol: [0,4,\lin,0,1]
 		);
 
 		var playView = util[\playView].(val + 1, node, view);
-		var multiInputsView = util[\multiInputsView].(node, view);s
+		var multiInputsView = util[\multiInputsView].(node, view);
 
 		myView.layout.add(playView.maxWidth_(150));
 		myView.layout.add(multiInputsView.maxWidth_(150));
@@ -32,5 +33,6 @@ view: {arg objName, envir, util;
 	})
 }
 )
+//[\view].("", ()).front;
 
 

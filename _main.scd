@@ -107,7 +107,7 @@ var findView = {arg path;
 var loadView = {arg file;
 
 	var view, count = 1, viewPath;
-	var envir = ~p.envir ? currentEnvironment;
+	var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
 	var objName = PathName(file).fileNameWithoutExtension;
 	var util = File.open(rootpath ++ "_funcs.scd", "r").readAllString.interpret;
 	var win;
@@ -199,25 +199,6 @@ var show = {arg path;
 		}
 	});
 
-	PopUpMenu(view).items_(ServerOptions.inDevices)
-	//.value_(s.options.inDevice ? "Built-in Microph")
-	.action_({arg ctrl;
-		var device = ctrl.item;
-		s.options.inDevice = device;
-		s.reboot;
-	});
-	//.value_(ServerOptions.inDevices.indexOf("Built-in Microph"));
-
-	PopUpMenu(view)
-	.items_(ServerOptions.outDevices)
-	//.value_(s.options.outDevice ? "Built-in Output")
-	.action_({arg ctrl;
-		var device = ctrl.item;
-		s.options.outDevice = device;
-		s.reboot
-	});
-	//.value_(ServerOptions.outDevices.indexOf(s.options.outDevice ? "Built-in Output"));
-
 	cv = ScrollView(win, width@height)
 	.autohidesScrollers_( true )
 	.hasVerticalScroller_( true )
@@ -248,7 +229,9 @@ var show = {arg path;
 			view.decorator.nextLine;
 		};
 
-		folders.select({arg p; p.folderName.beginsWith("_").not}).do({arg path;
+		folders
+		.select({arg p; p.folderName.beginsWith("_").not})
+		.do({arg path;
 
 			StaticText.new(view, textWidth@fontSize )
 			.string_("> " ++ path.folderName)
@@ -259,7 +242,10 @@ var show = {arg path;
 			view.decorator.nextLine;
 		});
 
-		files.select({arg p; p.fileName.beginsWith("_").not;}).do({arg path;
+		files
+		.select({arg p; p.fileName.beginsWith("_").not;})
+		.select({arg p; p.fileName.endsWith("scd")})
+		.do({arg path;
 
 			StaticText.new(view, letterWidth@fontSize )
 			.string_("+ ")

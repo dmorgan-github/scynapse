@@ -2,7 +2,7 @@
 func: {arg in;
 
 	var sig = PitchShift.ar(in,
-		0.1,
+		0.5,
 		\pitchRatio.kr(1),
 		\pitchDispersion.kr(0),
 		\timeDispersion.kr(0)

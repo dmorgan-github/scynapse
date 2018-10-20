@@ -13,7 +13,7 @@ func: {arg in;
 },
 specs: (
 	freq: [20, 20000, \lin, 0, 1000],
-	res: [0.01, 4, \lin, 0, 0.1],
+	res: [0.01, 1, \lin, 0, 0.1],
 	inputgain: [0.1, 2, \lin, 0, 1],
 	type: [0, 1, \lin, 1, 0],
 	noiselevel: [0.0001, 1, \lin, 0.0001, 0.0003]

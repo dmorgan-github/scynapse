@@ -4,6 +4,6 @@ func: {
 	Impulse.kr(freq);
 },
 specs: (
-	freq: [0.001, 80, \lin, 0, 20]
+	freq: [1/512, 80, \lin, 0, 20]
 )
 )

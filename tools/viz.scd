@@ -26,11 +26,14 @@ view: {arg objName, envir, util;
 
 	var multiInputsView;
 
-	var node = NodeProxy.audio(s, 2).filter(100, {arg in;
+	//envir[objName] = NodeProxy.audio(s, 2);
+	var node = NodeProxy.audio(s, 2);
+	node[50] = \filter ->  {arg in;
 		var buffer = \buf.kr(0);
 		RecordBuf.ar(Mix.ar(in), buffer);
-		Silence.ar;
-	}).set(\buf, buf);
+		Silent.ar;
+	};
+	node.set(\buf, buf);
 
 	//--main loop
 	uv.drawFunc = {
@@ -85,7 +88,7 @@ view: {arg objName, envir, util;
 		cnt = cnt+1;
 	};
 
-        //--window management
+    //--window management
 	uv.clearOnRefresh = false;	//do not erase - just draw on top of
 	win.onClose= {
 		node.clear;
@@ -95,7 +98,7 @@ view: {arg objName, envir, util;
 
 	//win.asView.front;
 	//CmdPeriod.doOnce({if(w.isClosed.not, {w.close})});
-	uv.animate= true;
+	uv.animate = true;
 
 	multiInputsView = util[\multiInputsView].(node, view);
 
@@ -146,5 +149,7 @@ view: {arg objName, envir, util;
 			envir[objName] = nil;
 		}.defer(envir[objName].fadeTime + 1);
 	});
+
+	view;
 }
 )

@@ -5,7 +5,7 @@ func: {
 	LFPulse.kr(freq, width:width);
 },
 specs: (
-	freq: [1/256, 80, \lin, 0, 1],
+	freq: [1/512, 80, \lin, 0, 1],
 	width: [0, 1, \lin, 0, 0.5]
 )
 )
