@@ -3,7 +3,7 @@ func: {
 	var freq = \freq.kr;
 	LFTri.kr(freq);
 },
-specs: (
-	freq: [1/512, 80, \lin, 0, 1]
-)
+specs: [
+	\freq -> [1/512, 80, \lin, 0, 1]
+]
 )

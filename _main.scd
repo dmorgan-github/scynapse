@@ -132,7 +132,7 @@ var loadView = {arg file;
 		view = viewObj[\view].(objName, envir, obj, util);
 	};
 
-	win = View().layout_(VLayout().spacing_(1).margins_(1)).palette_(QPalette.dark).name_(objName).minWidth_(275);
+	win = View().layout_(VLayout().spacing_(1).margins_(1)).palette_(QPalette.dark).name_(objName).minWidth_(300);
 
 	NotificationCenter.register(view, \status, win, {arg msg;
 		status.string_(msg);
@@ -171,7 +171,7 @@ var show = {arg path;
 	var win = Window("Browser", Rect(left, top, width + (paddingX * 3), height + (paddingY * 2)));
 	var view = win.view.palette_(QPalette.dark);
 	var letterWidth = fontSize * 0.6;
-	var cv, draw;
+	var cv, draw, fsv;
 
 	view.decorator_(FlowLayout(view.bounds, paddingX@paddingY));
 	win.front;
@@ -199,12 +199,18 @@ var show = {arg path;
 		}
 	});
 
-	cv = ScrollView(win, width@height)
+	cv = ScrollView(win, width@150)
 	.autohidesScrollers_( true )
 	.hasVerticalScroller_( true )
 	.hasHorizontalScroller_( true );
 
 	cv.decorator_(FlowLayout(cv.bounds));
+
+	/*
+	fsv = FreqScopeView(win, 300@200);
+	fsv.active_(true); // turn it on the first time;
+	win.onClose_({ fsv.kill });
+	*/
 
 	draw = {arg path, view;
 

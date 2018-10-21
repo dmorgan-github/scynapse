@@ -3,7 +3,7 @@ func: {arg in;
 
 	var sig = PitchShift.ar(in,
 		0.5,
-		\pitchRatio.kr(1),
+		\pitchRatio.kr(1).midiratio,
 		\pitchDispersion.kr(0),
 		\timeDispersion.kr(0)
 	);
@@ -11,7 +11,7 @@ func: {arg in;
 	Splay.ar(sig);
 },
 specs: [
-	\pitchRatio -> [0.0, 4.0, \lin, 0.0, 1],
+	\pitchRatio -> [-24, 24, \lin, 0.0, 0],
 	\pitchDispersion -> [0, 1, \lin, 0.0, 0.1],
 	\timeDispersion -> [0.0, 0.1, \lin, 0, 0.1]
 ]

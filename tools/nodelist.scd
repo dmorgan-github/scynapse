@@ -16,6 +16,7 @@ view: {arg objName, envir, util;
 					view.layout.add(HLayout(
 
 						StaticText().string_(k),
+						Button().states_([["gui"]]).action_({nodes[k].gui}),
 						DragSource()
 						.background_(Color.clear)
 						.object_((node:v,name:k))

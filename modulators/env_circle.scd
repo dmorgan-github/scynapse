@@ -7,11 +7,11 @@ func: {
 	var curve = \curve.kr(-4);
 	Env.circle([0,1,1,0],[atk,sus,rel,wait],curve).kr(gate:1);
 },
-specs: (
-	atk: [0.001, 64, \lin, 0, 1],
-	sus: [0.001, 64, \lin, 0, 1],
-	rel: [0.001, 64, \lin, 0, 1],
-	wait: [0.001, 64, \lin, 0, 1],
-	curve: [-24, 24, \lin, 0, -4]
-)
+specs: [
+	\atk -> [0.001, 64, \lin, 0, 1],
+	\sus -> [0.001, 64, \lin, 0, 1],
+	\rel -> [0.001, 64, \lin, 0, 1],
+	\wait -> [0.001, 64, \lin, 0, 1],
+	\curve -> [-24, 24, \lin, 0, -4]
+]
 )

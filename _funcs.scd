@@ -53,7 +53,8 @@
 			var view = View()
 			.layout_(VLayout().margins_(1).spacing_(1))
 			.onClose_({
-				specs.keysDo({arg key;
+				specs.do({arg assoc;
+					var key = assoc.key;
 					node.unset(key);
 				});
 				mappers.do({arg v;
@@ -214,8 +215,11 @@
 			var wetKey = ("wet" ++ 100).asSymbol;
 			var view = View().layout_(HLayout().margins_(2).spacing_(2));
 			var outBus = 0;
+			var privateBus = node.bus.index;
 
 			view.layout.add(StaticText().string_(name));
+
+			view.layout.add(StaticText().string_("(" ++ privateBus.asString ++ ")"));
 
 			view.layout.add(
 				Slider()
@@ -285,6 +289,15 @@
 				.states_([ ["scope"] ])
 				.action_({arg ctrl;
 					node.scope;
+				})
+			);
+
+			view.layout.add(
+				Button()
+				.fixedSize_(30@height)
+				.states_([ ["fscope"] ])
+				.action_({arg ctrl;
+					FreqScope.new(300, 200, busNum:node.bus.index);
 				})
 			);
 

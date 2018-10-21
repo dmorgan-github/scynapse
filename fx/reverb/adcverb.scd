@@ -10,8 +10,8 @@ func: {arg in;
 		numCombs:8,
 		numAllpasses:4,
 		inFilter:\inFilter.kr(0.6),
-		combScale:\combScale.kr(1).lag(0.1),
-		apScale:\apScale.kr(1).lag(0.1)
+		combScale:\combScale.kr(3).lag(0.1),
+		apScale:\apScale.kr(3).lag(0.1)
 	);
 
 	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0));
@@ -21,7 +21,9 @@ specs: [
 	\hfDamping -> [0, 1, \lin, 0.0, 0.1],
 	\predelay -> [0, 30, \lin, 0, 0.02],
 	\inFilter -> [0, 1, \lin, 0, 0.6],
-	\combScale -> [0.1, 10, \lin, 0, 1],
-	\apScale -> [0.1, 10, \lin, 0, 1]
+	\combScale -> [0.1, 10, \lin, 0, 3],
+	\apScale -> [0.1, 10, \lin, 0, 3],
+	\spread -> [0, 1, \lin, 0, 1],
+	\center -> [-1, 1, \lin, 0, 0]
 ]
 )
