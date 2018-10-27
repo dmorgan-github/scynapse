@@ -81,10 +81,10 @@ view: {arg objName, envir, util;
 		myView;
 	};
 
-	var specs = (
-		pan: [-1,1,\lin,0,0],
-		rate: [0,4,\lin,0,1]
-	);
+	var specs = [
+		\pan -> [-1,1,\lin,0,0],
+		\rate -> [0,4,\lin,0,1]
+	];
 
 	var playView = util[\playView].(objName, node, view);
 	var specsView = util[\specsView].(objName, specs, node, envir, view);

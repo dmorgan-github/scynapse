@@ -21,9 +21,9 @@ view: {arg objName, envir, util;
 	})
 	.set(\dels, dels, \fb, fb);
 
-	var specs = (
-		pan: [-1,1,\lin,0,0]
-	);
+	var specs = [
+		\pan -> [-1,1,\lin,0,0]
+	];
 
 	var view = View().layout_(VLayout());
 

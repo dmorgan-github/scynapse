@@ -64,18 +64,18 @@ view: {arg objName, envir, util;
 		Splay.ar(sig);
 	}).set(\envbuf, envbufs[\hann].bufnum);
 
-	var specs = (
-		buf: \set,
-		trig: \set,
-		pos: [0,1,\lin,0,0],
-		graindur: [0,2,\lin,0,0.5],
-		rate: [0,4,\lin,0,1],
-		pan: [-1,1,\lin,0,0],
-		grainamp: [0,1,\lin,0,1],
-		loop: [0,1,\lin,1,0],
-		reverse: [0,1,\lin,0,0],
-		stereo:[-1,1,\lin,0,0]
-	);
+	var specs = [
+		\buf -> \set,
+		\trig -> \set,
+		\pos -> [0,1,\lin,0,0],
+		\graindur -> [0,2,\lin,0,0.5],
+		\rate -> [0,4,\lin,0,1],
+		\pan -> [-1,1,\lin,0,0],
+		\grainamp -> [0,1,\lin,0,1],
+		\loop -> [0,1,\lin,1,0],
+		\reverse -> [0,1,\lin,0,0],
+		\stereo -> [-1,1,\lin,0,0]
+	];
 
 	var envkeys = envbufs.keys.asArray;
 	var view = View().layout_(VLayout().margins_(2).spacing_(2));

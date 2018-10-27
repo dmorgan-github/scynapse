@@ -5,7 +5,7 @@ func: {arg in;
 		\outof.kr(40),
 		\mode.kr(1),
 	);
-	sig;
+	LeakDC.ar(sig);
 },
 specs: [
 	\drop -> [1,50,\lin,1,20],

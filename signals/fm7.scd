@@ -479,17 +479,17 @@ view: {arg objName, envir, util;
 		.normalColor_(Color.white)
 	});
 
-	var specs = (
+	var specs = [
 		//trig: \set,
 		//freq: \set,
-		vrate: [0, 10, \lin, 0, 6],
-		vdepth: [0, 1, \lin, 0, 0],
-		vdelay: [0, 1, \lin, 0, 0],
-		vonset: [0, 1, \lin, 0, 0],
-		vrateVar: [0, 1, \lin, 0, 0.04],
-		vdepthVar: [0, 1, \lin, 0, 0.1],
+		\vrate -> [0, 10, \lin, 0, 6],
+		\vdepth -> [0, 1, \lin, 0, 0],
+		\vdelay -> [0, 1, \lin, 0, 0],
+		\vonset -> [0, 1, \lin, 0, 0],
+		\vrateVar -> [0, 1, \lin, 0, 0.04],
+		\vdepthVar -> [0, 1, \lin, 0, 0.1],
 		//susLevel: [0,1,\lin,0,0.5]
-	);
+	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2)).minWidth_(400).minHeight_(700);
 	var playView = util[\playView].(objName, node, view);

@@ -18,11 +18,11 @@ view:{arg objName, envir, util;
 		Pan2.ar(sig, \pan.kr(0));
 	});
 
-	var specs = (
-		pan: [-1,1,\lin,0,0],
-		rate: [0,4,\lin,0,1],
-		buf: \set
-	);
+	var specs = [
+		\pan -> [-1,1,\lin,0,0],
+		\rate -> [0,4,\lin,0,1],
+		\buf -> \set
+	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
 

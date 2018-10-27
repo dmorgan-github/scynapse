@@ -7,15 +7,16 @@ view: {arg objName, envir, util;
 
 	var node = NodeProxy.audio(s, 1).source_({
 		var buf = \buf.kr();
-		var sig = PlayBufCF.ar(1, buf, rate:\rate.kr(1), trigger:1, startPos:0, loop:1);
+		var pos = \pos.kr(0);
+		var sig = PlayBufCF.ar(1, buf, rate:\rate.kr(1), trigger:1, startPos:pos, loop:1);
 		var env = Env.asr.kr(gate:1);
 		sig * env;
 	});
 
-	specs = (
-		buf: \set,
-		rate: [0.1, 4, \lin, 0, 1]
-	);
+	specs = [
+		\buf -> \set,
+		\rate -> [0.1, 4, \lin, 0, 1]
+	];
 
 	envir[objName] = node;
 	playView = util[\playView].(objName, node, view);
