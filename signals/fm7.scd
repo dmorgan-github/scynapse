@@ -480,14 +480,14 @@ view: {arg objName, envir, util;
 	});
 
 	var specs = [
-		//trig: \set,
-		//freq: \set,
-		\vrate -> [0, 10, \lin, 0, 6],
-		\vdepth -> [0, 1, \lin, 0, 0],
-		\vdelay -> [0, 1, \lin, 0, 0],
-		\vonset -> [0, 1, \lin, 0, 0],
-		\vrateVar -> [0, 1, \lin, 0, 0.04],
-		\vdepthVar -> [0, 1, \lin, 0, 0.1],
+		\trig -> \set,
+		\freq -> \set,
+		//\vrate -> [0, 10, \lin, 0, 6],
+		//\vdepth -> [0, 1, \lin, 0, 0],
+		//\vdelay -> [0, 1, \lin, 0, 0],
+		//\vonset -> [0, 1, \lin, 0, 0],
+		//\vrateVar -> [0, 1, \lin, 0, 0.04],
+		//\vdepthVar -> [0, 1, \lin, 0, 0.1],
 		//susLevel: [0,1,\lin,0,0.5]
 	];
 
@@ -592,22 +592,22 @@ view: {arg objName, envir, util;
 				Knob().value_(defaultAtk).action_({arg ctrl;
 					var key = \atk;
 					node.set(key,ctrl.value);
-				}),
+				}).mode_(\vert),
 				StaticText().string_("A").align_(\center)
 			),
 			VLayout(
 				Knob().value_(defaultDecay).action_({arg ctrl;
 					var key = \decay;
 					node.set(key,ctrl.value);
-				}),
+				}).mode_(\vert),
 				StaticText().string_("D").align_(\center)
 			),
 			VLayout(
 				HLayout(
 					Knob().value_(defaultSus).action_({arg ctrl;
-					var key = \sus;
-					node.set(key,ctrl.value);
-				}),
+						var key = \sus;
+						node.set(key,ctrl.value);
+					}).mode_(\vert),
 					Slider().maxHeight_(35).maxWidth_(15).thumbSize_(10).value_(defaultSusLevel)
 					.action_({arg ctrl;
 						var key = \susLevel;
@@ -620,14 +620,14 @@ view: {arg objName, envir, util;
 				Knob().value_(defaultRel).action_({arg ctrl;
 					var key = \rel;
 					node.set(key,ctrl.value);
-				}),
+				}).mode_(\vert),
 				StaticText().string_("R").align_(\center)
 			),
 			VLayout(
 				Knob().value_(defaultAmp).action_({arg ctrl;
 					var key = \amp;
 					node.set(key,ctrl.value);
-				}),
+				}).mode_(\vert),
 				StaticText().string_("Output").align_(\center)
 			)
 		)
@@ -658,9 +658,9 @@ view: {arg objName, envir, util;
 		node.set(\wet1, ctrl.value);
 	}).value_(0).orientation_(\horizontal));
 
-	//view.layout.add(StaticText().string_(" ").background_(Color.black).maxHeight_(2));
+	view.layout.add(StaticText().string_(" ").background_(Color.black).maxHeight_(2));
 	//view.layout.add(StaticText().string_("Vibrato"));
-	//view.layout.add(specsView);
+	view.layout.add(specsView);
 
 	envir[objName] = node;
 

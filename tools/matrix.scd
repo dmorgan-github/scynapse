@@ -52,7 +52,7 @@ view: {arg objName, envir, util;
 	));
 
 	var ctrls = View().layout_(VLayout().margins_(0).spacing_(0));
-	var size = 50;
+	var size = 30;
 	var keys = Order.new;
 	var poll = 5;
 	var clock;
@@ -86,15 +86,13 @@ view: {arg objName, envir, util;
 				}
 			});
 
-			//keys.debug("keys");
-
 			// clear the ui
 			ctrls.children.do({arg child;
 				child.remove();
 			});
 			// add header
 			keys.do({arg k;
-				header.layout.add(StaticText().string_(k).fixedWidth_(size).align_(\center));
+				header.layout.add(StaticText().string_(k.asString[0..3]).fixedWidth_(size).align_(\center));
 			});
 			ctrls.layout.add(header);
 
@@ -104,13 +102,23 @@ view: {arg objName, envir, util;
 
 					StaticText().string_(rowkey).fixedWidth_(size),
 
-					Slider().fixedHeight_(size).fixedWidth_(size/3).thumbSize_(8).action_({arg ctrl;
+					Knob().mode_(\vert)
+					.fixedSize_(size)
+					//.fixedHeight_(size)
+					//.fixedWidth_(size/3)
+					//.thumbSize_(8)
+					.action_({arg ctrl;
 						var val = ctrl.value.linlin(0,1,0,64);
 						envir[rowkey].fadeTime = val;
 					})
 					.value_(envir[rowkey].fadeTime.linlin(0,64,0,1)),
 
-					Slider().fixedHeight_(size).fixedWidth_(size/3).thumbSize_(8).action_({arg ctrl;
+					Knob().mode_(\vert)
+					.fixedSize_(size)
+					//.fixedHeight_(size)
+					//.fixedWidth_(size/3)
+					//.thumbSize_(8)
+					.action_({arg ctrl;
 						envir[rowkey].vol = ctrl.value;
 					})
 					.value_(envir[rowkey].vol),
@@ -119,7 +127,7 @@ view: {arg objName, envir, util;
 						["play", Color.white, Color.grey],
 						["stop", Color.white, Color.blue]
 					])
-					.fixedWidth_(30)
+					.fixedWidth_(size)
 					.action_({arg ctrl;
 						if (ctrl.value == 1) {
 							envir[rowkey].play(fadeTime:envir[rowkey].fadeTime);
@@ -133,10 +141,10 @@ view: {arg objName, envir, util;
 
 				keys.do({arg colkey, j;
 
-					var slider = Slider()
-					.orientation_(\vertical)
+					var slider = Knob()
+					.mode_(\vert)
 					.fixedSize_(size)
-					.thumbSize_(8)
+					//.thumbSize_(8)
 					.action_({arg ctrl;
 
 						if (ctrl.value > 0) {

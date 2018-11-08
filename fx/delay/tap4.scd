@@ -4,10 +4,10 @@ func: {arg in;
 	var tap1, tap2, tap3, tap4;
 	var fbNode = FbNode(1, 6.5, 4);
 
-	var tap1_delay = \tap1_delay.kr(0.2).lag(0.1);
-	var tap2_delay = \tap2_delay.kr(0.5).lag(0.1);
-	var tap3_delay = \tap3_delay.kr(0.7).lag(0.1);
-	var tap4_delay = \tap4_delay.kr(1).lag(0.1);
+	var tap1_delay = \tap1_delay.kr(2).lag(0.1)/16;
+	var tap2_delay = \tap2_delay.kr(6).lag(0.1)/16;
+	var tap3_delay = \tap3_delay.kr(10).lag(0.1)/16;
+	var tap4_delay = \tap4_delay.kr(16).lag(0.1)/16;
 
 	var tap1_mul = \tap1_mul.kr(1).lag(0.1);
 	var tap2_mul = \tap2_mul.kr(0.7).lag(0.1);
@@ -33,10 +33,10 @@ func: {arg in;
 },
 specs: [
 
-	\tap1_delay -> [0, 6, \lin, 0, 0.2],
-	\tap2_delay -> [0, 6, \lin, 0, 0.5],
-	\tap3_delay -> [0, 6, \lin, 0, 0.7],
-	\tap4_delay -> [0, 6, \lin, 0, 1],
+	\tap1_delay -> [1, 32, \lin, 1, 2],
+	\tap2_delay -> [1, 32, \lin, 1, 6],
+	\tap3_delay -> [1, 32, \lin, 1, 10],
+	\tap4_delay -> [1, 32, \lin, 1, 16],
 
 	\tap1_mul -> [0, 1, \lin, 0, 1],
 	\tap2_mul -> [0, 1, \lin, 0, 0.7],

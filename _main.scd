@@ -172,6 +172,9 @@ var show = {arg path;
 	var view = win.view.palette_(QPalette.dark);
 	var letterWidth = fontSize * 0.6;
 	var cv, draw, fsv;
+	var fadeTime = 30;
+	// todo: fix this
+	var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
 
 	view.decorator_(FlowLayout(view.bounds, paddingX@paddingY));
 	win.front;
@@ -197,6 +200,18 @@ var show = {arg path;
 		} {
 			stopRecordStems.();
 		}
+	});
+
+	NumberBox(view, 30@20).action_({arg ctrl;
+		fadeTime = ctrl.value;
+	})
+	.value_(fadeTime)
+	.normalColor_(Color.white);
+
+	Button(view, 30@20).states_([["[]"]]).action_({
+		envir.keysValuesDo({arg k, v;
+			v.stop(fadeTime:fadeTime);
+		})
 	});
 
 	cv = ScrollView(win, width@150)
