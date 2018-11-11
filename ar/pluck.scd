@@ -12,7 +12,7 @@ func: {
 	var sig = Pluck.ar(noise,
 		trig:trig,
 		maxdelaytime:100.reciprocal,
-		delaytime:freq.reciprocal,
+		delaytime:freq.reciprocal.lag(\lag.kr(0)),
 		decaytime:\decay.kr(1),
 		coef:\coef.kr(0.5)
 	);
@@ -24,6 +24,7 @@ func: {
 specs: [
 	\trig -> \set,
 	\freq -> \set,
+	\lag -> [0,1,\lin,0,0],
 	\which -> [0, 2, \lin, 1, 0],
 	\focus -> [0,1, \lin, 0, 1],
 	\vrate -> [0,6, \lin,0,0.001],

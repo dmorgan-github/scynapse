@@ -8,6 +8,7 @@ func: {arg in;
 		\timeDispersion.kr(0.01)
 	);
 	sig
+
 },
 specs: [
 	\pitchRatio -> [-24, 24, \lin, 0.0, 12],

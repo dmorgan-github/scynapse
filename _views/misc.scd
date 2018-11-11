@@ -8,7 +8,7 @@ view: {arg name, envir, config, util;
 	envir[name].fadeTime = 1;
 	envir[name][0] = config[\func];
 
-	view = View().layout_(VLayout().margins_(2).spacing_(2)).minWidth_(300)
+	view = View().layout_(VLayout().margins_(2).spacing_(2)).minWidth_(250)
 	.onClose_({
 		envir[name].clear;
 		envir[name] = nil;

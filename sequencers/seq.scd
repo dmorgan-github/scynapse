@@ -97,6 +97,12 @@ view: {arg objName, envir, util;
 			}
 		})
 		.fixedSize_(size),
+		//Button()
+		//.states_([["r"]])
+		//.action_({arg ctrl;
+		//	pattern.reset;
+		//})
+		//.fixedSize_(size),
 		NumberBox().action_({arg ctrl;
 			octave = ctrl.value;
 		})
@@ -120,12 +126,14 @@ view: {arg objName, envir, util;
 		.background_(Color.clear)
 		.object_((node:trig,name:"trig: " ++ objName))
 		.string_("-->")
-		.align_(\right),
+		.align_(\right)
+		.minWidth_(30),
 		DragSource()
 		.background_(Color.clear)
 		.object_((node:freq,name:"freq: " ++ objName))
 		.string_("-->")
 		.align_(\right)
+		.minWidth_(30)
 	));
 
 	view.layout.add(ctrlView);
@@ -145,3 +153,5 @@ view: {arg objName, envir, util;
 	});
 }
 )
+
+

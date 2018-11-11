@@ -82,6 +82,7 @@
 				.ctrl_scale_(0.1)
 				.shift_scale_(1);
 				var stack = StackLayout();
+				var numberbox = NumberBox();
 				var height = 20;
 
 				if (mappers[k].isNil) {
@@ -111,6 +112,7 @@
 						.action_({
 							dragSink.string = "";
 							slider.enabled_(true);
+							numberbox.enabled_(true);
 							rs.enabled_(false);
 							if (spec == \set) {
 								node.set(specKey, nil);
@@ -138,6 +140,7 @@
 
 							if (lfo.isNil.not) {
 								slider.enabled_(false);
+								numberbox.enabled_(false);
 								rs.enabled_(true);
 								if (spec == \set) {
 									node.set(specKey, lfo);
@@ -194,11 +197,25 @@
 								var val = spec.map(ctrl.value);
 								var msg = k ++ " " ++ val;
 								mappers[k].set(\val, val.linlin(spec.minval, spec.maxval, -1, 1));
+								numberbox.value_(val);
 								NotificationCenter.notify(containerView, \status, msg);
 							})
-							.value_(v.asSpec.unmap(v.asSpec.default))
+							.value_(spec.unmap(spec.default))
+						)
+						.mode_(\stackAll).index_(1)
+					);
 
-						).mode_(\stackAll).index_(1)
+					layout.add(
+						numberbox
+						.minWidth_(40)
+						.action_({arg ctrl;
+							var val = spec.unmap(ctrl.value);
+							slider.valueAction_(val);
+						})
+						.clipLo_(spec.minval)
+						.clipHi_(spec.maxval)
+						.normalColor_(Color.white)
+						.value_(spec.default)
 					);
 				};
 
@@ -397,6 +414,3 @@
 	);//[\playView].( \bobo, (), View()).front;
 
 }.();
-
-
-

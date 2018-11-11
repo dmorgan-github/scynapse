@@ -14,11 +14,11 @@ view: {arg objName, envir, util;
 			);
 			var width = \width.kr(0.5);
 			var sig = {
-				Saw.ar(freq * LFNoise2.kr(\ddepth.kr(0.0625)).range(1 + detune.neg, 1 + detune)) * (1/numvoices)
+				Saw.ar(freq * LFNoise2.kr(\ddepth.kr(1/16)).range(1 + detune.neg, 1 + detune)) * (1/numvoices)
 			}.dup(numvoices);
 			var env = Env.linen(
 				\atk.kr(0.01), \sus.kr(1), \rel.kr(1), curve:\curve.kr(-4)
-			).kr(gate:trig);
+			).kr(gate:trig, timeScale:\ts.kr(1));
 			sig = sig * env * AmpCompA.kr(freq) * \amp.kr(-12.dbamp);
 			sig = Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 			sig;
@@ -36,6 +36,7 @@ view: {arg objName, envir, util;
 		\rel -> [0, 1, \lin, 0, 1],
 		\sus -> [0, 1, \lin, 0, 1],
 		\curve -> [-24, 24, \lin, 0, -4],
+		\ts -> [0, 64, \lin, 0, 1],
 		\lag -> [0, 1, \lin, 0, 0],
 		\amp -> [0, 1, \lin, 0, 0.1],
 		\spread -> [0, 1, \lin, 0, 1],
