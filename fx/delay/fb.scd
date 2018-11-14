@@ -7,7 +7,7 @@ func: {arg in;
 	var tempo = \tempo.kr(1).lag(0.1);
 	var speed = \speed.kr(0).lag(0.1);
 	var sig = FbC({arg fb; fb * fblevel + in}, 4, [delL, delR] * tempo + speed);
-	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0));
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \vol.kr(0.dbamp);
 },
 specs: [
 	\fb -> [0.0, 0.99, \lin, 0.0, 0.3],

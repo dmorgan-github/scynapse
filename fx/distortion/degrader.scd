@@ -5,7 +5,7 @@ func: {arg in;
 	var ratelo = \ratelo.kr(1000);
 	var ratehi = \ratehi.kr(16000);
 	var sig = Latch.ar(in, Impulse.ar(LFNoise0.kr(lfo).lag(0.1).exprange(ratelo, ratehi)));
-	LeakDC.ar(sig);
+	LeakDC.ar(sig) * \vol.kr(0.dbamp);
 },
 specs: [
 	\lfo -> [(1/128), 20, \lin, 0.0, 5],

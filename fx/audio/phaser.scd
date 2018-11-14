@@ -7,7 +7,7 @@ func: {arg in;
 		\feedback.kr(0),
 		\spread.kr(0.1),
 		in
-	);
+	) * \vol.kr(0.dbamp);
 },
 specs: [
 	\rate -> [0, 100, \lin, 0, 1],

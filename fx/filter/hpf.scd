@@ -5,7 +5,7 @@ func: {arg in;
 		\freq.kr(1000).clip(20, 20000);
 	);
 
-	sig;
+	sig * \vol.kr(0.dbamp);
 },
 specs: [
 	\freq -> [20, 20000, \lin, 0, 1000]

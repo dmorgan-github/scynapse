@@ -5,7 +5,7 @@ func: {arg in;
 		\outof.kr(40),
 		\mode.kr(1),
 	);
-	LeakDC.ar(sig);
+	LeakDC.ar(sig) * \vol.kr(0.dbamp);
 },
 specs: [
 	\drop -> [1,50,\lin,1,20],

@@ -1,79 +1,56 @@
 (
 view: {arg objName, envir, util;
 
-	// this is to handle the presets
 	var load;
-	var presets = Order.new;
-	var previous = 0;
-	var currentState = {arg preset;
+	var dict = ();
 
-		// save state to current hilighted preset
-		// before changing to new selected preset
-		var list = List.new;
-		envir.keysDo({arg k, i;
-			if (envir[k].rate == \audio) {
-				var n = envir[k];
-				var controls = n.controlNames
-				.select({arg cn; cn.name.asString.beginsWith("mix")})
-				.collect({arg cn; (name:cn.name, val:cn.defaultValue)});
-				list.add(n -> controls);
-			}
-		});
-		presets[previous] = list;
+	var node = NodeProxy.audio(s, 2);
 
-		if (presets[preset].isNil.not) {
-			var list = presets[preset];
-			list.do({arg assoc;
-				var n = assoc.key;
-				var controls = assoc.value;
-				controls.do({arg ctrl;
-					//[ctrl.name, ctrl.val].debug;
-					n.set(ctrl.name.asSymbol, ctrl.val);
-				});
-			});
-			load.(true);
-		};
-		previous = preset;
-	};
-	var view = View().layout_(VLayout().margins_(0).spacing_(0));
-	var presetsView = View().layout_(HLayout(
-		*(0..7).collect({arg i;
-			var button = Button()
-			.states_([["", Color.gray, Color.gray],["", Color.white, Color.white]])
-			.fixedSize_(20).action_({arg ctrl;
-				ctrl.states_([["", Color.white, Color.white]]);
-				currentState.(i);
-			});
-			if (i == 0) {
-				button.states_([["", Color.white, Color.white]])
-			};
-			button;
-		});
-	));
+	var view = View().layout_(VLayout().margins_(0).spacing_(0)).minWidth_(200);
+
+	var dragsink = DragSink()
+	.string_("<-  ")
+	.background_(Color.clear)
+	.canReceiveDragHandler_({
+		true;
+	})
+	.receiveDragHandler_({arg v;
+		var obj = View.currentDrag.value;
+		var node = obj[\node];
+		var name = obj[\name];
+		dict[name.asSymbol] = node;
+		load.();
+	})
+	.maxHeight_(35)
+	.minWidth_(35);
 
 	var ctrls = View().layout_(VLayout().margins_(0).spacing_(0));
+	var playView = util[\playView].(objName, node, view);
 	var size = 30;
 	var keys = Order.new;
-	var poll = 5;
-	var clock;
 
 	load = {arg force = false;
 
-		var num = envir.values.select({arg val; val.rate == \audio}).size;
+		var num = dict.values.select({arg val; val.rate == \audio}).size;
 
 		if (force || (num != keys.size)) {
 
-			var header = View().layout_(HLayout(nil, nil).margins_(1).spacing_(1));
+			var header = View().layout_(HLayout(nil).margins_(1).spacing_(1));
 
 			// this is to ensure the same order
-			envir.keysDo({arg k, i;
+			dict.keysDo({arg k, i;
 				var result = keys.select({arg val; val == k});
-				if (envir[k].rate == \audio) {
+				if (dict[k].rate == \audio) {
 					if (result.size == 0) {
 						if (keys.lastIndex.isNil) {
-							keys[0] = k
+							keys[0] = k;
+							node[0] = \mix -> {dict[k].ar};
+							node.set('mix0', 1);
 						}{
-							keys[keys.lastIndex + 1] = k;
+							var index = keys.lastIndex + 1;
+							keys[index] = k;
+							node[index] = \mix -> {dict[k].ar};
+							node.set(('mix' ++ index).asSymbol, 1);
 						}
 					};
 				}
@@ -81,7 +58,7 @@ view: {arg objName, envir, util;
 
 			keys.indices.do({arg i;
 				var key = keys[i];
-				if (envir[key].isNil) {
+				if (dict[key].isNil) {
 					keys.removeAt(i)
 				}
 			});
@@ -104,39 +81,25 @@ view: {arg objName, envir, util;
 
 					Knob().mode_(\vert)
 					.fixedSize_(size)
-					//.fixedHeight_(size)
-					//.fixedWidth_(size/3)
-					//.thumbSize_(8)
 					.action_({arg ctrl;
-						var val = ctrl.value.linlin(0,1,0,64);
-						envir[rowkey].fadeTime = val;
+						//dict[rowkey].vol = ctrl.value;
+						var key = ('mix' ++ i).asSymbol;
+						[key, ctrl.value].postln;
+						node.set(key, ctrl.value);
 					})
-					.value_(envir[rowkey].fadeTime.linlin(0,64,0,1)),
+					.value_(node.get(('mix' ++ i).asSymbol)),
 
-					Knob().mode_(\vert)
-					.fixedSize_(size)
-					//.fixedHeight_(size)
-					//.fixedWidth_(size/3)
-					//.thumbSize_(8)
-					.action_({arg ctrl;
-						envir[rowkey].vol = ctrl.value;
-					})
-					.value_(envir[rowkey].vol),
-
-					Button().states_([
-						["play", Color.white, Color.grey],
-						["stop", Color.white, Color.blue]
-					])
+					Button()
 					.fixedWidth_(size)
+					.states_([ ["M", Color.white], ["M", Color.white, Color.new(red:1, green:0.64705882352941, blue:0)] ])
 					.action_({arg ctrl;
 						if (ctrl.value == 1) {
-							envir[rowkey].play(fadeTime:envir[rowkey].fadeTime);
+							dict[rowkey].set(\vol, 0);
 						} {
-							envir[rowkey].stop(fadeTime:envir[rowkey].fadeTime);
-						};
+							dict[rowkey].set(\vol, 1);
+						}
 					})
-					.value_(envir[rowkey].isMonitoring.if(1,0))
-					.valueAction_(envir[rowkey].isMonitoring.if(1,0))
+
 				).margins_(1).spacing_(1));
 
 				keys.do({arg colkey, j;
@@ -153,16 +116,16 @@ view: {arg objName, envir, util;
 							ctrl.background = Color.grey;
 						};
 
-						if (envir[colkey][i].class != Function) {
-							if (envir[colkey][i] == nil) {
-								envir[colkey][i] = \mix -> {envir[rowkey].ar};
+						if (dict[colkey][i].class != Function) {
+							if (dict[colkey][i] == nil) {
+								dict[colkey][i] = \mix -> {dict[rowkey].ar};
 							};
-							envir[colkey].set(('mix' ++ i).asSymbol, ctrl.value);
+							dict[colkey].set(('mix' ++ i).asSymbol, ctrl.value);
 						};
 					})
-					.value_(envir[colkey].get(('mix' ++ i).asSymbol))
-					.valueAction_(envir[colkey].get(('mix' ++ i).asSymbol))
-					.enabled_((envir[colkey][i].class == Function).if(false,true));
+					.value_(dict[colkey].get(('mix' ++ i).asSymbol))
+					.valueAction_(dict[colkey].get(('mix' ++ i).asSymbol))
+					.enabled_((dict[colkey][i].class == Function).if(false,true));
 
 					row.layout.add(slider);
 				});
@@ -171,16 +134,19 @@ view: {arg objName, envir, util;
 		}
 	};
 
-	load.();
+	view.layout.add(playView);
+	view.layout.add(dragsink);
+	view.layout.add(ctrls);
 
-	// how do you stop an app clock?
-	AppClock.sched(poll, {
-		load.();
-		poll;
+	envir[objName] = node;
+	view.onClose_({
+		envir[objName].clear(envir[objName].fadeTime);
+		{
+			"destroy: ".debug(objName);
+			envir[objName] = nil;
+		}.defer(envir[objName].fadeTime + 1);
 	});
 
-	view.layout.add(presetsView);
-	view.layout.add(ctrls);
 	view;
 }
 )

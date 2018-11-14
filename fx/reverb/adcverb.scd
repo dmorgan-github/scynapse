@@ -14,7 +14,7 @@ func: {arg in;
 		apScale:\apScale.kr(3).lag(0.1)
 	);
 
-	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0));
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \vol.kr(0.dbamp);
 },
 specs: [
 	\revTime -> [0.1, 60, \lin, 0.0, 3],

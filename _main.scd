@@ -38,11 +38,17 @@ var alwaysOnTop = {arg view;
 var recordStems = {
 
 	var key = Date.getDate.asSortableString;
-	currentEnvironment.keysValuesDo({arg k,v;
+	// TODO: fix this
+	var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
+
+	"recordStems".postln;
+
+	envir.keysValuesDo({arg k,v;
 		if (v.class == NodeProxy) {
 			if (v.rate == \audio) {
 				var rec;
 				var folder = Platform.recordingsDir ++ "/stems/" ++ key ++ "/";
+				//folder.debug("recording stems");
 				if (File.exists(folder).not) {
 					File.mkdir(folder)
 				};
@@ -160,72 +166,66 @@ var loadView = {arg file;
 
 var show = {arg path;
 
-	var paddingX = 5;
-	var paddingY = 5;
+	var fadeTime = 30;
 	var height = 250;
 	var width = 300;
-	var fontSize = 10;
 	var top = Window.screenBounds.height - height;
 	var left = Window.screenBounds.width - width;
-
-	var win = Window("Browser", Rect(left, top, width + (paddingX * 3), height + (paddingY * 2)));
-	var view = win.view.palette_(QPalette.dark);
+	var fontSize = 10;
 	var letterWidth = fontSize * 0.6;
-	var cv, draw, fsv;
-	var fadeTime = 30;
-	// todo: fix this
+
 	var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
+	var draw, scrollView;
+	var win = Window("Browser", Rect(left, top, width, height));
+	var view = win.view.layout_(HLayout().margins_(2).spacing_(2)).palette_(QPalette.dark);
+	var ctrlView = View().layout_(HLayout(
 
-	view.decorator_(FlowLayout(view.bounds, paddingX@paddingY));
-	win.front;
-
-	Button(view, 30@30)
-	.states_([ ["--"], ["__"] ]).action_({arg ctrl;
-		if (ctrl.value == 1) {
-			view.alwaysOnTop = true;
-		}{
-			view.alwaysOnTop = false;
-		}
-	}).maxSize_(15);
-
-	Button(view, 30@20)
-	.states_([ ["rec"], ["stop", Color.red] ] )
-	.action_({arg ctrl; if (ctrl.value == 1) {s.record} {s.stopRecording} });
-
-	Button(view, 50@20)
-	.states_([ ["stems"], ["stop", Color.red] ] )
-	.action_({arg ctrl;
-		if (ctrl.value == 1) {
-			recordStems.();
-		} {
-			stopRecordStems.();
-		}
-	});
-
-	NumberBox(view, 30@20).action_({arg ctrl;
-		fadeTime = ctrl.value;
-	})
-	.value_(fadeTime)
-	.normalColor_(Color.white);
-
-	Button(view, 30@20).states_([["[]"]]).action_({
-		envir.keysValuesDo({arg k, v;
-			v.stop(fadeTime:fadeTime);
+		Button()
+		.states_([ ["--"], ["__"] ]).action_({arg ctrl;
+			if (ctrl.value == 1) {
+				view.alwaysOnTop = true;
+			}{
+				view.alwaysOnTop = false;
+			}
 		})
-	});
+		.fixedSize_(20@20),
 
-	cv = ScrollView(win, width@200)
-	.autohidesScrollers_( true )
-	.hasVerticalScroller_( true )
-	.hasHorizontalScroller_( true );
+		Button()
+		.states_([ ["rec"], ["stop", Color.red] ] )
+		.action_({arg ctrl; if (ctrl.value == 1) {s.record} {s.stopRecording} })
+		.fixedSize_(35@20),
 
-	cv.decorator_(FlowLayout(cv.bounds));
+		Button()
+		.states_([ ["stems"], ["stop", Color.red] ] )
+		.action_({arg ctrl;
+			if (ctrl.value == 1) {
+				recordStems.();
+			} {
+				stopRecordStems.();
+			}
+		})
+		.fixedSize_(40@20),
 
-	/*
-	fsv = FreqScopeView(win, 300@200);
-	fsv.active_(true); // turn it on the first time;
-	win.onClose_({ fsv.kill });
-	*/
+		NumberBox().action_({arg ctrl;
+			fadeTime = ctrl.value;
+		})
+		.value_(fadeTime)
+		.normalColor_(Color.white)
+		.fixedSize_(25@20),
+
+		Button().states_([["[]"]]).action_({
+			envir.keysValuesDo({arg k, v;
+				v.stop(fadeTime:fadeTime);
+			})
+		})
+		.fixedSize_(20@20);
+	));
+
+	scrollView = ScrollView()
+	.autohidesScrollers_(true)
+	.hasVerticalScroller_(true)
+	.hasHorizontalScroller_(true);
+	scrollView.decorator = FlowLayout(scrollView.bounds);
 
 	draw = {arg path, view;
 
@@ -240,7 +240,6 @@ var show = {arg path;
 		view.decorator.reset;
 
 		if (pathName.fullPath != rootpath) {
-
 			StaticText.new(view, letterWidth@fontSize )
 			.string_("^")
 			.stringColor_(Color.white)
@@ -286,11 +285,15 @@ var show = {arg path;
 		});
 	};
 
-	draw.(path, cv);
+	view.layout.add(VLayout(ctrlView, scrollView));
+	view.layout.add(
+		ServerMeterView.new(s, win, numIns:0, numOuts:2).view.minHeight_(50).minWidth_(75)
+	);
+	draw.(path, scrollView);
+	view.front;
 };
 
 show.(rootpath);
-
 )
 
 

@@ -6,7 +6,7 @@ view: {arg name, envir;
 	.minHeight_(245);
 
 	var win = Window.new("Server Levels");
-	var smv = ServerMeterView.new(s, win, 10@10, 2, 16);
+	var smv = ServerMeterView.new(s, win, 10@10, 0, 2);
 
 	view.layout.add(StaticText()
 		.string_(s.options.inDevice ++ " | " ++ s.options.outDevice)

@@ -9,7 +9,7 @@ func: {arg in;
 		\noiselevel.kr(0.0003)
 	);
 
-	sig;
+	sig * \vol.kr(0.dbamp);
 },
 specs: [
 	\freq -> [20, 20000, \lin, 0, 1000],

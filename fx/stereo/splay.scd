@@ -4,7 +4,7 @@ func: {arg in;
 		\spread.kr.range(\spread_min.kr(0), \spread_max.kr(1)),
 		1,
 		\center.kr(0)
-	);
+	) * \vol.kr(0.dbamp);
 },
 
 specs: [

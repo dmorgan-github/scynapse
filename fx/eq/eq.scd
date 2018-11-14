@@ -43,7 +43,7 @@ func: {arg in;
 	sig = BHiShelf.ar(sig, hs_freq, hs_rs, hs_db);
 	sig = RemoveBadValues.ar(sig);
 
-	sig;
+	sig * \vol.kr(0.dbamp);
 },
 
 specs: [

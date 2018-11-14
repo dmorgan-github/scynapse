@@ -8,7 +8,7 @@ func: {arg in;
 		mul:bw.reciprocal.sqrt
 	);
 
-	sig;
+	sig * \vol.kr(0.dbamp);
 },
 specs: [
 	\freq -> [20, 20000, \lin, 0, 1200],

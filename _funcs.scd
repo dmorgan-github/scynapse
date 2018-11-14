@@ -77,10 +77,18 @@
 				.alt_scale_(0.01)
 				.ctrl_scale_(0.1)
 				.shift_scale_(1);
-				var slider = Slider()
-				.alt_scale_(0.01)
-				.ctrl_scale_(0.1)
-				.shift_scale_(1);
+				//var slider = Slider()
+				//.alt_scale_(0.01)
+				//.ctrl_scale_(0.1)
+				//.shift_scale_(1);
+				var slider = LevelIndicator(bounds:Rect(width:50, height:20))
+				.value_(1)
+				.style_(\continuous)
+				.meterColor_(Color.blue(1))
+				.warningColor_(Color.blue(1))
+				.criticalColor_(Color.blue(1));
+				//.numSteps_(10);
+
 				var stack = StackLayout();
 				var numberbox = NumberBox();
 				var height = 20;
@@ -187,19 +195,41 @@
 							.align_(\center),
 
 							slider
-							.orientation_(\horizontal)
-							.thumbSize_(10)
+							//.orientation_(\horizontal)
+							//.thumbSize_(10)
 							.minWidth_(100)
 							.maxHeight_(height)
-							.background_(Color.white.alpha_(0.0))
-							.action_({arg ctrl;
-
-								var val = spec.map(ctrl.value);
-								var msg = k ++ " " ++ val;
+							.mouseMoveAction_({arg ctrl, x, y, modifiers;
+								var msg;
+								var ctrlval = x.linlin(0, ctrl.bounds.width, 0, 1);
+								var val = spec.map(ctrlval);
+								msg = k ++ " " ++ val;
 								mappers[k].set(\val, val.linlin(spec.minval, spec.maxval, -1, 1));
 								numberbox.value_(val);
+								ctrl.value = ctrlval;
+								//[ctrlval].debug("mouseMoveAction");
 								NotificationCenter.notify(containerView, \status, msg);
 							})
+							.mouseUpAction_({arg ctrl, x, y, modifiers;
+								var msg;
+								var ctrlval = x.linlin(0, ctrl.bounds.width, 0, 1);
+								var val = spec.map(ctrlval);
+								msg = k ++ " " ++ val;
+								mappers[k].set(\val, val.linlin(spec.minval, spec.maxval, -1, 1));
+								numberbox.value_(val);
+								ctrl.value = ctrlval;
+								//[ctrlval].debug("mouseUpAction");
+								NotificationCenter.notify(containerView, \status, msg);
+							})
+							//.background_(Color.white.alpha_(0.0))
+							//.action_({arg ctrl;
+
+							//	var val = spec.map(ctrl.value);
+							//	var msg = k ++ " " ++ val;
+							//	mappers[k].set(\val, val.linlin(spec.minval, spec.maxval, -1, 1));
+							//	numberbox.value_(val);
+							//	NotificationCenter.notify(containerView, \status, msg);
+							//})
 							.value_(spec.unmap(spec.default))
 						)
 						.mode_(\stackAll).index_(1)
@@ -215,6 +245,7 @@
 						.clipLo_(spec.minval)
 						.clipHi_(spec.maxval)
 						.normalColor_(Color.white)
+						//.decimals_(4)
 						.value_(spec.default)
 					);
 				};
@@ -234,21 +265,27 @@
 			var outBus = 0;
 			var privateBus = node.bus.index;
 
-			view.layout.add(StaticText().string_(name));
+			view.layout.add(
+				// TODO: wire this up
+				LevelIndicator()
+				.style_(\led)
+				.value_(0.1)
+				.maxHeight_(20)
+				.maxWidth_(8)
+				.meterColor_(Color.blue(0.9))
+				.warningColor_(Color.blue(0.8))
+				.criticalColor_(Color.blue(0.6))
+			);
 
+			view.layout.add(StaticText().string_(name));
 			view.layout.add(StaticText().string_("(" ++ privateBus.asString ++ ")"));
 
 			view.layout.add(
-				Slider()
-				.orientation_(\horizontal)
-				.thumbSize_(10)
-				.fixedSize_(50@height)
-				.alt_scale_(0.01)
-				.ctrl_scale_(0.1)
-				.shift_scale_(1)
+				Knob()
+				.fixedSize_(25)
+				.mode_(\vert)
 				.value_(1.linlin(0,4,0,1))
 				.action_({arg ctrl;
-
 					var val = ctrl.value.linlin(0,1,0,4);
 					NotificationCenter.notify(containerView, \status, "vol: " ++ val.asString);
 					node.vol = val;
@@ -256,14 +293,9 @@
 			);
 
 			view.layout.add(
-
-				Slider()
-				.orientation_(\horizontal)
-				.thumbSize_(10)
-				.fixedSize_(50@height)
-				.alt_scale_(0.01)
-				.ctrl_scale_(0.1)
-				.shift_scale_(1)
+				Knob()
+				.fixedSize_(25)
+				.mode_(\vert)
 				.value_(1)
 				.action_({arg ctrl;
 					node.set(wetKey, ctrl.value);
@@ -303,7 +335,20 @@
 			view.layout.add(
 				Button()
 				.fixedSize_(30@height)
-				.states_([ ["scope"] ])
+				.states_([ ["M", Color.white], ["M", Color.white, Color.new(red:1, green:0.64705882352941, blue:0)] ])
+				.action_({arg ctrl;
+					if (ctrl.value == 1) {
+						node.set(\vol, 0);
+					} {
+						node.set(\vol, 1);
+					}
+				})
+			);
+
+			view.layout.add(
+				Button()
+				.fixedSize_(30@height)
+				.states_([ ["sc"] ])
 				.action_({arg ctrl;
 					node.scope;
 				})
@@ -312,7 +357,7 @@
 			view.layout.add(
 				Button()
 				.fixedSize_(30@height)
-				.states_([ ["fscope"] ])
+				.states_([ ["fs"] ])
 				.action_({arg ctrl;
 					FreqScope.new(300, 200, busNum:node.bus.index);
 				})
@@ -364,8 +409,43 @@
 
 				row.layout.add(dragSink);
 
-				row.layout.add(Slider()
-					.fixedHeight_(20)
+				row.layout.add(
+
+					LevelIndicator(bounds:Rect(width:50, height:18))
+					.style_(\continuous)
+					.meterColor_(Color.blue().alpha_(1))
+					.warningColor_(Color.blue().alpha_(1))
+					.criticalColor_(Color.blue().alpha_(1))
+					.numSteps_(10)
+					.minWidth_(150)
+					.fixedHeight_(15)
+					.mouseMoveAction_({arg ctrl, x, y, modifiers;
+						var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+						var msg = "";
+						if (num >= 0) {
+							var key = ('mix' ++ num).asSymbol;
+							node.set(key, val);
+							msg = "mix % %".format(name, val);
+							ctrl.value = val;
+							NotificationCenter.notify(mainView, \status, msg);
+						}
+					})
+					.mouseUpAction_({arg ctrl, x, y, modifiers;
+						var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+						var msg = "";
+						if (num >= 0) {
+							var key = ('mix' ++ num).asSymbol;
+							node.set(key, val);
+							msg = "mix % %".format(name, val);
+							ctrl.value = val;
+							NotificationCenter.notify(mainView, \status, msg);
+						}
+					})
+					.value_(1)
+
+					/*
+					Slider()
+
 					.minWidth_(35)
 					.orientation_(\horizontal)
 					.action_({arg ctrl;
@@ -379,6 +459,7 @@
 							NotificationCenter.notify(mainView, \status, msg);
 						}
 					}).valueAction_(1)
+					*/
 				);
 
 				row.layout.add(Button().string_("+").action_({

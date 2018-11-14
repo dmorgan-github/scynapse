@@ -6,7 +6,7 @@ func: {arg in;
 		\rq.kr(1)
 	);
 
-	sig;
+	sig * \vol.kr(0.dbamp);
 },
 specs: [
 	\freq -> [20, 20000, \lin, 0, 1000],

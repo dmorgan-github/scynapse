@@ -29,7 +29,7 @@ func: {arg in;
 	Splay.ar([tap1 * tap1_mul, tap2 * tap2_mul, tap3 * tap3_mul, tap4 * tap4_mul],
 		\spread.kr(1),
 		center:\center.kr(0)
-	);
+	) * \vol.kr(0.dbamp);
 },
 specs: [
 

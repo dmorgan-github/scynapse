@@ -6,7 +6,7 @@ func: {arg in;
 		bits: \bits.kr(24)
 	);
 
-	LeakDC.ar(sig);
+	LeakDC.ar(sig) * \vol.kr(0.dbamp);
 },
 specs: [
 	\rate -> [1, 10, \lin, 0, 1],

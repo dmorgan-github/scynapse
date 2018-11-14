@@ -22,7 +22,7 @@ func: {arg in;
 		input
 	);
 
-	Pan2.ar(sig, 0);
+	Pan2.ar(sig, 0) * \vol.kr(0.dbamp);
 },
 specs: [
 	\tape_speed -> [0,10,\lin,0,1],

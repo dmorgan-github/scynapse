@@ -15,7 +15,7 @@ func: {arg in;
 		highcut: \highcut.kr(2000)
 	);
 
-	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0));
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \vol.kr(0.dbamp);
 },
 specs: [
 	\t60 -> [0.1, 60, \lin, 0.0, 1],

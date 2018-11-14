@@ -30,7 +30,7 @@ func: {arg in;
 
 	sig = sig * AmpCompA.kr(freq_in);
 
-	Splay.ar(sig.asArray.sum, spread:\spread.kr(1), center:\center.kr(0));
+	Splay.ar(sig.asArray.sum, spread:\spread.kr(1), center:\center.kr(0)) * \vol.kr(0.dbamp);
 },
 specs: [
 	\freq -> [20, 20000, \lin, 0.0, 432],

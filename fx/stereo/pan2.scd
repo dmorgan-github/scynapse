@@ -1,6 +1,6 @@
 (
 func: {arg in;
-	Pan2.ar(in, \pos.kr(0) );
+	Pan2.ar(in, \pos.kr(0) ) * \vol.kr(0.dbamp);
 },
 
 specs: [

@@ -6,7 +6,7 @@ func: {arg in;
 		smooth: \smooth.kr(0.5)
 	);
 
-	LeakDC.ar(sig) * 0.1;
+	LeakDC.ar(sig) * 0.1 * \vol.kr(0.dbamp);
 },
 specs: [
 	\amp -> [0, 1, \lin, 0, 0.5],

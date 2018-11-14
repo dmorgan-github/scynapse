@@ -6,7 +6,7 @@ func: {arg in;
 	var rel = \rel.kr(1);
 	var curve = \curve.kr(-4);
 	var ts = \ts.kr(1);
-	in * Env.perc(atk, rel, curve:curve).kr(gate:trig, timeScale:ts);
+	in * Env.perc(atk, rel, curve:curve).kr(gate:trig, timeScale:ts) * \vol.kr(0.dbamp);
 },
 specs: [
 	\trig -> \set,

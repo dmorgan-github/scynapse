@@ -10,7 +10,7 @@ func: {arg in;
 		\crossfade.kr(20)
 	);
 
-	sig;
+	sig * \vol.kr(0.dbamp);
 },
 specs: [
 	\delay -> [0, 5, \lin, 0, 1],

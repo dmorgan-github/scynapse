@@ -4,7 +4,7 @@ func: {arg in;
 	var trig = \trig.kr;
 	var atk = \atk.kr(0.01);
 	var rel = \rel.kr(1);
-	in * Decay2.kr(trig, atk, rel);
+	in * Decay2.kr(trig, atk, rel) * \vol.kr(0.dbamp);
 },
 specs: [
 	\trig -> \set,

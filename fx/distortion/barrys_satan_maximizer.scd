@@ -14,7 +14,7 @@ func: {arg in;
 		in
 	);
 
-	LeakDC.ar(sig) * 0.1
+	LeakDC.ar(sig) * 0.1 * \vol.kr(0.dbamp);
 },
 specs: [
 	\decayL -> [2, 30, \lin, 0, 10],

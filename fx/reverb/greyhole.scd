@@ -10,7 +10,7 @@ func: {arg in;
 		\modFreq.kr(2)
 	);
 
-	sig;
+	sig * \vol.kr(0.dbamp);
 },
 specs: [
 	\delayTime -> [0.1, 60, \lin, 0, 2],

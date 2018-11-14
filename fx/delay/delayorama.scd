@@ -55,7 +55,7 @@ func: {arg in;
 		in
 	);
 
-	sig;
+	sig * \vol.kr(0.dbamp);
 },
 specs: [
 	\inputgain -> [-96, 24, \lin, 0, 0],

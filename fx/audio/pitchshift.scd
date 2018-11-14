@@ -7,8 +7,7 @@ func: {arg in;
 		\pitchDispersion.kr(0.01),
 		\timeDispersion.kr(0.01)
 	);
-	sig
-
+	sig * \vol.kr(0.dbamp);
 },
 specs: [
 	\pitchRatio -> [-24, 24, \lin, 0.0, 12],
