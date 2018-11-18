@@ -10,7 +10,7 @@ func: {arg in;
 	sig * \vol.kr(0.dbamp);
 },
 specs: [
-	\pitchRatio -> [-24, 24, \lin, 0.0, 12],
+	\pitchRatio -> [-24, 24, \lin, 1, 12],
 	\pitchDispersion -> [0, 1, \lin, 0.0, 0.01],
 	\timeDispersion -> [0.0, 0.5, \lin, 0, 0.01]
 ]

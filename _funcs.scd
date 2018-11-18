@@ -24,25 +24,26 @@
 			}).set(\wet110, 0);
 
 			view.layout.add(HLayout(
-				Slider2D().fixedSize_(45).action_({arg ctrl;
+
+				Slider().action_({arg ctrl;
+					node.set(\wet110, ctrl.value);
+				}).value_(0).orientation_(\vertical),
+
+				Slider2D().minHeight_(45).action_({arg ctrl;
 					node.set(\lo_freq, ctrl.x.linlin(0,1,0.1,1000));
 					node.set(\lo_db, ctrl.y.linlin(0,1,-18,18));
 				}).x_(100.linlin(0,1000,0,1)).y_(0.linlin(-18,18,0,1)),
 
-				Slider2D().fixedSize_(45).action_({arg ctrl;
+				Slider2D().minHeight_(45).action_({arg ctrl;
 					node.set(\mid_freq, ctrl.x.linlin(0,1,1000,10000));
 					node.set(\mid_db, ctrl.y.linlin(0,1,-18,18));
 				}).x_(1000.linlin(1000,10000,0,1)).y_(0.linlin(-18,18,0,1)),
 
-				Slider2D().fixedSize_(45).action_({arg ctrl;
+				Slider2D().minHeight_(45).action_({arg ctrl;
 					node.set(\hi_freq, ctrl.x.linlin(0,1,10000,20000));
 					node.set(\hi_db, ctrl.y.linlin(0,1,-18,18));
 				}).x_(10000.linlin(10000,20000,0,2)).y_(0.linlin(-18,18,0,1))
 			));
-
-			view.layout.add(Slider().action_({arg ctrl;
-				node.set(\wet110, ctrl.value);
-			}).value_(0).orientation_(\horizontal));
 
 			view;
 		},
@@ -51,7 +52,8 @@
 
 			var mappers = ();
 			var view = View()
-			.layout_(VLayout().margins_(1).spacing_(1))
+			//.minWidth_(200)
+			.layout_(GridLayout().margins_(4).spacing_(4))
 			.onClose_({
 				specs.do({arg assoc;
 					var key = assoc.key;
@@ -63,7 +65,10 @@
 				});
 			});
 
-			specs.do({arg assoc;
+			specs.do({arg assoc, row;
+
+				var myrow = (row/2).floor.asInt;
+				var coloffset = ((row + 6) % 2).asInt * 6;
 
 				var k = assoc.key;
 				var v = assoc.value;
@@ -71,27 +76,25 @@
 				var specKey = k.asSymbol;
 				var spec = if (v == \set) {\set} {v.asSpec};
 
-				var layout = HLayout().margins_(1).spacing_(1);
-				var rs = RangeSlider().orientation_(\horizontal)
-				.enabled_(false)
-				.alt_scale_(0.01)
-				.ctrl_scale_(0.1)
-				.shift_scale_(1);
-				//var slider = Slider()
-				//.alt_scale_(0.01)
-				//.ctrl_scale_(0.1)
-				//.shift_scale_(1);
-				var slider = LevelIndicator(bounds:Rect(width:50, height:20))
-				.value_(1)
-				.style_(\continuous)
-				.meterColor_(Color.blue(1))
-				.warningColor_(Color.blue(1))
-				.criticalColor_(Color.blue(1));
-				//.numSteps_(10);
+				var layout = view.layout;
 
-				var stack = StackLayout();
+				var rs = Knob()
+				.mode_(\vert)
+				.enabled_(false)
+				.fixedSize_(25);
+
+				var slider = Knob()
+				.mode_(\vert)
+				.enabled_(true)
+				.fixedSize_(25);
+
 				var numberbox = NumberBox();
 				var height = 20;
+
+				if (specs.size < 4) {
+					myrow = row;
+					coloffset = 0;
+				};
 
 				if (mappers[k].isNil) {
 					mappers[k] = NodeProxy();
@@ -100,158 +103,129 @@
 				if (spec == \set) {
 
 				} {
-					mappers[k][0] = { \val.kr.range(\min.kr(spec.minval), \max.kr(spec.maxval)); };
-					mappers[k].set(\val, spec.default.linlin(spec.minval, spec.maxval, -1, 1));
+					mappers[k][0] = {
+						var center = \center.kr(0);
+						var depth = \depth.kr(1);
+						var min = (center + (depth * center).neg);
+						var max = (center + (depth * center));
+						\val.kr.range(min, max).round(spec.step).clip(spec.minval, spec.maxval);
+					};
+					mappers[k].set(
+						\val, spec.default.linlin(spec.minval, spec.maxval, -1, 1),
+						\center, spec.default,
+						\depth, 0
+					);
 					node.set(k, mappers[k]);
 				};
 
-				layout.add(
+				if (spec == \buf) {
+				} {
+					var dragSink, button;
 
-					if (spec == \buf) {
+					button = Button()
+					.fixedSize_(8)
+					.states_([ ["x"] ])
+					.font_(Font().size_(9))
+					.action_({
+						dragSink.string = "";
+						//slider.enabled_(true);
+						//numberbox.enabled_(true);
+						rs.enabled_(false);
+						if (spec == \set) {
+							node.set(specKey, nil);
+						} {
+							mappers[k].set(\val, spec.map(slider.value).linlin(spec.minval, spec.maxval,-1,1));
+						};
 
-					} {
+						button.enabled = false;
+					})
+					.enabled_(false);
 
-						var dragSink, button;
+					dragSink = DragSink()
+					.string_("<-  ")
+					.background_(Color.clear)
+					.canReceiveDragHandler_({
+						var obj = View.currentDrag;
+						var node = obj[\node];
+						(node.rate == \control);
+					})
+					.receiveDragHandler_({arg v;
 
-						button = Button()
-						.fixedSize_(8)
-						.states_([ ["x"] ])
-						.font_(Font().size_(9))
-						.action_({
-							dragSink.string = "";
-							slider.enabled_(true);
-							numberbox.enabled_(true);
-							rs.enabled_(false);
+						var obj = View.currentDrag.value;
+						var lfo = obj[\node];
+						var name = obj[\name];
+						var color = obj[\color];
+
+						if (lfo.isNil.not) {
+							//slider.enabled_(false);
+							//numberbox.enabled_(false);
+							rs.enabled_(true);
 							if (spec == \set) {
-								node.set(specKey, nil);
+								node.set(specKey, lfo);
 							} {
-								mappers[k].set(\val, spec.map(slider.value).linlin(spec.minval, spec.maxval,-1,1));
+								mappers[k].set(\val, lfo);
 							};
 
-							button.enabled = false;
-						})
-						.enabled_(false);
-
-						dragSink = DragSink()
-						.string_("<-  " ++ k)
-						.background_(Color.clear)
-						.canReceiveDragHandler_({
-							var obj = View.currentDrag;
-							var node = obj[\node];
-							(node.rate == \control);
-						})
-						.receiveDragHandler_({arg v;
-
-							var obj = View.currentDrag.value;
-							var lfo = obj[\node];
-							var name = obj[\name];
-
-							if (lfo.isNil.not) {
-								slider.enabled_(false);
-								numberbox.enabled_(false);
-								rs.enabled_(true);
-								if (spec == \set) {
-									node.set(specKey, lfo);
-								} {
-									mappers[k].set(\val, lfo);
-								};
-
-								v.string = name;
-								button.enabled = true;
-							} {
-								var msg = "node % doesn't exist in environment".format(name);
-								NotificationCenter.notify(containerView, \status, msg);
-								button.enabled = false;
+							v.string = name;
+							button.enabled = true;
+							if (color.isNil.not) {
+								v.background_(color)
 							}
-						})
-						.maxHeight_(35)
-						.minWidth_(35);
+						} {
+							var msg = "node % doesn't exist in environment".format(name);
+							NotificationCenter.notify(containerView, \status, msg);
+							button.enabled = false;
+						}
+					})
+					.maxHeight_(35)
+					.fixedWidth_(35);
 
-						HLayout(
-							dragSink, button
-						);
-					}
-				);
+					//[myrow, coloffset].postln;
+					layout.addSpanning(StaticText().string_(k), myrow, coloffset + 0);
+					layout.add(dragSink, myrow, coloffset + 1);
+					layout.add(button, myrow, coloffset + 2);
+				};
 
 				///////////////////////////////////
 				if (spec != \set) {
 					layout.add(
 						rs.action_({arg ctrl;
-							var min = spec.map(ctrl.lo);
-							var max = spec.map(ctrl.hi);
-							var msg = "min: " ++ min ++ "; max: " ++ max;
-							mappers[k].set(\min, min, \max, max);
+							var val = ctrl.value;
+							var msg = "depth: " ++ val;
+							mappers[k].set(\depth, val);
 							NotificationCenter.notify(containerView, \status, msg);
-						})
+						}), myrow, coloffset + 3
 					);
 
 					layout.add(
-
-						StackLayout(
-							StaticText()
-							.string_(k)
-							.font_(Font().bold_(true))
-							.minWidth_(100)
-							.align_(\center),
-
-							slider
-							//.orientation_(\horizontal)
-							//.thumbSize_(10)
-							.minWidth_(100)
-							.maxHeight_(height)
-							.mouseMoveAction_({arg ctrl, x, y, modifiers;
-								var msg;
-								var ctrlval = x.linlin(0, ctrl.bounds.width, 0, 1);
-								var val = spec.map(ctrlval);
-								msg = k ++ " " ++ val;
-								mappers[k].set(\val, val.linlin(spec.minval, spec.maxval, -1, 1));
-								numberbox.value_(val);
-								ctrl.value = ctrlval;
-								//[ctrlval].debug("mouseMoveAction");
-								NotificationCenter.notify(containerView, \status, msg);
-							})
-							.mouseUpAction_({arg ctrl, x, y, modifiers;
-								var msg;
-								var ctrlval = x.linlin(0, ctrl.bounds.width, 0, 1);
-								var val = spec.map(ctrlval);
-								msg = k ++ " " ++ val;
-								mappers[k].set(\val, val.linlin(spec.minval, spec.maxval, -1, 1));
-								numberbox.value_(val);
-								ctrl.value = ctrlval;
-								//[ctrlval].debug("mouseUpAction");
-								NotificationCenter.notify(containerView, \status, msg);
-							})
-							//.background_(Color.white.alpha_(0.0))
-							//.action_({arg ctrl;
-
-							//	var val = spec.map(ctrl.value);
-							//	var msg = k ++ " " ++ val;
-							//	mappers[k].set(\val, val.linlin(spec.minval, spec.maxval, -1, 1));
-							//	numberbox.value_(val);
-							//	NotificationCenter.notify(containerView, \status, msg);
-							//})
-							.value_(spec.unmap(spec.default))
-						)
-						.mode_(\stackAll).index_(1)
+						slider
+						.action_({arg ctrl;
+							var msg;
+							var val = spec.map(ctrl.value);
+							msg = k ++ " " ++ val;
+							//mappers[k].set(\center, val.linlin(spec.minval, spec.maxval, -1, 1));
+							mappers[k].set(\center, val);
+							numberbox.value_(val);
+							NotificationCenter.notify(containerView, \status, msg);
+						})
+						.value_(spec.unmap(spec.default)), myrow, coloffset + 4
 					);
 
 					layout.add(
 						numberbox
-						.minWidth_(40)
+						.fixedWidth_(40)
 						.action_({arg ctrl;
-							var val = spec.unmap(ctrl.value);
+							var ctrlval = ctrl.value;
+							var val = spec.unmap(ctrlval);
+							mappers[k].set(\val, ctrlval.linlin(spec.minval, spec.maxval, -1, 1));
 							slider.valueAction_(val);
 						})
 						.clipLo_(spec.minval)
 						.clipHi_(spec.maxval)
 						.normalColor_(Color.white)
-						//.decimals_(4)
-						.value_(spec.default)
+						.value_(spec.default), myrow, coloffset + 5
 					);
 				};
-
-				view.layout.add(layout);
-
 			});
 
 			view;
@@ -261,21 +235,9 @@
 
 			var height = 20;
 			var wetKey = ("wet" ++ 100).asSymbol;
-			var view = View().layout_(HLayout().margins_(2).spacing_(2));
+			var view = View().layout_(HLayout().margins_(4).spacing_(4));
 			var outBus = 0;
 			var privateBus = node.bus.index;
-
-			view.layout.add(
-				// TODO: wire this up
-				LevelIndicator()
-				.style_(\led)
-				.value_(0.1)
-				.maxHeight_(20)
-				.maxWidth_(8)
-				.meterColor_(Color.blue(0.9))
-				.warningColor_(Color.blue(0.8))
-				.criticalColor_(Color.blue(0.6))
-			);
 
 			view.layout.add(StaticText().string_(name));
 			view.layout.add(StaticText().string_("(" ++ privateBus.asString ++ ")"));
@@ -363,6 +325,8 @@
 				})
 			);
 
+			view.layout.add(nil);
+
 			view;
 		},
 
@@ -412,7 +376,7 @@
 				row.layout.add(
 
 					LevelIndicator(bounds:Rect(width:50, height:18))
-					.style_(\continuous)
+					.style_(\led)
 					.meterColor_(Color.blue().alpha_(1))
 					.warningColor_(Color.blue().alpha_(1))
 					.criticalColor_(Color.blue().alpha_(1))
@@ -442,24 +406,6 @@
 						}
 					})
 					.value_(1)
-
-					/*
-					Slider()
-
-					.minWidth_(35)
-					.orientation_(\horizontal)
-					.action_({arg ctrl;
-						var val = ctrl.value;
-						var msg = "";
-						if (num >= 0) {
-							var key = ('mix' ++ num).asSymbol;
-							node.set(key, val);
-
-							msg = "mix % %".format(name, val);
-							NotificationCenter.notify(mainView, \status, msg);
-						}
-					}).valueAction_(1)
-					*/
 				);
 
 				row.layout.add(Button().string_("+").action_({

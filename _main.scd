@@ -118,6 +118,7 @@ var loadView = {arg file;
 	var util = File.open(rootpath ++ "_funcs.scd", "r").readAllString.interpret;
 	var win;
 	var status = StaticText().string_("").font_(Font().size_(9));
+	var color = Color.rand;
 
 	envir.keysValuesDo({arg k,v;
 		if (v.class == NodeProxy and: k.asString.beginsWith(objName) )  {
@@ -149,8 +150,8 @@ var loadView = {arg file;
 			nil,
 			if (envir[objName] != nil) {
 				DragSource()
-				.background_(Color.clear)
-				.object_((node:envir[objName],name:objName))
+				.background_(color)
+				.object_((node:envir[objName],name:objName,color:color))
 				.string_("-->")
 				.maxWidth_(30)
 				.minWidth_(30)
@@ -159,6 +160,7 @@ var loadView = {arg file;
 		)
 	);
 
+	//win.backgroundImage_(Image.new("/Users/david/projects/droptableuser/images/OwDjxLVFZ9rTkVlpNvwsrNgk_dreamt.jpg"));
 	win.layout.add(view);
 	win.layout.add(status);
 	win.front;
@@ -178,6 +180,8 @@ var show = {arg path;
 	var draw, scrollView;
 	var win = Window("Browser", Rect(left, top, width, height));
 	var view = win.view.layout_(HLayout().margins_(2).spacing_(2)).palette_(QPalette.dark);
+	//.backgroundImage_(Image.new("/Users/david/projects/droptableuser/images/OwDjxLVFZ9rTkVlpNvwsrNgk_dreamt.jpg"));
+
 	var ctrlView = View().layout_(HLayout(
 
 		Button()

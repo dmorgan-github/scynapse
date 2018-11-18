@@ -14,7 +14,7 @@ view: {arg objName, envir, util;
 			);
 			var fb = \fb.kr(0.5);
 			var sig = {
-				SinOscFB.ar(freq * LFNoise2.kr(\ddepth.kr(1/16)).range(1 + detune.neg, 1 + detune),
+				SinOscFB.ar(freq * LFNoise2.kr(\ddepth.kr(3)).range(1 + detune.neg, 1 + detune),
 					feedback:fb) * (1/numvoices)
 			}.dup(numvoices);
 			var env = Env.linen(
@@ -31,7 +31,7 @@ view: {arg objName, envir, util;
 	var specs = [
 		\trig -> \set,
 		\freq -> \set,
-		\ddepth -> [(1/128), 6, \lin, 0, (1/16)],
+		\ddepth -> [(1/128), 6, \lin, 0, 3],
 		\detune -> [0, 1, \lin, 0, 0.01],
 		\fb -> [0, 1, \lin, 0, 0.5],
 		\atk -> [0, 1, \lin, 0, 0.01],

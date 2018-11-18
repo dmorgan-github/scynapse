@@ -14,7 +14,7 @@ view: {arg objName, envir, util;
 			);
 			var width = \width.kr(0.5);
 			var sig = {
-				Pulse.ar(freq * LFNoise2.kr(\ddepth.kr(1/16)).range(1 + detune.neg, 1 + detune),
+				Pulse.ar(freq * LFNoise2.kr(\ddepth.kr(3)).range(1 + detune.neg, 1 + detune),
 					width: width);
 			}.dup(numvoices) * Array.fill(numvoices,1).normalizeSum;
 			//var env = Env.linen(
@@ -38,7 +38,7 @@ view: {arg objName, envir, util;
 		\trig -> \set,
 		\freq -> \set,
 		\width -> [0, 1, \lin, 0, 0.5],
-		\ddepth -> [(1/128), 6, \lin, 0, (1/16)],
+		\ddepth -> [(1/128), 6, \lin, 0, 3],
 		\detune -> [0, 1, \lin, 0, 0.01],
 		\atk -> [0, 1, \lin, 0, 0.01],
 		\dec -> [0, 1, \lin, 0, 0.3],
