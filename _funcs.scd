@@ -3,6 +3,19 @@
 		eqView: {arg name, node, envir, containerView;
 
 			var view = View().layout_(VLayout().spacing_(2).margins_(2));
+			var width = 400;
+			var height = 100;
+			var userview = UserView().fixedSize_(width@height);//.background_(Color.gray.alpha_(0.5));
+			var lofreq = 339;
+			var hifreq = 4000;
+			var minfreq = 20;
+			var maxfreq = 11000;
+			var mindb = -60;
+			var maxdb = 18;
+			var midfreq = (lofreq+hifreq)/2;
+			var lowxpos = lofreq.explin(minfreq,maxfreq,0,width);
+			var hixpos = hifreq.explin(minfreq,maxfreq,0,width);
+			var stack, fsv;
 
 			node.filter(110, {arg in;
 
@@ -23,6 +36,104 @@
 				sig;
 			}).set(\wet110, 0);
 
+			userview.drawFunc = { |v|
+				// Pen.fillColor = Color.blue;
+				Pen.strokeColor = Color.red;
+				Pen.moveTo(lowxpos@0);
+				Pen.lineTo(lowxpos@height);
+				Pen.fillStroke;
+
+				Pen.strokeColor = Color.blue;
+				Pen.moveTo(hixpos@0);
+				Pen.lineTo(hixpos@height);
+				Pen.fillStroke;
+			};
+
+			stack = StackLayout(
+				userview,
+				fsv = FreqScopeView().active_(true).freqMode_(1).inBus_(node.bus.index)
+			).mode_(1);
+			view.layout.add(stack);
+			view.layout.add(HLayout(
+
+				Slider().action_({arg ctrl;
+					node.set(\wet110, ctrl.value);
+				})
+				.value_(0)
+				.orientation_(\vertical)
+				.maxWidth_(15)
+				.thumbSize_(10),
+
+				Knob().action_({arg ctrl;
+					var val = ctrl.value;
+					var msg = "lo db " ++ val.linlin(0,1,mindb,maxdb);
+					node.set(\lo_db, val.linlin(0,1,mindb,maxdb));
+					NotificationCenter.notify(containerView, \status, msg);
+				})
+				.fixedSize_(30)
+				.mode_(\vert)
+				.value_(0.linlin(mindb,maxdb,0,1)),
+
+				Knob().action_({arg ctrl;
+					var val = ctrl.value;
+					var msg = "mid db " ++ val.linlin(0,1,mindb,maxdb);
+					node.set(\mid_db, val.linlin(0,1,mindb,maxdb));
+					NotificationCenter.notify(containerView, \status, msg);
+				})
+				.fixedSize_(30)
+				.mode_(\vert)
+				.value_(0.linlin(mindb,maxdb,0,1)),
+
+				Knob().action_({arg ctrl;
+					var val = ctrl.value;
+					var msg = "hi db " ++ val.linlin(0,1,mindb,maxdb);
+					node.set(\hi_db, val.linlin(0,1,mindb,maxdb));
+					NotificationCenter.notify(containerView, \status, msg);
+				})
+				.fixedSize_(30)
+				.mode_(\vert)
+				.value_(0.linlin(mindb,maxdb,0,1))
+			));
+
+			view.layout.add(HLayout(
+				NumberBox().action_({arg ctrl;
+
+					var width = userview.bounds.width;
+					lofreq = ctrl.value;
+					midfreq = (lofreq+hifreq)/2;
+					lowxpos = lofreq.explin(minfreq, maxfreq, 0, width);
+
+					node.set(\lo_freq, lofreq);
+					node.set(\mid_freq, midfreq);
+
+					userview.refresh;
+				})
+				.value_(lofreq)
+				.normalColor_(Color.white)
+				.maxWidth_(50)
+				.clipLo_(minfreq)
+				.clipHi_(maxfreq),
+
+				NumberBox().action_({arg ctrl;
+					var width = userview.bounds.width;
+					hifreq = ctrl.value;
+					midfreq = (lofreq+hifreq)/2;
+					hixpos = ctrl.value.explin(minfreq, maxfreq, 0, width);
+
+					node.set(\hi_freq, hifreq);
+					node.set(\mid_freq, midfreq);
+
+					userview.refresh;
+				})
+				.value_(hifreq)
+				.normalColor_(Color.white)
+				.maxWidth_(50)
+				.align_(\right)
+				.clipLo_(minfreq)
+				.clipHi_(maxfreq),
+			));
+
+			/*
 			view.layout.add(HLayout(
 
 				Slider().action_({arg ctrl;
@@ -44,6 +155,12 @@
 					node.set(\hi_db, ctrl.y.linlin(0,1,-18,18));
 				}).x_(10000.linlin(10000,20000,0,2)).y_(0.linlin(-18,18,0,1))
 			));
+			*/
+
+			view.onClose_({
+				["eqView", fsv].debug("close ");
+				fsv.kill;
+			});
 
 			view;
 		},
@@ -283,8 +400,7 @@
 			view.layout.add(
 				Button()
 				.fixedSize_(30@height)
-				.states_([ ["play", Color.white], ["stop", Color.white, Color.blue] ])
-				.string_("play")
+				.states_([ [">", Color.white], ["[]", Color.white, Color.blue] ])
 				.action_({arg ctrl;
 					if (ctrl.value == 1) {
 						node.play(fadeTime:node.fadeTime);
@@ -353,6 +469,7 @@
 
 					var obj = View.currentDrag.value;
 					var input = obj[\node];
+					var color = obj[\color];
 					var msg;
 
 					name = obj[\name];
@@ -365,6 +482,9 @@
 					};
 
 					node[num] = \mix -> { input.ar; };
+					if (color.isNil.not) {
+						v.background_(color);
+					};
 					//node[num].set(('mix' ++ num).asSymbol, 1);
 					NotificationCenter.notify(mainView, \status, msg);
 				})
