@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 
 	var sig = LADSPA.ar(1, 1605,
 		in,
@@ -10,11 +10,12 @@ func: {arg in;
 		\crossfade.kr(20)
 	);
 
-	sig * \vol.kr(0.dbamp);
+	sig * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\delay -> [0, 5, \lin, 0, 1],
 	\feedback -> [0, 1, \lin, 0, 0.5],
-	\crossfade -> [0, 100, \lin, 0, 20]
+	\crossfade -> [0, 100, \lin, 0, 20],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

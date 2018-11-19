@@ -1,9 +1,9 @@
 (
-func: {
+synth: {
 
 	var sig1 = \sig1.kr;
 	var sig2 = \sig2.kr;
-	(sig1 + sig2).range(-1,1);
+	max(sig1, sig2);
 },
 specs: [
 	\sig1 -> \set,

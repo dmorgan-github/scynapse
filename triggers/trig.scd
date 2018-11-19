@@ -1,5 +1,5 @@
 (
-func: {
+synth: {
 
 	var sig = \sig.kr;
 	var dur = \dur.kr;

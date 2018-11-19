@@ -1,5 +1,5 @@
 (
-func: {
+synth: {
 
 	var div = \div.kr;
 	var trig = \trig.tr;

@@ -1,15 +1,16 @@
 (
-func: {arg in;
+synth: {arg in;
 
 	var sig = CrossoverDistortion.ar(in,
-		amp: \amp.kr(0.5),
+		amp: \cossover.kr(0.5),
 		smooth: \smooth.kr(0.5)
 	);
 
-	LeakDC.ar(sig) * 0.1 * \vol.kr(0.dbamp);
+	LeakDC.ar(sig) * 0.1 * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
-	\amp -> [0, 1, \lin, 0, 0.5],
-	\smooth -> [0, 1, \lin, 0, 0.5]
+	\cossover -> [0, 1, \lin, 0, 0.5],
+	\smooth -> [0, 1, \lin, 0, 0.5],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

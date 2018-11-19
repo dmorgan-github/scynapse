@@ -1,5 +1,5 @@
 (
-func: {
+synth: {
 
 	var in = \in.kr;
 	var trig = \trig.kr;

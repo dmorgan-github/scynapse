@@ -1,12 +1,12 @@
 (
-func: {arg in;
+synth: {arg in;
 	var gain = \gain.kr(1);
 	var sig = (in * gain).tanh * (gain.reciprocal.sqrt);
 	//sig = DelayC.ar(sig, 0.1, Rand(3.5/1000, 65/1000));
-	LeakDC.ar(sig) * \vol.kr(0.dbamp);
-	//sig;
+	LeakDC.ar(sig) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
-	\gain -> [1, 20, \lin, 0, 1]
+	\gain -> [1, 20, \lin, 0, 1],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 
 	var input = Mix.ar(in);
 	var sig = LADSPA.ar(1, 1211,
@@ -22,7 +22,7 @@ func: {arg in;
 		input
 	);
 
-	Pan2.ar(sig, 0) * \vol.kr(0.dbamp);
+	Pan2.ar(sig, 0) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\tape_speed -> [0,10,\lin,0,1],
@@ -33,6 +33,7 @@ specs: [
 	\tap3_distance -> [0,4,\lin,0,3],
 	\tap3_level -> [0,1,\lin,0,0],
 	\tap4_distance -> [0,4,\lin,0,4],
-	\tap4_level -> [0,1,\lin,0,0]
+	\tap4_level -> [0,1,\lin,0,0],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

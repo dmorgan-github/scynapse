@@ -2,6 +2,7 @@
 var rootpath = PathName(Document.current.path).parentPath;
 var viewsPath = rootpath ++ "_views/";
 var recorders = List.new;
+var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
 
 // init
 var init = {
@@ -38,8 +39,6 @@ var alwaysOnTop = {arg view;
 var recordStems = {
 
 	var key = Date.getDate.asSortableString;
-	// TODO: fix this
-	var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
 
 	"recordStems".postln;
 
@@ -113,10 +112,9 @@ var findView = {arg path;
 var loadView = {arg file;
 
 	var view, count = 1, viewPath;
-	var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
 	var objName = PathName(file).fileNameWithoutExtension;
 	var util = File.open(rootpath ++ "_funcs.scd", "r").readAllString.interpret;
-	var win;
+	var win, obj;
 	var status = StaticText().string_("").font_(Font().size_(9));
 	var color = Color.rand;
 
@@ -127,43 +125,61 @@ var loadView = {arg file;
 	});
 
 	objName = (objName ++ count.asString).asSymbol;
-	viewPath = findView.(file);
 
-	if (viewPath.isNil) {
-		var viewObj = File.open(file, "r").readAllString.interpret;
-		view = viewObj[\view].(objName, envir, util);
+	// if the module provides its own view
+	// we can load it directly
+	obj = File.open(file, "r").readAllString.interpret;
+	if (obj[\view].isNil.not) {
+		view = obj[\view].(objName, envir, util);
 	} {
-		var viewObj = File.open(viewPath, "r").readAllString.interpret;
-		// the data object
-		var obj = File.open(file, "r").readAllString.interpret;
+		// otherwise we will search for an appropriate view
+		var viewObj;
+		viewPath = findView.(file);
+		viewObj = File.open(viewPath, "r").readAllString.interpret;
 		view = viewObj[\view].(objName, envir, obj, util);
 	};
 
-	win = View().layout_(VLayout().spacing_(1).margins_(1)).palette_(QPalette.dark).name_(objName);//.minWidth_(300);
+	if (view.isNil) {
+		"view object not present %".format(file).debug("loadView");
+	} {
 
-	NotificationCenter.register(view, \status, win, {arg msg;
-		status.string_(msg);
-	});
+		if (view.class == View) {
+			win = View().layout_(VLayout().spacing_(1).margins_(1)).palette_(QPalette.dark).name_(objName);//.minWidth_(300);
 
-	win.layout.add(
-		HLayout(alwaysOnTop.(win),
-			nil,
-			if (envir[objName] != nil) {
-				DragSource()
-				.background_(color)
-				.object_((node:envir[objName],name:objName,color:color))
-				.string_("-->")
-				.maxWidth_(30)
-				.minWidth_(30)
-				.align_(\right)
-			}
-		)
-	);
+			NotificationCenter.register(view, \status, win, {arg msg;
+				status.string_(msg);
+			});
 
-	//win.backgroundImage_(Image.new("/Users/david/projects/droptableuser/images/OwDjxLVFZ9rTkVlpNvwsrNgk_dreamt.jpg"));
-	win.layout.add(view);
-	win.layout.add(status);
-	win.front;
+			win.layout.add(
+				HLayout(
+					alwaysOnTop.(win),
+					StaticText().string_(objName ++
+						if (envir[objName].isNil.not) {
+							" (bus: " ++ envir[objName].bus.index.asString ++ ")";
+						}{
+							""
+						}
+					),
+					if (envir[objName] != nil) {
+						DragSource()
+						.background_(color)
+						.object_((node:envir[objName],name:objName,color:color))
+						.string_("-->")
+						.maxWidth_(30)
+						.minWidth_(30)
+						.align_(\right)
+					}
+				)
+			);
+
+			//win.backgroundImage_(Image.new("/Users/david/projects/droptableuser/images/OwDjxLVFZ9rTkVlpNvwsrNgk_dreamt.jpg"));
+			win.layout.add(view);
+			win.layout.add(status);
+			win.front;
+		} {
+			"% %".format(view.class, file).debug("loadView");
+		}
+	}
 };
 
 var show = {arg path;
@@ -176,7 +192,6 @@ var show = {arg path;
 	var fontSize = 10;
 	var letterWidth = fontSize * 0.6;
 
-	var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
 	var draw, scrollView;
 	var win = Window("Browser", Rect(left, top, width, height));
 	var view = win.view.layout_(HLayout().margins_(2).spacing_(2)).palette_(QPalette.dark);

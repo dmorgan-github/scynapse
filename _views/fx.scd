@@ -6,9 +6,9 @@ view: {arg name, envir, config, util;
 	var filterSlot = 100;
 	var func = {
 
-		var func = config[\func];
+		var func = config[\synth];
 		if ( func.argNames[0] == \self ) {
-			func = config[\func].value(config);
+			func = config[\synth].value(config);
 		};
 		func;
 	};

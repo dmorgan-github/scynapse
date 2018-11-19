@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 
 	var numFreqs = 6;
 
@@ -30,7 +30,7 @@ func: {arg in;
 
 	sig = sig * AmpCompA.kr(freq_in);
 
-	Splay.ar(sig.asArray.sum, spread:\spread.kr(1), center:\center.kr(0)) * \vol.kr(0.dbamp);
+	Splay.ar(sig.asArray.sum, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\freq -> [20, 20000, \lin, 0.0, 432],
@@ -53,6 +53,7 @@ specs: [
 	\a4 -> [0, 1, \lin, 0, 1],
 	\a5 -> [0, 1, \lin, 0, 1],
 	\spread -> [0,1,\lin,0, 1],
-	\center -> [-1,1,\lin,0,0]
+	\center -> [-1,1,\lin,0,0],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

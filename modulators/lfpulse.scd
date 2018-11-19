@@ -1,5 +1,5 @@
 (
-func: {
+synth: {
 	var freq = \freq.kr;
 	var width = \width.kr;
 	LFPulse.kr(freq, width:width);

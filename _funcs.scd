@@ -56,13 +56,19 @@
 			view.layout.add(stack);
 			view.layout.add(HLayout(
 
-				Slider().action_({arg ctrl;
-					node.set(\wet110, ctrl.value);
+				RoundButton()
+				.extrude_(true)
+				.border_(1)
+				.states_([
+					['power', Color.gray(0.2), Color.white(0.75).alpha_(0.25)],
+					['power', Color.red(0.8), Color.white(0.75).alpha_(0.25)]])
+				.action_({arg bt;
+					switch(bt.value,
+					1, { node.set(\wet110, 1) },
+					0, { node.set(\wet110, 0) });
 				})
-				.value_(0)
-				.orientation_(\vertical)
-				.maxWidth_(15)
-				.thumbSize_(10),
+				.fixedSize_(17)
+				.value_(0),
 
 				Knob().action_({arg ctrl;
 					var val = ctrl.value;
@@ -244,9 +250,7 @@
 					.states_([ ["x"] ])
 					.font_(Font().size_(9))
 					.action_({
-						dragSink.string = "";
-						//slider.enabled_(true);
-						//numberbox.enabled_(true);
+						dragSink.string = "<- ";
 						rs.enabled_(false);
 						if (spec == \set) {
 							node.set(specKey, nil);
@@ -274,8 +278,6 @@
 						var color = obj[\color];
 
 						if (lfo.isNil.not) {
-							//slider.enabled_(false);
-							//numberbox.enabled_(false);
 							rs.enabled_(true);
 							if (spec == \set) {
 								node.set(specKey, lfo);
@@ -356,8 +358,8 @@
 			var outBus = 0;
 			var privateBus = node.bus.index;
 
-			view.layout.add(StaticText().string_(name));
-			view.layout.add(StaticText().string_("(" ++ privateBus.asString ++ ")"));
+			//view.layout.add(StaticText().string_(name));
+			//view.layout.add(StaticText().string_("(" ++ privateBus.asString ++ ")"));
 
 			view.layout.add(
 				Knob()
@@ -429,15 +431,6 @@
 				.states_([ ["sc"] ])
 				.action_({arg ctrl;
 					node.scope;
-				})
-			);
-
-			view.layout.add(
-				Button()
-				.fixedSize_(30@height)
-				.states_([ ["fs"] ])
-				.action_({arg ctrl;
-					FreqScope.new(300, 200, busNum:node.bus.index);
 				})
 			);
 

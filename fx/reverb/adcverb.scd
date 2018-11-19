@@ -1,6 +1,6 @@
 AdCVerb.maxTime = 10;
 (
-func: {arg in;
+synth: {arg in;
 
 	var sig = AdCVerb.ar(in,
 		revTime:\revTime.kr(3),
@@ -14,7 +14,7 @@ func: {arg in;
 		apScale:\apScale.kr(3).lag(0.1)
 	);
 
-	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \vol.kr(0.dbamp);
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\revTime -> [0.1, 60, \lin, 0.0, 3],
@@ -24,6 +24,7 @@ specs: [
 	\combScale -> [0.1, 10, \lin, 0, 3],
 	\apScale -> [0.1, 10, \lin, 0, 3],
 	\spread -> [0, 1, \lin, 0, 1],
-	\center -> [-1, 1, \lin, 0, 0]
+	\center -> [-1, 1, \lin, 0, 0],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

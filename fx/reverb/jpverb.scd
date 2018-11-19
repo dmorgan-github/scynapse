@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 
 	var sig = JPverb.ar(in,
 		t60: \t60.kr(1).lag(0.1),
@@ -15,7 +15,7 @@ func: {arg in;
 		highcut: \highcut.kr(2000)
 	);
 
-	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \vol.kr(0.dbamp);
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\t60 -> [0.1, 60, \lin, 0.0, 1],
@@ -30,6 +30,7 @@ specs: [
 	\lowcut -> [100, 6000, \exp, 1, 500],
 	\highcut -> [1000, 10000, \exp, 1, 2000],
 	\spread -> [0, 1, \lin, 0, 1],
-	\center -> [-1, 1, \lin, 0, 0]
+	\center -> [-1, 1, \lin, 0, 0],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

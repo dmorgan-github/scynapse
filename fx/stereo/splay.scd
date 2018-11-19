@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 	Splay.ar(in,
 		\spread.kr.range(\spread_min.kr(0), \spread_max.kr(1)),
 		1,

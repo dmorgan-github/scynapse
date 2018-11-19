@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 
 	var sig = DFM1.ar(in,
 		\freq.kr(1000).clip(20, 20000);,
@@ -9,13 +9,14 @@ func: {arg in;
 		\noiselevel.kr(0.0003)
 	);
 
-	sig * \vol.kr(0.dbamp);
+	sig * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\freq -> [20, 20000, \lin, 0, 1000],
 	\res -> [0.01, 1, \lin, 0, 0.1],
 	\inputgain -> [0.1, 2, \lin, 0, 1],
 	\type -> [0, 1, \lin, 1, 0],
-	\noiselevel -> [0.0001, 1, \lin, 0.0001, 0.0003]
+	\noiselevel -> [0.0001, 1, \lin, 0.0001, 0.0003],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

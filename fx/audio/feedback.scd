@@ -11,20 +11,20 @@ view: {arg objName, envir, util;
 	var node = NodeProxy.audio(s, 2)
 	.filter(100, {arg in;
 		var sig = in;
-		var fb = DelayC.ar(LocalIn.ar(2), 1, \delay.kr(0).poll) * \fb.kr(0.1);
+		var fb = DelayC.ar(LocalIn.ar(2), 1, \delay.kr(0)) * \fb.kr(0.1);
 		ReplaceOut.ar(sendbus, fb);
 		fb = InFeedback.ar(\return.kr(18), 2);
 		LocalOut.ar((fb + sig).tanh);
-		sig = (sig + fb) * \amp.kr(-12.dbamp);
-		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
+		sig = (sig + fb);
+		Splay.ar(sig, \spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 	});
 
 	var specs = [
 		\fb -> [0, 1, \lin, 0, 0.1],
 		\delay -> [0, 1, \lin, 0, 0],
-		\amp -> [0, 1, \lin, 0, 0.1],
 		\spread -> [0, 1, \lin, 0, 1],
-		\center -> [-1, 1, \lin, 0, 0]
+		\center -> [-1, 1, \lin, 0, 0],
+		\amp -> [0,1,\lin,0,1]
 	];
 
 	var dragsink;

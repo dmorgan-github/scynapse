@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 
 	var bw = \bw.kr(1);
 	var sig = BBandPass.ar(in,
@@ -8,10 +8,11 @@ func: {arg in;
 		mul:bw.reciprocal.sqrt
 	);
 
-	sig * \vol.kr(0.dbamp);
+	sig * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\freq -> [20, 20000, \lin, 0, 1200],
-	\bw -> [0, 10.0, \lin, 0, 1]
+	\bw -> [0, 10.0, \lin, 0, 1],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

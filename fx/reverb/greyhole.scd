@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 	var sig = Greyhole.ar(in,
 		\delayTime.kr(2),
 		\damp.kr(0),
@@ -10,7 +10,7 @@ func: {arg in;
 		\modFreq.kr(2)
 	);
 
-	sig * \vol.kr(0.dbamp);
+	sig * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\delayTime -> [0.1, 60, \lin, 0, 2],
@@ -20,5 +20,6 @@ specs: [
 	\feedback -> [0,1, \lin,0, 0.9],
 	\modDepth -> [0, 1, \lin, 0, 0.1],
 	\modFreq -> [0, 10, \lin, 0, 2],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

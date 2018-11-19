@@ -1,5 +1,5 @@
 (
-func: {arg in;
+synth: {arg in;
 	EnvFollow.kr(in.asArray.sum, decaycoeff:\decay.kr(0.99));
 },
 specs: [

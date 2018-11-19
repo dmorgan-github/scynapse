@@ -12,7 +12,7 @@ frpresets = [// x_ = cannot delete or modify
 */
 
 
-func: {arg in;
+synth: {arg in;
 
 	var sig = in;
 

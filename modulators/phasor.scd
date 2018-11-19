@@ -1,5 +1,5 @@
 (
-func: {
+synth: {
 
 	var trig = \trig.tr;
 	var rate = \rate.kr(1);

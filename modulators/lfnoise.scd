@@ -1,5 +1,5 @@
 (
-func: {
+synth: {
 	var freq = \freq.kr;
 	LFNoise2.kr(freq);
 },

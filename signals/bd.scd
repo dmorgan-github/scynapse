@@ -1,5 +1,5 @@
 (
-func: {
+synth: {
 	/*
 	var trig = \trig.tr;
 	var freq = Env([444,444,33],[0, 0.1], -7).kr(gate:trig);

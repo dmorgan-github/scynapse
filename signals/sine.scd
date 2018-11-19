@@ -14,11 +14,17 @@ view: {arg objName, envir, util;
 			);
 			var width = \width.kr(0.5);
 			var sig = {
-				SinOsc.ar(freq * LFNoise2.kr(\ddepth.kr(3)).range(1 + detune.neg, 1 + detune)) * (1/numvoices)
-			}.dup(numvoices);
-			var env = Env.linen(
-				\atk.kr(0.01), \sus.kr(1), \rel.kr(1), curve:\curve.kr(-4)
+				SinOsc.ar(freq * LFNoise2.kr(\ddepth.kr(5)).range(1 + detune.neg, 1 + detune)) * (1/numvoices)
+			}.dup(numvoices) * Array.fill(numvoices,1).normalizeSum;
+
+			var susLevel = \susLevel.kr(0.7);
+			var curve = \curve.kr(-4);
+			var env = Env(
+				[0,1,susLevel,susLevel,0],
+				[\atk.kr(0.01), \dec.kr(0.3), \sus.kr(1), \rel.kr(1)],
+				curve:curve
 			).kr(gate:trig, timeScale:\ts.kr(1));
+
 			sig = sig * env * AmpCompA.kr(freq) * \amp.kr(-12.dbamp);
 			sig = Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 			sig;
@@ -30,11 +36,13 @@ view: {arg objName, envir, util;
 	var specs = [
 		\trig -> \set,
 		\freq -> \set,
-		\ddepth -> [(1/128), 6, \lin, 0, 3],
+		\ddepth -> [(1/128), 20, \lin, 0, 5],
 		\detune -> [0, 1, \lin, 0, 0.01],
 		\atk -> [0, 1, \lin, 0, 0.01],
-		\rel -> [0, 1, \lin, 0, 1],
+		\dec -> [0, 1, \lin, 0, 0.3],
 		\sus -> [0, 1, \lin, 0, 1],
+		\susLevel -> [0,1,\lin,0,0.7],
+		\rel -> [0, 1, \lin, 0, 1],
 		\curve -> [-24, 24, \lin, 0, -4],
 		\ts -> [0, 64, \lin, 0, 1],
 		\lag -> [0, 1, \lin, 0, 0],

@@ -6,7 +6,7 @@
 < a: Output
 */
 (
-func: {arg in;
+synth: {arg in;
 
 	var sig = LADSPA.ar(1, 1408,
 		[\decayL.kr(10), \decayR.kr(10)],
@@ -14,13 +14,14 @@ func: {arg in;
 		in
 	);
 
-	LeakDC.ar(sig) * 0.1 * \vol.kr(0.dbamp);
+	LeakDC.ar(sig) * 0.1 * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\decayL -> [2, 30, \lin, 0, 10],
 	\decayR -> [2, 30, \lin, 0, 10],
 
 	\kneepointL -> [-90, 1, \lin, 0, -10],
-	\kneepointR -> [-90, 1, \lin, 0, -10]
+	\kneepointR -> [-90, 1, \lin, 0, -10],
+	\amp -> [0,1,\lin,0,1]
 ]
 )

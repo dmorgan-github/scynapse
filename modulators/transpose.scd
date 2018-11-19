@@ -1,5 +1,5 @@
 (
-func: {
+synth: {
 
 	var freq = \freq.kr;
 	var trans = \trans.kr;

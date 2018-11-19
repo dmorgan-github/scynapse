@@ -6,7 +6,7 @@ view: {arg name, envir, config, util;
 
 	envir[name] = NodeProxy.control;
 	envir[name].fadeTime = 1;
-	envir[name][0] = config[\func];
+	envir[name][0] = config[\synth];
 
 	view = View().layout_(VLayout().margins_(2).spacing_(2)).minWidth_(300)
 	.onClose_({
