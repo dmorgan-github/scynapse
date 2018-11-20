@@ -250,21 +250,25 @@
 								mappers[k].set(\val, lfo);
 							};
 
-							if (color.isNil.not) {
-								dragSink.drawFunc_({
-									var size = 13;
-									var width = 1;
-									Pen.color = color;
-									Pen.width = width;
-									Pen.fillOval(Rect(0,5,size,size))
-								});
-								dragSink.refresh;
-							}
+							if (color.isNil) {
+								color = Color.gray;
+							};
+
+							dragSink.drawFunc_({
+								var size = 13;
+								var width = 1;
+								Pen.color = color;
+								Pen.width = width;
+								Pen.fillOval(Rect(0,5,size,size))
+							});
+							dragSink.refresh;
+
 						} {
 							var msg = "node % doesn't exist in environment".format(name);
 							NotificationCenter.notify(containerView, \status, msg);
 						}
 					})
+					.minHeight_(22)
 					.fixedWidth_(15);
 
 					dragSink.setContextMenuActions(
@@ -465,16 +469,19 @@
 					};
 
 					node[num] = \mix -> { input.ar; };
-					if (color.isNil.not) {
-						dragSink.drawFunc_({
-							var size = 13;
-							var width = 1;
-							Pen.color = color;
-							Pen.width = width;
-							Pen.fillOval(Rect(0,5,size,size))
-						});
-						dragSink.refresh;
+					if (color.isNil) {
+						color = Color.gray;
 					};
+
+					dragSink.drawFunc_({
+						var size = 13;
+						var width = 1;
+						Pen.color = color;
+						Pen.width = width;
+						Pen.fillOval(Rect(0,5,size,size))
+					});
+					dragSink.refresh;
+
 					//node[num].set(('mix' ++ num).asSymbol, 1);
 					NotificationCenter.notify(mainView, \status, msg);
 				})

@@ -172,9 +172,20 @@ var loadView = {arg file;
 				)
 			);
 
-			//win.backgroundImage_(Image.new("/Users/david/projects/droptableuser/images/OwDjxLVFZ9rTkVlpNvwsrNgk_dreamt.jpg"));
 			win.layout.add(view);
 			win.layout.add(status);
+
+			if (view.onClose.isNil) {
+				"adding default close handler".debug("loadView");
+				win.onClose_({
+					envir[objName].clear();
+					{
+						"destroy: ".debug(objName);
+						envir[objName] = nil;
+					}.defer();
+				});
+			};
+
 			win.front;
 		} {
 			"% %".format(view.class, file).debug("loadView");
