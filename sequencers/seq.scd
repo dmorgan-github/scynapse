@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var beats = 16;
 

@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
 	var nodes = ();

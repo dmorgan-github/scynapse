@@ -1,6 +1,5 @@
-
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var num = 5;
 	var nodefunc = {arg num = 5;
@@ -28,7 +27,7 @@ view: {arg objName, envir, util;
 	});
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
 	var ctrlView = View().layout_(VLayout(
 		*(0..(num-1)).collect({arg val;
 			DragSource()

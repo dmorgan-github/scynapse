@@ -1,5 +1,5 @@
 (
-view:{arg objName, envir, util;
+view:{arg objName, envir, components;
 
 	var node = NodeProxy.audio(s, 2)
 	.filter(100, {arg in;
@@ -26,11 +26,11 @@ view:{arg objName, envir, util;
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
 
-	var playView = util[\playView].(objName, node, view);
+	var playView = components[\playView].(objName, node, view);
 
-	var multiInputsView = util[\multiInputsView].(node, view);
+	var multiInputsView = components[\multiInputsView].(node, view);
 
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
 
 	var recView = View().layout_(HLayout(
 		Button().states_([ ["rec", nil, nil], ["stop",nil,nil] ])

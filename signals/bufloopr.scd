@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var buf;
 	var navView;
@@ -86,8 +86,8 @@ view: {arg objName, envir, util;
 		\rate -> [0,4,\lin,0,1]
 	];
 
-	var playView = util[\playView].(objName, node, view);
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var playView = components[\playView].(objName, node, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
 
 	var sfv = SoundFileView()
 	.background_(Color.gray(0.3))

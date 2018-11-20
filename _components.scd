@@ -2,10 +2,8 @@
 	(
 		eqView: {arg name, node, envir, containerView;
 
-			var view = View().layout_(VLayout().spacing_(2).margins_(2));
-			var width = 400;
-			var height = 100;
-			var userview = UserView().fixedSize_(width@height);//.background_(Color.gray.alpha_(0.5));
+			var view = View().layout_(VLayout().spacing_(2).margins_(2)).background_(Color.grey.alpha_(0.6));
+			var userview = UserView().minHeight_(100);
 			var lofreq = 339;
 			var hifreq = 4000;
 			var minfreq = 20;
@@ -13,8 +11,6 @@
 			var mindb = -60;
 			var maxdb = 18;
 			var midfreq = (lofreq+hifreq)/2;
-			var lowxpos = lofreq.explin(minfreq,maxfreq,0,width);
-			var hixpos = hifreq.explin(minfreq,maxfreq,0,width);
 			var stack, fsv;
 
 			node.filter(110, {arg in;
@@ -33,11 +29,19 @@
 				sig = BPeakEQ.ar(sig, lo_freq, 1, lo_db);
 				sig = BPeakEQ.ar(sig, mid_freq, 1, mid_db);
 				sig = BPeakEQ.ar(sig, hi_freq, 1, hi_db);
+				sig = RemoveBadValues.ar(sig);
 				sig;
+
 			}).set(\wet110, 0);
 
-			userview.drawFunc = { |v|
-				// Pen.fillColor = Color.blue;
+			userview.drawFunc = {arg ctrl;
+
+				var width = ctrl.bounds.width;
+				var height = ctrl.bounds.height;
+
+				var lowxpos = lofreq.explin(minfreq,maxfreq,0,width);
+				var hixpos = hifreq.explin(minfreq,maxfreq,0,width);
+
 				Pen.strokeColor = Color.red;
 				Pen.moveTo(lowxpos@0);
 				Pen.lineTo(lowxpos@height);
@@ -51,7 +55,10 @@
 
 			stack = StackLayout(
 				userview,
-				fsv = FreqScopeView().active_(true).freqMode_(1).inBus_(node.bus.index)
+				fsv = FreqScopeView()
+				.active_(true)
+				.freqMode_(1)
+				.inBus_(node.bus.index)
 			).mode_(1);
 			view.layout.add(stack);
 			view.layout.add(HLayout(
@@ -104,10 +111,8 @@
 			view.layout.add(HLayout(
 				NumberBox().action_({arg ctrl;
 
-					var width = userview.bounds.width;
 					lofreq = ctrl.value;
 					midfreq = (lofreq+hifreq)/2;
-					lowxpos = lofreq.explin(minfreq, maxfreq, 0, width);
 
 					node.set(\lo_freq, lofreq);
 					node.set(\mid_freq, midfreq);
@@ -121,10 +126,9 @@
 				.clipHi_(maxfreq),
 
 				NumberBox().action_({arg ctrl;
-					var width = userview.bounds.width;
+
 					hifreq = ctrl.value;
 					midfreq = (lofreq+hifreq)/2;
-					hixpos = ctrl.value.explin(minfreq, maxfreq, 0, width);
 
 					node.set(\hi_freq, hifreq);
 					node.set(\mid_freq, midfreq);
@@ -139,30 +143,6 @@
 				.clipHi_(maxfreq),
 			));
 
-			/*
-			view.layout.add(HLayout(
-
-				Slider().action_({arg ctrl;
-					node.set(\wet110, ctrl.value);
-				}).value_(0).orientation_(\vertical),
-
-				Slider2D().minHeight_(45).action_({arg ctrl;
-					node.set(\lo_freq, ctrl.x.linlin(0,1,0.1,1000));
-					node.set(\lo_db, ctrl.y.linlin(0,1,-18,18));
-				}).x_(100.linlin(0,1000,0,1)).y_(0.linlin(-18,18,0,1)),
-
-				Slider2D().minHeight_(45).action_({arg ctrl;
-					node.set(\mid_freq, ctrl.x.linlin(0,1,1000,10000));
-					node.set(\mid_db, ctrl.y.linlin(0,1,-18,18));
-				}).x_(1000.linlin(1000,10000,0,1)).y_(0.linlin(-18,18,0,1)),
-
-				Slider2D().minHeight_(45).action_({arg ctrl;
-					node.set(\hi_freq, ctrl.x.linlin(0,1,10000,20000));
-					node.set(\hi_db, ctrl.y.linlin(0,1,-18,18));
-				}).x_(10000.linlin(10000,20000,0,2)).y_(0.linlin(-18,18,0,1))
-			));
-			*/
-
 			view.onClose_({
 				["eqView", fsv].debug("close ");
 				fsv.kill;
@@ -175,8 +155,7 @@
 
 			var mappers = ();
 			var view = View()
-			//.minWidth_(200)
-			.layout_(GridLayout().margins_(4).spacing_(4))
+			.layout_(GridLayout().margins_(4).spacing_(4)).background_(Color.grey.alpha_(0.3))
 			.onClose_({
 				specs.do({arg assoc;
 					var key = assoc.key;
@@ -191,7 +170,7 @@
 			specs.do({arg assoc, row;
 
 				var myrow = (row/2).floor.asInt;
-				var coloffset = ((row + 6) % 2).asInt * 6;
+				var coloffset = ((row + 5) % 2).asInt * 5;
 
 				var k = assoc.key;
 				var v = assoc.value;
@@ -243,28 +222,14 @@
 
 				if (spec == \buf) {
 				} {
-					var dragSink, button;
-
-					button = Button()
-					.fixedSize_(8)
-					.states_([ ["x"] ])
-					.font_(Font().size_(9))
-					.action_({
-						dragSink.string = "<- ";
-						rs.enabled_(false);
-						if (spec == \set) {
-							node.set(specKey, nil);
-						} {
-							mappers[k].set(\val, spec.map(slider.value).linlin(spec.minval, spec.maxval,-1,1));
-						};
-
-						button.enabled = false;
+					var dragSink = UserView()
+					.drawFunc_({
+						var size = 13;
+						var width = 2;
+						Pen.color = Color.black;
+						Pen.width = width;
+						Pen.strokeOval(Rect(0,5,size,size))
 					})
-					.enabled_(false);
-
-					dragSink = DragSink()
-					.string_("<-  ")
-					.background_(Color.clear)
 					.canReceiveDragHandler_({
 						var obj = View.currentDrag;
 						var node = obj[\node];
@@ -285,24 +250,47 @@
 								mappers[k].set(\val, lfo);
 							};
 
-							v.string = name;
-							button.enabled = true;
 							if (color.isNil.not) {
-								v.background_(color)
+								dragSink.drawFunc_({
+									var size = 13;
+									var width = 1;
+									Pen.color = color;
+									Pen.width = width;
+									Pen.fillOval(Rect(0,5,size,size))
+								});
+								dragSink.refresh;
 							}
 						} {
 							var msg = "node % doesn't exist in environment".format(name);
 							NotificationCenter.notify(containerView, \status, msg);
-							button.enabled = false;
 						}
 					})
-					.maxHeight_(35)
-					.fixedWidth_(35);
+					.fixedWidth_(15);
+
+					dragSink.setContextMenuActions(
+						MenuAction("Delete", {
+
+							rs.enabled_(false);
+							if (spec == \set) {
+								node.set(specKey, nil);
+							} {
+								mappers[k].set(\val, spec.map(slider.value).linlin(spec.minval, spec.maxval,-1,1));
+							};
+
+							dragSink.drawFunc_({
+								var size = 13;
+								var width = 2;
+								Pen.color = Color.black;
+								Pen.width = width;
+								Pen.strokeOval(Rect(0,5,size,size))
+							})
+							.refresh;
+						});
+					);
 
 					//[myrow, coloffset].postln;
-					layout.addSpanning(StaticText().string_(k), myrow, coloffset + 0);
+					layout.add(StaticText().string_(k).maxWidth_(50), myrow, coloffset + 0);
 					layout.add(dragSink, myrow, coloffset + 1);
-					layout.add(button, myrow, coloffset + 2);
 				};
 
 				///////////////////////////////////
@@ -313,7 +301,7 @@
 							var msg = "depth: " ++ val;
 							mappers[k].set(\depth, val);
 							NotificationCenter.notify(containerView, \status, msg);
-						}), myrow, coloffset + 3
+						}), myrow, coloffset + 2
 					);
 
 					layout.add(
@@ -322,12 +310,11 @@
 							var msg;
 							var val = spec.map(ctrl.value);
 							msg = k ++ " " ++ val;
-							//mappers[k].set(\center, val.linlin(spec.minval, spec.maxval, -1, 1));
 							mappers[k].set(\center, val);
 							numberbox.value_(val);
 							NotificationCenter.notify(containerView, \status, msg);
 						})
-						.value_(spec.unmap(spec.default)), myrow, coloffset + 4
+						.value_(spec.unmap(spec.default)), myrow, coloffset + 3
 					);
 
 					layout.add(
@@ -342,7 +329,7 @@
 						.clipLo_(spec.minval)
 						.clipHi_(spec.maxval)
 						.normalColor_(Color.white)
-						.value_(spec.default), myrow, coloffset + 5
+						.value_(spec.default), myrow, coloffset + 4
 					);
 				};
 			});
@@ -357,9 +344,6 @@
 			var view = View().layout_(HLayout().margins_(4).spacing_(4));
 			var outBus = 0;
 			var privateBus = node.bus.index;
-
-			//view.layout.add(StaticText().string_(name));
-			//view.layout.add(StaticText().string_("(" ++ privateBus.asString ++ ")"));
 
 			view.layout.add(
 				Knob()
@@ -450,14 +434,21 @@
 				var num = -1;
 				var name;
 
-				dragSink = DragSink()
-				.string_("<-  ")
-				.background_(Color.clear)
+
+				dragSink = UserView()
+				.drawFunc_({
+					var size = 13;
+					var width = 2;
+					Pen.color = Color.black;
+					Pen.width = width;
+					Pen.strokeOval(Rect(0,5,size,size))
+				})
 				.canReceiveDragHandler_({
 					var obj = View.currentDrag;
 					var node = obj[\node];
 					(node.rate == \audio);
 				})
+				.fixedWidth_(15)
 				.receiveDragHandler_({arg v;
 
 					var obj = View.currentDrag.value;
@@ -467,7 +458,6 @@
 
 					name = obj[\name];
 					msg = "inuput: " ++ name;
-					v.string = name;
 
 					if (num < 0) {
 						num = node.objects.indices.select({arg val; val < 100}).last ? num;
@@ -476,7 +466,14 @@
 
 					node[num] = \mix -> { input.ar; };
 					if (color.isNil.not) {
-						v.background_(color);
+						dragSink.drawFunc_({
+							var size = 13;
+							var width = 1;
+							Pen.color = color;
+							Pen.width = width;
+							Pen.fillOval(Rect(0,5,size,size))
+						});
+						dragSink.refresh;
 					};
 					//node[num].set(('mix' ++ num).asSymbol, 1);
 					NotificationCenter.notify(mainView, \status, msg);

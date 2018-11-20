@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	// Node
 	var node = NodeProxy.audio.source_({
@@ -126,8 +126,8 @@ view: {arg objName, envir, util;
 		\seq -> \set
 	];
 
-	var playView = util[\playView].(objName, node, view);
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var playView = components[\playView].(objName, node, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
 	node.set(\replyid, replyid);
 
 	sfv = SoundFileView()

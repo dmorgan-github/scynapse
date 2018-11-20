@@ -1,6 +1,6 @@
 (
 // dependant on ~bufs global variable
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var minWidth = 300;
 

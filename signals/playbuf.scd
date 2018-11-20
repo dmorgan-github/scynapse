@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
 	var specs;
@@ -19,8 +19,8 @@ view: {arg objName, envir, util;
 	];
 
 	envir[objName] = node;
-	playView = util[\playView].(objName, node, view);
-	specsView = util[\specsView].(objName, specs, node, envir, view);
+	playView = components[\playView].(objName, node, view);
+	specsView = components[\specsView].(objName, specs, node, envir, view);
 
 	view.layout.add(playView);
 	view.layout.add(specsView);

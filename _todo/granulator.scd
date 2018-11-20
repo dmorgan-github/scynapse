@@ -1,5 +1,5 @@
 (
-view: {arg name, envir, util;
+view: {arg name, envir, components;
 
 	var buf;
 	var windowSize = 1024;
@@ -73,7 +73,7 @@ view: {arg name, envir, util;
 		var menuView = {
 
 			var view = View().layout_(HLayout().margins_(2).spacing_(2));
-			view.layout.add(util[\playView].(name, node, main));
+			view.layout.add(components[\playView].(name, node, main));
 
 			view.layout.add(Button()
 				.string_("open")
@@ -132,7 +132,7 @@ view: {arg name, envir, util;
 		};
 
 		main.layout.add(menuView.());
-		main.layout.add(util[\presetsView].(node, (), main));
+		main.layout.add(components[\presetsView].(node, (), main));
 		main.layout.add(waveView.());
 
 		main.layout.add(PopUpMenu()
@@ -143,7 +143,7 @@ view: {arg name, envir, util;
 			.value_(0)
 		);
 
-		main.layout.add(util[\specsView].(specs, node, envir, main));
+		main.layout.add(components[\specsView].(specs, node, envir, main));
 		main.layout.add(status);
 		main;
 	};

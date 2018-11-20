@@ -1,5 +1,5 @@
 (
-view: {arg name, envir, config, util;
+view: {arg name, envir, config, components;
 
 	var mainView, horizontalView, inputs, controls, eq;
 	var height = 20;
@@ -28,15 +28,15 @@ view: {arg name, envir, config, util;
 		}.defer(envir[name].fadeTime + 1);
 	});
 
-	eq = util[\eqView].(name, envir[name], envir, mainView;);
-	inputs = util[\multiInputsView].(envir[name], mainView);
-	controls = util[\specsView].(name, config[\specs], envir[name], envir, mainView);
+	eq = components[\eqView].(name, envir[name], envir, mainView;);
+	inputs = components[\multiInputsView].(envir[name], mainView);
+	controls = components[\specsView].(name, config[\specs], envir[name], envir, mainView);
 
 	horizontalView = View().layout_(HLayout().margins_(2).spacing_(2));
 	horizontalView.layout.add(controls);
 
 	// main
-	mainView.layout.add(util[\playView].(name, envir[name], mainView));
+	mainView.layout.add(components[\playView].(name, envir[name], mainView));
 	mainView.layout.add(inputs);
 	mainView.layout.add(eq);
 	mainView.layout.add(horizontalView);

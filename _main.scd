@@ -113,7 +113,7 @@ var loadView = {arg file;
 
 	var view, count = 1, viewPath;
 	var objName = PathName(file).fileNameWithoutExtension;
-	var util = File.open(rootpath ++ "_funcs.scd", "r").readAllString.interpret;
+	var components = File.open(rootpath ++ "_components.scd", "r").readAllString.interpret;
 	var win, obj;
 	var status = StaticText().string_("").font_(Font().size_(9));
 	var color = Color.rand;
@@ -130,13 +130,13 @@ var loadView = {arg file;
 	// we can load it directly
 	obj = File.open(file, "r").readAllString.interpret;
 	if (obj[\view].isNil.not) {
-		view = obj[\view].(objName, envir, util);
+		view = obj[\view].(objName, envir, components);
 	} {
 		// otherwise we will search for an appropriate view
 		var viewObj;
 		viewPath = findView.(file);
 		viewObj = File.open(viewPath, "r").readAllString.interpret;
-		view = viewObj[\view].(objName, envir, obj, util);
+		view = viewObj[\view].(objName, envir, obj, components);
 	};
 
 	if (view.isNil) {

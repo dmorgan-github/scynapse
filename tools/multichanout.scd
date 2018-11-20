@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var view = View().layout_(HLayout().spacing_(1).margins_(1));
 	var nodes = List.new;
@@ -13,8 +13,8 @@ view: {arg objName, envir, util;
 			vol: [0,4,\lin,0,1]
 		);
 
-		var playView = util[\playView].(val + 1, node, view);
-		var multiInputsView = util[\multiInputsView].(node, view);
+		var playView = components[\playView].(val + 1, node, view);
+		var multiInputsView = components[\multiInputsView].(node, view);
 
 		myView.layout.add(playView.maxWidth_(150));
 		myView.layout.add(multiInputsView.maxWidth_(150));

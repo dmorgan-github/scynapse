@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var node = NodeProxy(s, \control, 1).source_({
 		var val = \val.kr;

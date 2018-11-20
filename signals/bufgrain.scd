@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var blackman = {arg size = 2048;
 
@@ -79,8 +79,8 @@ view: {arg objName, envir, util;
 
 	var envkeys = envbufs.keys.asArray;
 	var view = View().layout_(VLayout().margins_(2).spacing_(2));
-	var playView = util[\playView].(objName, node, view);
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var playView = components[\playView].(objName, node, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
 	var buttonsView = View().layout_(HLayout(
 		Button().states_([["o"], ["||"]]).action_({arg ctrl;
 			if (ctrl.value == 1) {

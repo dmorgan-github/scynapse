@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var numvoices = 2;
 	var nodefunc = {arg numvoices = 2;
@@ -54,9 +54,9 @@ view: {arg objName, envir, util;
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var playView = util[\playView].(objName, node, view);
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
-	var eqView = util[\eqView].(objName, node, envir, view);
+	var playView = components[\playView].(objName, node, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
+	var eqView = components[\eqView].(objName, node, envir, view);
 	var pulseView = View().layout_(HLayout(
 		NumberBox().maxDecimals_(0).action_({arg ctrl;
 			var num = ctrl.value;

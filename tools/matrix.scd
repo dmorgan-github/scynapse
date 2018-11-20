@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var load;
 	var dict = ();
@@ -25,7 +25,7 @@ view: {arg objName, envir, util;
 	.minWidth_(35);
 
 	var ctrls = View().layout_(VLayout().margins_(0).spacing_(0));
-	var playView = util[\playView].(objName, node, view);
+	var playView = components[\playView].(objName, node, view);
 	var size = 30;
 	var keys = Order.new;
 

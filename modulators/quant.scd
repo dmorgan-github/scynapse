@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var numvoices = 2;
 	var scalename = \dorian;
@@ -28,7 +28,7 @@ view: {arg objName, envir, util;
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
 	var ctrlView = View().layout_(HLayout(
 		PopUpMenu().items_(Scale.names).action_({arg ctrl;
 			scalename = ctrl.item;

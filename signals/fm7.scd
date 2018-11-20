@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var algos = {arg num;
 
@@ -492,8 +492,8 @@ view: {arg objName, envir, util;
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2)).minWidth_(400).minHeight_(700);
-	var playView = util[\playView].(objName, node, view);
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var playView = components[\playView].(objName, node, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
 	var controllersView = View().layout_(VLayout().margins_(3).spacing_(3));
 
 	view.layout.add(playView);

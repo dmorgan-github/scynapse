@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	var size = 128;
 	var maxdel = 0.5;
@@ -28,11 +28,11 @@ view: {arg objName, envir, util;
 
 	var view = View().layout_(VLayout());
 
-	var playView = util[\playView].(objName, node, view);
+	var playView = components[\playView].(objName, node, view);
 
-	var multiInputsView = util[\multiInputsView].(node, view);
+	var multiInputsView = components[\multiInputsView].(node, view);
 
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
 
 	var delayView = MultiSliderView().action_({arg ctrl;
 		var val = ctrl.currentvalue * maxdel;

@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, util;
+view: {arg objName, envir, components;
 
 	//--variables
 	var len = 256;
@@ -100,7 +100,7 @@ view: {arg objName, envir, util;
 	//CmdPeriod.doOnce({if(w.isClosed.not, {w.close})});
 	uv.animate = true;
 
-	multiInputsView = util[\multiInputsView].(node, view);
+	multiInputsView = components[\multiInputsView].(node, view);
 
 	view.layout.add(multiInputsView);
 

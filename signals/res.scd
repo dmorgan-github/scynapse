@@ -1,5 +1,5 @@
 (
-view:{arg objName, envir, util;
+view:{arg objName, envir, components;
 
 	var node = NodeProxy.audio(s, 2).source_({
 
@@ -55,9 +55,9 @@ view:{arg objName, envir, util;
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var playView = util[\playView].(objName, node, view);
-	var specsView = util[\specsView].(objName, specs, node, envir, view);
-	var eqView = util[\eqView].(objName, node, envir, view);
+	var playView = components[\playView].(objName, node, view);
+	var specsView = components[\specsView].(objName, specs, node, envir, view);
+	var eqView = components[\eqView].(objName, node, envir, view);
 
 	var ctrls = (0..5).collect({arg num;
 		HLayout(
