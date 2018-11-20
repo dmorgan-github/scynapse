@@ -2,13 +2,25 @@
 var rootpath = PathName(Document.current.path).parentPath;
 var viewsPath = rootpath ++ "_views/";
 var recorders = List.new;
-var envir = if (~p.isNil.not) { ~p.envir } { currentEnvironment };
+var proxyspace = \p;
+var getenvir = {
+
+	if (currentEnvironment.class == ProxySpace) {
+		"using proxy space".postln;
+		currentEnvironment.envir;
+	}{
+		"using currentEnvironment".postln;
+		currentEnvironment;
+	}
+};
 
 // init
 var init = {
-	"init".postln;
+	var bufs = getenvir.()[\bufs];
+	if (bufs.isNil) {
+		getenvir.()[\bufs] = ();
+	};
 	Font.setDefault(Font("Courier New", 10));
-	~bufs = ~bufs ? ();
 	nil;
 }.value;
 
@@ -39,6 +51,7 @@ var alwaysOnTop = {arg view;
 var recordStems = {
 
 	var key = Date.getDate.asSortableString;
+	var envir = getenvir.();
 
 	"recordStems".postln;
 
@@ -117,6 +130,7 @@ var loadView = {arg file;
 	var win, obj;
 	var status = StaticText().string_("").font_(Font().size_(9));
 	var color = Color.rand;
+	var envir = getenvir.();
 
 	envir.keysValuesDo({arg k,v;
 		if (v.class == NodeProxy and: k.asString.beginsWith(objName) )  {
@@ -206,6 +220,7 @@ var show = {arg path;
 	var draw, scrollView;
 	var win = Window("Browser", Rect(left, top, width, height));
 	var view = win.view.layout_(HLayout().margins_(2).spacing_(2)).palette_(QPalette.dark);
+	var envir = getenvir.();
 	//.backgroundImage_(Image.new("/Users/david/projects/droptableuser/images/OwDjxLVFZ9rTkVlpNvwsrNgk_dreamt.jpg"));
 
 	var ctrlView = View().layout_(HLayout(
@@ -249,6 +264,12 @@ var show = {arg path;
 			})
 		})
 		.fixedSize_(20@20);
+
+		/*
+		TextField().action_({arg ctrl;
+			proxyspace = ctrl.value;
+		}).value_(\p);
+		*/
 	));
 
 	scrollView = ScrollView()

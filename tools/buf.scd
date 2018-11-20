@@ -1,6 +1,7 @@
 (
-// dependant on ~bufs global variable
 view: {arg objName, envir, components;
+
+	var bufs = envir[\bufs];
 
 	var minWidth = 300;
 
@@ -40,7 +41,7 @@ view: {arg objName, envir, components;
 			var buf;
 			// allocate a buffer
 			buf = Buffer.alloc(s, dur * s.sampleRate, 1, bufnum:bufnum);
-			~bufs[key] = buf;
+			bufs[key] = buf;
 			NotificationCenter.notify(win, \status, "alloc: " ++ key);
 		});
 
@@ -50,7 +51,7 @@ view: {arg objName, envir, components;
 		])
 		.action_({arg ctrl;
 			if (ctrl.value == 1) {
-				~bufs[key].play;
+				bufs[key].play;
 			};
 		})
 		.fixedWidth_(25)
@@ -85,8 +86,8 @@ view: {arg objName, envir, components;
 					var newKey = ctrl.value;
 					var oldKey = key;
 
-					~bufs[newKey.asSymbol] = ~bufs[oldKey.asSymbol];
-					~bufs[oldKey.asSymbol] = nil;
+					bufs[newKey.asSymbol] = bufs[oldKey.asSymbol];
+					bufs[oldKey.asSymbol] = nil;
 
 					key = newKey.asSymbol;
 				}),
@@ -100,7 +101,7 @@ view: {arg objName, envir, components;
 				.action_({arg ctrl;
 					Dialog.openPanel({ arg path;
 						Buffer.read(s, path, action:{arg buf;
-							~bufs[key] = buf;
+							bufs[key] = buf;
 							updatePlot.(buf);
 							{
 								play.enabled = true;
@@ -113,7 +114,7 @@ view: {arg objName, envir, components;
 				}).maxWidth_(25),
 
 				Button().string_("zero").action_({
-					~bufs[key].zero;
+					bufs[key].zero;
 					NotificationCenter.notify(win, \status, "zero: " ++ key);
 				}).fixedWidth_(25),
 
@@ -137,7 +138,7 @@ view: {arg objName, envir, components;
 
 					sfv.remove();
 					row.remove();
-					~bufs[key] = nil;
+					bufs[key] = nil;
 
 					{
 						var sizeHint = view.sizeHint;
