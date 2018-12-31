@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var tap1, tap2, tap3, tap4;
 	var fbNode = FbNode(1, 6.5, 4);
 
@@ -50,6 +51,7 @@ specs: [
 
 	\spread -> [0, 1, \lin, 0, 1],
 	\center -> [-1, 1, \lin, 0, 0],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

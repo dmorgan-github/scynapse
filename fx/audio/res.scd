@@ -1,5 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
+
+	var in = sig_in * \input.kr(1);
 
 	var numFreqs = 6;
 
@@ -54,6 +56,7 @@ specs: [
 	\a5 -> [0, 1, \lin, 0, 1],
 	\spread -> [0,1,\lin,0, 1],
 	\center -> [-1,1,\lin,0,0],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

@@ -10,7 +10,7 @@ view: {arg objName, envir, components;
 
 	var node = NodeProxy.audio(s, 2)
 	.filter(100, {arg in;
-		var sig = in;
+		var sig = in * \input.kr(1);
 		var fb = DelayC.ar(LocalIn.ar(2), 1, \delay.kr(0)) * \fb.kr(0.1);
 		ReplaceOut.ar(sendbus, fb);
 		fb = InFeedback.ar(\return.kr(18), 2);
@@ -24,7 +24,8 @@ view: {arg objName, envir, components;
 		\delay -> [0, 1, \lin, 0, 0],
 		\spread -> [0, 1, \lin, 0, 1],
 		\center -> [-1, 1, \lin, 0, 0],
-		\amp -> [0,1,\lin,0,1]
+		\amp -> [0,1,\lin,0,1],
+		\input -> [0, 10, \lin, 0, 1]
 	];
 
 	var dragsink;

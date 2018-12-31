@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var sig = JPverb.ar(in,
 		t60: \t60.kr(1).lag(0.1),
 		damp: \damp.kr(0),
@@ -31,6 +32,7 @@ specs: [
 	\highcut -> [1000, 10000, \exp, 1, 2000],
 	\spread -> [0, 1, \lin, 0, 1],
 	\center -> [-1, 1, \lin, 0, 0],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	LADSPA.ar(1, 1217,
 		\rate.kr(1),
 		\depth.kr(0.5),
@@ -14,6 +15,7 @@ specs: [
 	\depth -> [0, 1, \lin, 0, 0.5],
 	\feedback -> [-1, 1, \lin, 0, 0],
 	\spread -> [0, 2, \lin, 0, 0.1],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

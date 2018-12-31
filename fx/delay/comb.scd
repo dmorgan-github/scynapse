@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var decay = \decay.kr(1);
 	var delL = \delL.kr(6).lag(0.1);// * 16.reciprocal;
 	var delR = \delR.kr(10).lag(0.1);// * 16.reciprocal;
@@ -17,6 +18,7 @@ specs: [
 	\speed -> [0.001, 4, \lin, 0.0, 0],
 	\spread -> [0,1,\lin,0, 1],
 	\center -> [-1,1,\lin,0,0],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var trig = \trig.kr;
 	var atk = \atk.kr(0.01);
 	var sus = \sus.kr(1);
@@ -16,6 +17,7 @@ specs: [
 	\rel -> [0, 1, \lin, 0, 1],
 	\curve -> [-24, 24, \lin, 0, -4],
 	\ts -> [(1/64), 64, \lin, 0, 1],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

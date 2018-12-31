@@ -14,7 +14,7 @@ frpresets = [// x_ = cannot delete or modify
 
 synth: {arg in;
 
-	var sig = in;
+	var sig = in * \input.kr(1);
 
 	var ls_freq = \ls_freq.kr(0).lag(0.1);
 	var ls_rs = \ls_rs.kr(1).lag(0.1);
@@ -65,6 +65,7 @@ specs: [
 
 	\hs_freq -> [20,20000,\lin,0,20000],
 	\hs_rs -> [0,1,\lin,0,1],
-	\hs_db -> [-18,18,\lin,0,0]
+	\hs_db -> [-18,18,\lin,0,0],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

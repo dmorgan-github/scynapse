@@ -1,9 +1,12 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
+
+	var in = sig_in * \input.kr(1);
 	Balance2.ar(in[0], in[1], \pos.kr(0) ) * \vol.kr(0.dbamp);
 },
 
 specs: [
-	\pos -> [-1, 1, \lin, 0, 0]
+	\pos -> [-1, 1, \lin, 0, 0],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

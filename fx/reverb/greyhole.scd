@@ -1,5 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
+
+	var in = sig_in * \input.kr(1);
 	var sig = Greyhole.ar(in,
 		\delayTime.kr(2),
 		\damp.kr(0),
@@ -20,6 +22,7 @@ specs: [
 	\feedback -> [0,1, \lin,0, 0.9],
 	\modDepth -> [0, 1, \lin, 0, 0.1],
 	\modFreq -> [0, 10, \lin, 0, 2],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

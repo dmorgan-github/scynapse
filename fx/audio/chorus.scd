@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	LADSPA.ar(1, 1201,
 		\numvoices.kr(2), //\numvoices.kr.range(\numvoices_min.kr(1), \numvoices_max.kr(8)).lag(0.1),
 		\delay.kr(10),
@@ -18,6 +19,8 @@ specs: [
 	\detune -> [0, 5, \lin, 0, 0.1],
 	\lfo -> [2, 30, \lin, 0, 2],
 	\output -> [-20, 0, \lin, 0, 0],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )
+

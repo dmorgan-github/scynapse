@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var sig = PitchShift.ar(in,
 		0.5,
 		\pitchRatio.kr(12).midiratio,
@@ -13,6 +14,7 @@ specs: [
 	\pitchRatio -> [-24, 24, \lin, 1, 12],
 	\pitchDispersion -> [0, 1, \lin, 0.0, 0.01],
 	\timeDispersion -> [0.0, 0.5, \lin, 0, 0.01],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var input = Mix.ar(in);
 	var sig = LADSPA.ar(1, 1211,
 
@@ -34,6 +35,7 @@ specs: [
 	\tap3_level -> [0,1,\lin,0,0],
 	\tap4_distance -> [0,4,\lin,0,4],
 	\tap4_level -> [0,1,\lin,0,0],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

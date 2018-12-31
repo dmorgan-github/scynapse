@@ -1,6 +1,7 @@
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var holdperiod = \hold.kr;
 	var multiplier = \multiplier.kr;
 	var rate = \rate.kr;
@@ -10,6 +11,7 @@ specs: [
 	\hold -> [0.01, 1.0, \lin, 0, 0.01],
 	\multiplier -> [1, 20, \lin, 0, 1],
 	\rate -> [0.1, 1, \lin, 0, 1],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

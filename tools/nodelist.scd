@@ -8,7 +8,7 @@ view: {arg objName, envir, components;
 
 		envir.sortedKeysValuesDo({arg k,v;
 
-			if (v.class == NodeProxy) {
+			if (v.isKindOf(NodeProxy)) {
 
 				if (nodes[k] == nil) {
 					nodes[k] = v;

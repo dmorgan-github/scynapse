@@ -7,8 +7,9 @@ view: {arg objName, envir, components;
 	var fb = Buffer.alloc(s, size, 1);
 
 	var node = NodeProxy.audio(s, 2)
-	.filter(100, {arg in;
+	.filter(100, {arg sig_in;
 
+		var in = sig_in * \input.kr(1);
 		var maxdel = 0.5;
 		var buf = LocalBuf(size * 2, 1).clear;
 		var pulse = Impulse.ar(0.33);
@@ -23,7 +24,8 @@ view: {arg objName, envir, components;
 
 	var specs = [
 		\pan -> [-1,1,\lin,0,0],
-		\amp -> [0,1,\lin,0,1]
+		\amp -> [0,1,\lin,0,1],
+		\input -> [0, 10, \lin, 0, 1]
 	];
 
 	var view = View().layout_(VLayout());

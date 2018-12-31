@@ -38,8 +38,9 @@ The level of delayed sound mixed into the output.
 
 
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var sig = LADSPA.ar(1, 1402,
 		RandSeed.ir(1000),
 		\inputgain.kr(0),
@@ -67,6 +68,7 @@ specs: [
 	\delayrandom -> [0, 100, \lin, 0, 30],
 	\ampchange -> [0.2, 5, \lin, 0, 0.5],
 	\amprand -> [0, 100, \lin, 0, 50],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

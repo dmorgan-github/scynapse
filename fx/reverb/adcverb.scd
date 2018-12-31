@@ -1,7 +1,8 @@
 AdCVerb.maxTime = 10;
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var sig = AdCVerb.ar(in,
 		revTime:\revTime.kr(3),
 		hfDamping:\hfDamping.kr(0.1),
@@ -25,6 +26,7 @@ specs: [
 	\apScale -> [0.1, 10, \lin, 0, 3],
 	\spread -> [0, 1, \lin, 0, 1],
 	\center -> [-1, 1, \lin, 0, 0],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

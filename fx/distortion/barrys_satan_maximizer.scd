@@ -6,8 +6,9 @@
 < a: Output
 */
 (
-synth: {arg in;
+synth: {arg sig_in;
 
+	var in = sig_in * \input.kr(1);
 	var sig = LADSPA.ar(1, 1408,
 		[\decayL.kr(10), \decayR.kr(10)],
 		[\kneepointL.kr(-10), \kneepointR.kr(-10)],
@@ -22,6 +23,7 @@ specs: [
 
 	\kneepointL -> [-90, 1, \lin, 0, -10],
 	\kneepointR -> [-90, 1, \lin, 0, -10],
-	\amp -> [0,1,\lin,0,1]
+	\amp -> [0,1,\lin,0,1],
+	\input -> [0, 10, \lin, 0, 1]
 ]
 )

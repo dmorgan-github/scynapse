@@ -190,7 +190,7 @@
 				.enabled_(true)
 				.fixedSize_(25);
 
-				var numberbox = NumberBox();
+				var numberbox = NumberBox().decimals_(3);
 				var height = 20;
 
 				if (specs.size < 4) {
@@ -272,6 +272,7 @@
 					.fixedWidth_(15);
 
 					dragSink.setContextMenuActions(
+						MenuAction(specKey, {specKey.postln}),
 						MenuAction("Delete", {
 
 							rs.enabled_(false);
@@ -433,11 +434,12 @@
 
 			var addRow = {
 
+				var menuaction = MenuAction();
+
 				var row = View().layout_(HLayout().spacing_(1).margins_(1));
 				var dragSink;
 				var num = -1;
-				var name;
-
+				var name = "";
 
 				dragSink = UserView()
 				.drawFunc_({
@@ -463,6 +465,8 @@
 					name = obj[\name];
 					msg = "inuput: " ++ name;
 
+					menuaction.string = name;
+
 					if (num < 0) {
 						num = node.objects.indices.select({arg val; val < 100}).last ? num;
 						num = num + 1;
@@ -482,11 +486,14 @@
 					});
 					dragSink.refresh;
 
-					//node[num].set(('mix' ++ num).asSymbol, 1);
 					NotificationCenter.notify(mainView, \status, msg);
 				})
 				.fixedHeight_(20)
 				.minWidth_(100); // width gets jacked up
+
+				dragSink.setContextMenuActions(
+					menuaction
+				);
 
 				row.layout.add(dragSink);
 
