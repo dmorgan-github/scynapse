@@ -61,7 +61,7 @@ view: {arg objName, envir, components;
 			envbufnum: envbuf
 		);
 
-		Splay.ar(sig);
+		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 	}).set(\envbuf, envbufs[\hann].bufnum);
 
 	var specs = [
@@ -74,7 +74,9 @@ view: {arg objName, envir, components;
 		\grainamp -> [0,1,\lin,0,1],
 		\loop -> [0,1,\lin,1,0],
 		\reverse -> [0,1,\lin,0,0],
-		\stereo -> [-1,1,\lin,0,0]
+		\stereo -> [-1,1,\lin,0,0],
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [-1, 1, \lin, 0, 0]
 	];
 
 	var envkeys = envbufs.keys.asArray;

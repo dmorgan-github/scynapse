@@ -22,7 +22,7 @@ view: {arg objName, envir, components;
 
 		SendTrig.kr(trig, id, startPos);
 		sig = sig * \amp.kr(-6.dbamp);
-		Splay.ar(sig);
+		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 	});
 	var replyid = rrand(100, 1000);
 
@@ -123,7 +123,9 @@ view: {arg objName, envir, components;
 	};
 
 	var specs = [
-		\seq -> \set
+		\seq -> \set,
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [-1, 1, \lin, 0, 0]
 	];
 
 	var playView = components[\playView].(objName, node, view);

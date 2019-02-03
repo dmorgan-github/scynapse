@@ -165,7 +165,7 @@ Fdef(\scynapse, {arg environment;
 		} {
 
 			if (view.class == View) {
-				win = View().layout_(VLayout().spacing_(1).margins_(1)).palette_(QPalette.dark).name_(objName);//.minWidth_(300);
+				win = View().layout_(VLayout().spacing_(0).margins_(0)).palette_(QPalette.dark).name_(objName);//.minWidth_(300);
 
 				NotificationCenter.register(view, \status, win, {arg msg;
 					status.string_(msg);
@@ -186,8 +186,8 @@ Fdef(\scynapse, {arg environment;
 							.background_(color)
 							.object_((node:envir[objName],name:objName,color:color))
 							.string_("-->")
-							.maxWidth_(30)
-							.minWidth_(30)
+							.fixedSize_(15)
+							.font_(Font(size:8))
 							.align_(\right)
 						}
 					)

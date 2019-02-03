@@ -14,14 +14,14 @@ view:{arg objName, envir, components;
 		recHead = Phasor.ar(reset, BufRateScale.kr(buf) * rate, 0, BufFrames.kr(buf));
 		sig = BufRd.ar(1, buf, recHead);
 		BufWr.ar((input * rec) + sig, buf, recHead);
-
-		Pan2.ar(sig, \pan.kr(0));
+		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 	});
 
 	var specs = [
-		\pan -> [-1,1,\lin,0,0],
 		\rate -> [0,4,\lin,0,1],
-		\buf -> \set
+		\buf -> \set,
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [-1, 1, \lin, 0, 0]
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));

@@ -11,13 +11,15 @@ synth: {arg sig_in;
 		\crossfade.kr(20)
 	);
 
-	sig * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\delay -> [0, 5, \lin, 0, 1],
 	\feedback -> [0, 1, \lin, 0, 0.5],
 	\crossfade -> [0, 100, \lin, 0, 20],
 	\amp -> [0,1,\lin,0,1],
-	\input -> [0, 10, \lin, 0, 1]
+	\input -> [0, 10, \lin, 0, 1],
+	\spread -> [0,1,\lin,0, 1],
+	\center -> [-1,1,\lin,0,0],
 ]
 )

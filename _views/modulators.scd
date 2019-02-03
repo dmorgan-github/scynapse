@@ -8,7 +8,7 @@ view: {arg name, envir, config, components;
 	envir[name].fadeTime = 1;
 	envir[name][0] = config[\synth];
 
-	view = View().layout_(VLayout().margins_(2).spacing_(2)).minWidth_(300)
+	view = View().layout_(VLayout().margins_(2).spacing_(2)).minWidth_(150)
 	.onClose_({
 		envir[name].clear;
 		envir[name] = nil;

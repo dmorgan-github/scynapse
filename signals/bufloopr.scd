@@ -16,7 +16,7 @@ view: {arg objName, envir, components;
 		var buf = \buf.kr(0);
 		var phasor = Phasor.ar(0, BufRateScale.kr(buf) * rate, lo, hi);
 		var sig = BufRd.ar(buf.numChannels, buf, phasor);
-		Pan2.ar(sig, \pan.kr(0));
+		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 	});
 
 	var view = View().layout_(VLayout().margins_(2).spacing_(2))
@@ -83,7 +83,9 @@ view: {arg objName, envir, components;
 
 	var specs = [
 		\pan -> [-1,1,\lin,0,0],
-		\rate -> [0,4,\lin,0,1]
+		\rate -> [0,4,\lin,0,1],
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [-1, 1, \lin, 0, 0]
 	];
 
 	var playView = components[\playView].(objName, node, view);

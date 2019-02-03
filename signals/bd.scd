@@ -21,10 +21,12 @@ synth: {
     snd = Select.ar(snd > 0, [0.7 * snd / (1 - snd), snd]);
     snd = Ringz.ar(snd, 60 * (1 + (OnePole.ar(Trig.ar(trig, 10e-3), 0.96)) + (snd * 0.1)), 1);
     snd = snd * -40.dbamp;
-	snd ! 2 * \amp.kr(0.dbamp);
+	Splay.ar(snd, \spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp);
 },
 specs: [
 	\trig -> \set,
-	\amp -> [0, 1, \lin, 0, 1]
+	\amp -> [0, 1, \lin, 0, 1],
+	\spread -> [0, 1, \lin, 0, 1],
+	\center -> [-1, 1, \lin, 0, 0]
 ]
 )

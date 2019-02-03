@@ -19,8 +19,7 @@ view: {arg objName, envir, components;
 		);
 
 		sig = sig * AmpCompA.kr(freq) * \amp.kr(-6.dbamp);
-		sig = Pan2.ar(LeakDC.ar(sig), \pan.kr(0));
-		sig;
+		Splay.ar(LeakDC.ar(sig), \spread.kr(1), center:\center.kr(0));
 	});
 
 	var specs = [
@@ -33,7 +32,9 @@ view: {arg objName, envir, components;
 		\vdepth -> [0,1, \lin, 0, 0.001],
 		\decay -> [-24, 24, \lin, 0, 1],
 		\coef -> [-1,1,\lin, 0, 0.5],
-		\amp -> [0, 1, \lin, 0, 0.1]
+		\amp -> [0, 1, \lin, 0, 0.1],
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [-1, 1, \lin, 0, 0]
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));

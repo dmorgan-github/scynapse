@@ -337,7 +337,7 @@ view: {arg objName, envir, components;
 
 		sig = sig * AmpCompA.kr(freq) * env * \amp.kr(defaultAmp);
 
-		Pan2.ar(Mix.ar(sig), \pan.kr(0));
+		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 
 	}).filter(1, {arg in;
 
@@ -482,6 +482,8 @@ view: {arg objName, envir, components;
 	var specs = [
 		\trig -> \set,
 		\freq -> \set,
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [-1, 1, \lin, 0, 0]
 		//\vrate -> [0, 10, \lin, 0, 6],
 		//\vdepth -> [0, 1, \lin, 0, 0],
 		//\vdelay -> [0, 1, \lin, 0, 0],

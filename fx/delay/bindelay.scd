@@ -16,16 +16,16 @@ view: {arg objName, envir, components;
 		var chain = FFT(buf, in, 0.25);
 		chain = PV_BinDelay(chain, maxdel, \dels.kr, \fb.kr, 0.25);
 
-		//Pan2.ar(in + IFFT(chain), \pan.kr(0));
-		Pan2.ar(IFFT(chain), \pan.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
-
+		Splay.ar(IFFT(chain), spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 	})
 	.set(\dels, dels, \fb, fb);
 
 	var specs = [
 		\pan -> [-1,1,\lin,0,0],
 		\amp -> [0,1,\lin,0,1],
-		\input -> [0, 10, \lin, 0, 1]
+		\input -> [0, 10, \lin, 0, 1],
+		\spread -> [0,1,\lin,0, 1],
+		\center -> [-1,1,\lin,0,0],
 	];
 
 	var view = View().layout_(VLayout());

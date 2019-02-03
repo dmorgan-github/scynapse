@@ -47,7 +47,8 @@ view: {arg objName, envir, components;
 			pan: panValue,
 			envbufnum: envbuf
 		);
-		sig;
+
+		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 	});
 
 	var specs = [
@@ -58,7 +59,9 @@ view: {arg objName, envir, components;
 		\pan -> [0,1,\lin,0,0],
 		\grainamp -> [0,1,\lin,0,1],
 		\loop -> [0,1,\lin,1,0],
-		\reverse -> [0,1,\lin,0,0]
+		\reverse -> [0,1,\lin,0,0],
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [-1, 1, \lin, 0, 0]
 	];
 
 	var view = View().layout_(VLayout().margins_(2).spacing_(2));

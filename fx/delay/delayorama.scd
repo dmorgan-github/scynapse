@@ -56,7 +56,7 @@ synth: {arg sig_in;
 		in
 	);
 
-	sig * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\inputgain -> [-96, 24, \lin, 0, 0],
@@ -69,6 +69,8 @@ specs: [
 	\ampchange -> [0.2, 5, \lin, 0, 0.5],
 	\amprand -> [0, 100, \lin, 0, 50],
 	\amp -> [0,1,\lin,0,1],
-	\input -> [0, 10, \lin, 0, 1]
+	\input -> [0, 10, \lin, 0, 1],
+	\spread -> [0,1,\lin,0, 1],
+	\center -> [-1,1,\lin,0,0],
 ]
 )

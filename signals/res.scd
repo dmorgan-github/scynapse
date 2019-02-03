@@ -40,7 +40,7 @@ view:{arg objName, envir, components;
 
 		sig = sig * AmpCompA.kr(freq_in) * \amp.kr(-12.dbamp);
 
-		Pan2.ar(sig.asArray.sum, \pan.kr(0));
+		Splay.ar(sig.asArray.sum, \spread.kr(1), center:\center.kr(0));
 	});
 
 	var specs = [
@@ -50,8 +50,9 @@ view:{arg objName, envir, components;
 		\focus -> [0,1, \lin, 0, 1],
 		\atk -> [0, 1, \lin, 0, 0.01],
 		\decay -> [0, 1, \lin, 0, 1],
-		\pan -> [-1, 1, \lin, 0, 0],
-		\amp -> [0, 1, \lin, 0, 0.1]
+		\amp -> [0, 1, \lin, 0, 0.1],
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [-1, 1, \lin, 0, 0]
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));

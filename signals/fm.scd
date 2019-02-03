@@ -28,6 +28,7 @@ view: {arg objName, envir, components;
 				[\atk.kr(0.01), \dec.kr(0.3), \sus.kr(1), \rel.kr(1)],
 				curve:curve
 			).kr(gate:trig, timeScale:\ts.kr(1));
+
 			sig = sig * env * AmpCompA.kr(freq) * \amp.kr(-12.dbamp);
 			sig = Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 			sig;

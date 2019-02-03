@@ -7,12 +7,14 @@ synth: {arg sig_in;
 		smooth: \smooth.kr(0.5)
 	);
 
-	LeakDC.ar(sig) * 0.1 * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(LeakDC.ar(sig) * 0.1, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\cossover -> [0, 1, \lin, 0, 0.5],
 	\smooth -> [0, 1, \lin, 0, 0.5],
 	\amp -> [0,1,\lin,0,1],
-	\input -> [0, 10, \lin, 0, 1]
+	\input -> [0, 10, \lin, 0, 1],
+	\spread -> [0,1,\lin,0, 1],
+	\center -> [-1,1,\lin,0,0],
 ]
 )

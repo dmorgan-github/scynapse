@@ -15,7 +15,7 @@ synth: {arg sig_in;
 		in
 	);
 
-	LeakDC.ar(sig) * 0.1 * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(LeakDC.ar(sig) * 0.1, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\decayL -> [2, 30, \lin, 0, 10],
@@ -24,6 +24,8 @@ specs: [
 	\kneepointL -> [-90, 1, \lin, 0, -10],
 	\kneepointR -> [-90, 1, \lin, 0, -10],
 	\amp -> [0,1,\lin,0,1],
-	\input -> [0, 10, \lin, 0, 1]
+	\input -> [0, 10, \lin, 0, 1],
+	\spread -> [0,1,\lin,0, 1],
+	\center -> [-1,1,\lin,0,0]
 ]
 )

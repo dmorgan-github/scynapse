@@ -7,12 +7,14 @@ synth: {arg sig_in;
 	var chain = FFT( { LocalBuf(512) } ! 2, in);
 	chain = PV_BinShift(chain, stretch, shift, interp: 1);
 	chain = IFFT(chain);
-	chain * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(chain, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\stretch -> [0.01, 8, \lin, 0, 1],
 	\shift -> [0.01, 8, \lin, 0, 0],
 	\amp -> [0,1,\lin,0,1],
-	\input -> [0, 10, \lin, 0, 1]
+	\input -> [0, 10, \lin, 0, 1],
+	\spread -> [0,1,\lin,0, 1],
+	\center -> [-1,1,\lin,0,0]
 ]
 )

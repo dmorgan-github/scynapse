@@ -12,7 +12,7 @@ synth: {arg sig_in;
 		\modFreq.kr(2)
 	);
 
-	sig * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
 	\delayTime -> [0.1, 60, \lin, 0, 2],
@@ -23,6 +23,8 @@ specs: [
 	\modDepth -> [0, 1, \lin, 0, 0.1],
 	\modFreq -> [0, 10, \lin, 0, 2],
 	\amp -> [0,1,\lin,0,1],
-	\input -> [0, 10, \lin, 0, 1]
+	\input -> [0, 10, \lin, 0, 1],
+	\spread -> [0,1,\lin,0, 1],
+	\center -> [-1,1,\lin,0,0]
 ]
 )

@@ -1,9 +1,10 @@
 {
+	var size = 15;
 	(
 		eqView: {arg name, node, envir, containerView;
 
-			var view = View().layout_(VLayout().spacing_(2).margins_(2)).background_(Color.grey.alpha_(0.6));
-			var userview = UserView().minHeight_(100);
+			var view = View().layout_(VLayout().spacing_(1).margins_(1)).background_(Color.grey.alpha_(0.6));
+			var userview = UserView();//.minHeight_(100);
 			var lofreq = 339;
 			var hifreq = 4000;
 			var minfreq = 20;
@@ -54,12 +55,20 @@
 			};
 
 			stack = StackLayout(
-				userview,
+				userview
+				//.fixedWidth_(250)
+				//.fixedHeight_(50)
+				,
+
 				fsv = FreqScopeView()
 				.active_(true)
 				.freqMode_(1)
 				.inBus_(node.bus.index)
-			).mode_(1);
+				//.fixedWidth_(250)
+				//.fixedHeight_(50)
+			)
+			.mode_(1);
+
 			view.layout.add(stack);
 			view.layout.add(HLayout(
 
@@ -74,7 +83,7 @@
 					1, { node.set(\wet110, 1) },
 					0, { node.set(\wet110, 0) });
 				})
-				.fixedSize_(17)
+				.fixedSize_(size)
 				.value_(0),
 
 				Knob().action_({arg ctrl;
@@ -83,7 +92,7 @@
 					node.set(\lo_db, val.linlin(0,1,mindb,maxdb));
 					NotificationCenter.notify(containerView, \status, msg);
 				})
-				.fixedSize_(30)
+				.fixedSize_(size)
 				.mode_(\vert)
 				.value_(0.linlin(mindb,maxdb,0,1)),
 
@@ -93,7 +102,7 @@
 					node.set(\mid_db, val.linlin(0,1,mindb,maxdb));
 					NotificationCenter.notify(containerView, \status, msg);
 				})
-				.fixedSize_(30)
+				.fixedSize_(size)
 				.mode_(\vert)
 				.value_(0.linlin(mindb,maxdb,0,1)),
 
@@ -103,7 +112,7 @@
 					node.set(\hi_db, val.linlin(0,1,mindb,maxdb));
 					NotificationCenter.notify(containerView, \status, msg);
 				})
-				.fixedSize_(30)
+				.fixedSize_(size)
 				.mode_(\vert)
 				.value_(0.linlin(mindb,maxdb,0,1))
 			));
@@ -121,6 +130,8 @@
 				})
 				.value_(lofreq)
 				.normalColor_(Color.white)
+				.font_(Font(size:8))
+				.fixedHeight_(size)
 				.maxWidth_(50)
 				.clipLo_(minfreq)
 				.clipHi_(maxfreq),
@@ -137,7 +148,9 @@
 				})
 				.value_(hifreq)
 				.normalColor_(Color.white)
+				.font_(Font(size:8))
 				.maxWidth_(50)
+				.fixedHeight_(size)
 				.align_(\right)
 				.clipLo_(minfreq)
 				.clipHi_(maxfreq),
@@ -155,7 +168,7 @@
 
 			var mappers = ();
 			var view = View()
-			.layout_(GridLayout().margins_(4).spacing_(4)).background_(Color.grey.alpha_(0.3))
+			.layout_(GridLayout().margins_(1).spacing_(1)).background_(Color.grey.alpha_(0.3))
 			.onClose_({
 				specs.do({arg assoc;
 					var key = assoc.key;
@@ -170,7 +183,7 @@
 			specs.do({arg assoc, row;
 
 				var myrow = (row/2).floor.asInt;
-				var coloffset = ((row + 5) % 2).asInt * 5;
+				var coloffset = ((row + 4) % 2).asInt * 4;
 
 				var k = assoc.key;
 				var v = assoc.value;
@@ -180,17 +193,35 @@
 
 				var layout = view.layout;
 
+				var numberbox = NumberBox()
+				.decimals_(3)
+				.fixedHeight_(size)
+				.fixedWidth_(30)
+				.font_(Font(size:8));
+
 				var rs = Knob()
 				.mode_(\vert)
 				.enabled_(false)
-				.fixedSize_(25);
+				.fixedSize_(size);
 
-				var slider = Knob()
-				.mode_(\vert)
-				.enabled_(true)
-				.fixedSize_(25);
+				var slider;
+				var stack = StackLayout(
 
-				var numberbox = NumberBox().decimals_(3);
+					slider = Slider()
+					.orientation_(\horizontal)
+					.fixedHeight_(size)
+					.minWidth_(25)
+					.thumbSize_(7)
+					.background_(Color.white.alpha_(0)),
+
+					StaticText()
+					.string_(k)
+					.align_(\center)
+					.font_(Font(size:8, bold:true))
+					.stringColor_(Color.white)
+				)
+				.mode_(\stackAll);
+
 				var height = 20;
 
 				if (specs.size < 4) {
@@ -224,11 +255,11 @@
 				} {
 					var dragSink = UserView()
 					.drawFunc_({
-						var size = 13;
-						var width = 2;
+						var size = 10;
+						var width = 1;
 						Pen.color = Color.black;
 						Pen.width = width;
-						Pen.strokeOval(Rect(0,5,size,size))
+						Pen.strokeOval(Rect(2,3,size,size))
 					})
 					.canReceiveDragHandler_({
 						var obj = View.currentDrag;
@@ -255,11 +286,11 @@
 							};
 
 							dragSink.drawFunc_({
-								var size = 13;
+								var size = 10;
 								var width = 1;
 								Pen.color = color;
 								Pen.width = width;
-								Pen.fillOval(Rect(0,5,size,size))
+								Pen.fillOval(Rect(2,3,size,size))
 							});
 							dragSink.refresh;
 
@@ -268,8 +299,7 @@
 							NotificationCenter.notify(containerView, \status, msg);
 						}
 					})
-					.minHeight_(22)
-					.fixedWidth_(15);
+					.fixedWidth_(size);
 
 					dragSink.setContextMenuActions(
 						MenuAction(specKey, {specKey.postln}),
@@ -283,48 +313,47 @@
 							};
 
 							dragSink.drawFunc_({
-								var size = 13;
-								var width = 2;
+								var size = 10;
+								var width = 1;
 								Pen.color = Color.black;
 								Pen.width = width;
-								Pen.strokeOval(Rect(0,5,size,size))
+								Pen.strokeOval(Rect(2,3,size,size))
 							})
 							.refresh;
 						});
 					);
 
-					//[myrow, coloffset].postln;
-					layout.add(StaticText().string_(k).maxWidth_(50), myrow, coloffset + 0);
-					layout.add(dragSink, myrow, coloffset + 1);
+					layout.add(dragSink, myrow, coloffset);
 				};
 
 				///////////////////////////////////
 				if (spec != \set) {
+
+					slider.action = {arg ctrl;
+						var msg;
+						var val = spec.map(ctrl.value);
+						msg = k ++ " " ++ val;
+						mappers[k].set(\center, val);
+						numberbox.value_(val);
+						NotificationCenter.notify(containerView, \status, msg);
+					};
+					slider.value = spec.unmap(spec.default);
+
 					layout.add(
 						rs.action_({arg ctrl;
 							var val = ctrl.value;
 							var msg = "depth: " ++ val;
 							mappers[k].set(\depth, val);
 							NotificationCenter.notify(containerView, \status, msg);
-						}), myrow, coloffset + 2
+						}), myrow, coloffset + 1
 					);
 
 					layout.add(
-						slider
-						.action_({arg ctrl;
-							var msg;
-							var val = spec.map(ctrl.value);
-							msg = k ++ " " ++ val;
-							mappers[k].set(\center, val);
-							numberbox.value_(val);
-							NotificationCenter.notify(containerView, \status, msg);
-						})
-						.value_(spec.unmap(spec.default)), myrow, coloffset + 3
+						stack, myrow, coloffset + 2
 					);
 
 					layout.add(
 						numberbox
-						.fixedWidth_(40)
 						.action_({arg ctrl;
 							var ctrlval = ctrl.value;
 							var val = spec.unmap(ctrlval);
@@ -334,7 +363,7 @@
 						.clipLo_(spec.minval)
 						.clipHi_(spec.maxval)
 						.normalColor_(Color.white)
-						.value_(spec.default), myrow, coloffset + 4
+						.value_(spec.default), myrow, coloffset + 3
 					);
 				};
 			});
@@ -352,7 +381,7 @@
 
 			view.layout.add(
 				Knob()
-				.fixedSize_(25)
+				.fixedSize_(size)
 				.mode_(\vert)
 				.value_(1.linlin(0,4,0,1))
 				.action_({arg ctrl;
@@ -364,7 +393,7 @@
 
 			view.layout.add(
 				Knob()
-				.fixedSize_(25)
+				.fixedSize_(size)
 				.mode_(\vert)
 				.value_(1)
 				.action_({arg ctrl;
@@ -375,7 +404,7 @@
 
 			view.layout.add(
 				NumberBox()
-				.fixedSize_(30@height)
+				.fixedSize_(size)
 				.alt_scale_(0.01)
 				.ctrl_scale_(0.1)
 				.shift_scale_(1)
@@ -390,7 +419,7 @@
 
 			view.layout.add(
 				Button()
-				.fixedSize_(30@height)
+				.fixedSize_(size)
 				.states_([ [">", Color.white], ["[]", Color.white, Color.blue] ])
 				.action_({arg ctrl;
 					if (ctrl.value == 1) {
@@ -403,7 +432,7 @@
 
 			view.layout.add(
 				Button()
-				.fixedSize_(30@height)
+				.fixedSize_(size)
 				.states_([ ["M", Color.white], ["M", Color.white, Color.new(red:1, green:0.64705882352941, blue:0)] ])
 				.action_({arg ctrl;
 					if (ctrl.value == 1) {
@@ -416,7 +445,7 @@
 
 			view.layout.add(
 				Button()
-				.fixedSize_(30@height)
+				.fixedSize_(size)
 				.states_([ ["sc"] ])
 				.action_({arg ctrl;
 					node.scope;
@@ -443,18 +472,18 @@
 
 				dragSink = UserView()
 				.drawFunc_({
-					var size = 13;
-					var width = 2;
+					var size = 10;
+					var width = 1;
 					Pen.color = Color.black;
 					Pen.width = width;
-					Pen.strokeOval(Rect(0,5,size,size))
+					Pen.strokeOval(Rect(2,3,size,size))
 				})
 				.canReceiveDragHandler_({
 					var obj = View.currentDrag;
 					var node = obj[\node];
 					(node.rate == \audio);
 				})
-				.fixedWidth_(15)
+				.fixedWidth_(size)
 				.receiveDragHandler_({arg v;
 
 					var obj = View.currentDrag.value;
@@ -478,18 +507,17 @@
 					};
 
 					dragSink.drawFunc_({
-						var size = 13;
+						var size = 10;
 						var width = 1;
 						Pen.color = color;
 						Pen.width = width;
-						Pen.fillOval(Rect(0,5,size,size))
+						Pen.fillOval(Rect(2,2,size,size))
 					});
 					dragSink.refresh;
 
 					NotificationCenter.notify(mainView, \status, msg);
 				})
-				.fixedHeight_(20)
-				.minWidth_(100); // width gets jacked up
+				.fixedHeight_(size);
 
 				dragSink.setContextMenuActions(
 					menuaction
@@ -499,13 +527,12 @@
 
 				row.layout.add(
 
-					LevelIndicator(bounds:Rect(width:50, height:18))
+					LevelIndicator(bounds:Rect(width:20, height:18))
 					.style_(\led)
 					.meterColor_(Color.blue().alpha_(1))
 					.warningColor_(Color.blue().alpha_(1))
 					.criticalColor_(Color.blue().alpha_(1))
 					.numSteps_(10)
-					.minWidth_(150)
 					.fixedHeight_(15)
 					.mouseMoveAction_({arg ctrl, x, y, modifiers;
 						var val = x.linlin(0, ctrl.bounds.width, 0, 1);
@@ -534,7 +561,7 @@
 
 				row.layout.add(Button().string_("+").action_({
 					addRow.();
-				}).fixedSize_(20));
+				}).fixedSize_(size));
 
 				row.layout.add(Button().string_("-").action_({
 
@@ -555,7 +582,7 @@
 						view.resizeTo(sizeHint.width, sizeHint.height)
 					}.defer(0.001)
 
-				}).fixedSize_(20));
+				}).fixedSize_(size));
 				view.layout.add(row);
 			};
 			addRow.();
