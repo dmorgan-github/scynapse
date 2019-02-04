@@ -2,7 +2,7 @@
 view: {arg objName, envir, components;
 
 	var load;
-	var dict = ();
+	var dict = List.new;
 
 	var node = NodeProxy.audio(s, 2);
 
@@ -18,19 +18,86 @@ view: {arg objName, envir, components;
 		var obj = View.currentDrag.value;
 		var node = obj[\node];
 		var name = obj[\name];
-		dict[name.asSymbol] = node;
+		dict.add( (name:name, node:node) );
 		load.();
 	})
 	.maxHeight_(35)
 	.minWidth_(35);
 
-	var ctrls = View().layout_(VLayout().margins_(0).spacing_(0));
+	var ctrls = View().layout_(GridLayout().margins_(0).spacing_(0));
 	var playView = components[\playView].(objName, node, view);
 	var size = 30;
 	var keys = Order.new;
 
 	load = {arg force = false;
 
+		var num = dict.size;
+		var key = dict[num-1][\name];
+		var node = dict[num-1][\node];
+		var issignal = (node[0].class == Function);
+		// add header
+		ctrls.layout.add(StaticText().string_(key).font_(Font(size:8)), 0, num, align:\center);
+		num.do({arg i;
+			var row = i + 1;
+			if (row == (num)) {
+				// we're in the new row so add all columns
+				var rowheader = View().layout_(HLayout(StaticText().string_(key + i).font_(Font(size:8))));
+				ctrls.layout.add(rowheader, num, 0);
+				num.do({arg j;
+					var disable = ((issignal && (i == j)) || (dict[j][\node][0].class == Function));
+					ctrls.layout.add(
+						Knob()
+						.mode_(\vert)
+						.enabled_(disable == false)
+						.action_({arg ctrl;
+							// we go from row as input to column
+
+							// node at current column
+							var current = dict[j][\node];
+							// node at current row
+							var src = dict[i][\node];
+
+							if (ctrl.value > 0) {
+								ctrl.background = Color.blue;
+							} {
+								ctrl.background = Color.grey;
+							};
+
+							if (current[i].isNil) {
+								current[i] = \mix -> {src.ar};
+							};
+							current.set((\mix ++ i).asSymbol, ctrl.value);
+
+						}),
+						num, j+1);
+				});
+			} {
+				// we're in a previously created row so just add new col
+				ctrls.layout.add(
+					Knob()
+					.mode_(\vert)
+					.enabled_(issignal == false)
+					.action_({arg ctrl;
+
+						var current = node;
+						var src = dict[i][\node];
+
+						if (ctrl.value > 0) {
+							ctrl.background = Color.blue;
+						} {
+							ctrl.background = Color.grey;
+						};
+
+						if (current[i].isNil) {
+							current[i] = \mix -> {src.ar};
+						};
+						current.set((\mix ++ i).asSymbol, ctrl.value);
+					}),
+					row, num);
+			}
+		});
+
+		/*
 		var num = dict.values.select({arg val; val.rate == \audio}).size;
 
 		if (force || (num != keys.size)) {
@@ -82,7 +149,6 @@ view: {arg objName, envir, components;
 					Knob().mode_(\vert)
 					.fixedSize_(size)
 					.action_({arg ctrl;
-						//dict[rowkey].vol = ctrl.value;
 						var key = ('mix' ++ i).asSymbol;
 						[key, ctrl.value].postln;
 						node.set(key, ctrl.value);
@@ -102,12 +168,14 @@ view: {arg objName, envir, components;
 
 				).margins_(1).spacing_(1));
 
+				"----".postln;
 				keys.do({arg colkey, j;
 
-					var slider = Knob()
+					var slider;
+
+					slider = Knob()
 					.mode_(\vert)
 					.fixedSize_(size)
-					//.thumbSize_(8)
 					.action_({arg ctrl;
 
 						if (ctrl.value > 0) {
@@ -116,7 +184,9 @@ view: {arg objName, envir, components;
 							ctrl.background = Color.grey;
 						};
 
+						[dict[colkey][i].class, i, colkey].postln;
 						if (dict[colkey][i].class != Function) {
+							[colkey, "here"].postln;
 							if (dict[colkey][i] == nil) {
 								dict[colkey][i] = \mix -> {dict[rowkey].ar};
 							};
@@ -132,6 +202,7 @@ view: {arg objName, envir, components;
 				ctrls.layout.add(row);
 			});
 		}
+		*/
 	};
 
 	view.layout.add(playView);
