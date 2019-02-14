@@ -270,12 +270,6 @@ Fdef(\scynapse, {arg environment;
 				})
 			})
 			.fixedSize_(20@20);
-
-			/*
-			TextField().action_({arg ctrl;
-			proxyspace = ctrl.value;
-			}).value_(\p);
-			*/
 		));
 
 		scrollView = ScrollView()

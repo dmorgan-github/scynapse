@@ -10,12 +10,39 @@ view: {arg objName, envir, components;
 	// Node
 	var node = NodeProxy.audio.source_({
 
-		var lo = \lo.kr(0);
-		var hi = \hi.kr(1);
-		var rate = \rate.kr(1);
+		var trig = Impulse.kr(\distance.kr(1).reciprocal);
+		var warp = \warp.kr(0);
+		var curve = \curve.kr(0);
 		var buf = \buf.kr(0);
-		var phasor = Phasor.ar(0, BufRateScale.kr(buf) * rate, lo, hi);
-		var sig = BufRd.ar(buf.numChannels, buf, phasor);
+		var start = \start.kr(0);
+		var end = \end.kr(1);
+		var atk = \atk.kr(0);
+		var dec = \dec.kr(0);
+		var suslevel = \suslevel.kr(1);
+		var sus = \sus.kr(1);
+		var rel = \rel.kr(1);
+		var ts = \ts.kr(1);
+		var speed = \stretch.kr(1);
+		var pitch = \pitch.kr(1);
+		var numframes = BufFrames.kr(buf);
+		var startframe = numframes * start;
+		var endframe = numframes * end;
+		var dur = (endframe - startframe) / BufSampleRate.kr(buf);
+		var phasor = Env([start,start,end], [0, dur * speed], warp).kr(gate:trig);
+		var env = Env([0,suslevel,suslevel,0], [atk,dec,sus,rel].normalizeSum, curve).kr(gate:trig, timeScale:ts);
+
+		var sig = Warp1.ar(
+			numChannels:1,
+			bufnum:buf,
+			pointer:phasor,
+			freqScale:pitch,
+			windowSize:16.reciprocal,// LFNoise2.kr(10).range(8,18).reciprocal,
+			envbufnum:-1,
+			overlaps:16,
+			windowRandRatio:0.2,
+			interp:4
+		) * env * \amp.kr(-8.dbamp);
+
 		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 	});
 
@@ -82,14 +109,27 @@ view: {arg objName, envir, components;
 	};
 
 	var specs = [
-		\pan -> [-1,1,\lin,0,0],
-		\rate -> [0,4,\lin,0,1],
+		\distance -> [0.1, 64, \lin, 0, 4],
+		\start -> [0, 1, \lin, 0, 0],
+		\end -> [0, 1, \lin, 0, 1],
+		\warp -> [-24, 24, \lin, 0, 0],
+		\atk -> [0, 1, \lin, 0, 0.001],
+		\dec -> [0, 1, \lin, 0, 0],
+		\sus -> [0, 1, \lin, 0, 1],
+		\suslevel -> [0,1,\lin,0, 1],
+		\rel -> [0, 1, \lin, 0, 0],
+		\curve -> [-24, 24, \lin, 0, 6],
+		\ts -> [0, 64, \lin, 0, 1],
+		\amp -> [0, 1, \lin, 0, 0.3],
+		\pitch -> [0.1, 4, \lin, 0, 1],
+		\stretch -> [0.1, 64, \lin,0, 1],
 		\spread -> [0, 1, \lin, 0, 1],
 		\center -> [-1, 1, \lin, 0, 0]
 	];
 
 	var playView = components[\playView].(objName, node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
+	var eqView = components[\eqView].(objName, node, envir, view);
 
 	var sfv = SoundFileView()
 	.background_(Color.gray(0.3))
@@ -103,11 +143,11 @@ view: {arg objName, envir, components;
 		loFrames = view.selection(0)[0];
 		hiFrames = view.selection(0)[1] + loFrames;
 		node.set(\lo, loFrames, \hi, hiFrames);
-		//status.string_("pos : " ++ loFrames.asString ++ " : " ++ hiFrames.asString);
 	});
 	sfv.setSelectionColor(0, Color.blue(alpha:0.5));
 
 	view.layout.add(playView);
+	view.layout.add(eqView);
 	view.layout.add(controlsView.());
 	view.layout.add(sfv);
 	view.layout.add(specsView);

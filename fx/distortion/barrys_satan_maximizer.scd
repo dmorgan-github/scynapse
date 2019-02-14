@@ -21,8 +21,8 @@ specs: [
 	\decayL -> [2, 30, \lin, 0, 10],
 	\decayR -> [2, 30, \lin, 0, 10],
 
-	\kneepointL -> [-90, 1, \lin, 0, -10],
-	\kneepointR -> [-90, 1, \lin, 0, -10],
+	\kneepointL -> [-90, 1, \lin, 0, -30],
+	\kneepointR -> [-90, 1, \lin, 0, -30],
 	\amp -> [0,1,\lin,0,1],
 	\input -> [0, 10, \lin, 0, 1],
 	\spread -> [0,1,\lin,0, 1],

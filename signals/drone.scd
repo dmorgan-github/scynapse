@@ -2,7 +2,7 @@
 view: {arg objName, envir, components;
 
 	var harms = 12;
-	var nodefunc = {arg harms = 10;
+	var nodefunc = {arg harms = 12;
 
 		{
 			var rq = \rq.kr(0.005);

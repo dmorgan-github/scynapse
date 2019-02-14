@@ -40,7 +40,7 @@ view: {arg objName, envir, components;
 			var dur = ctrl.value;
 			var buf;
 			// allocate a buffer
-			buf = Buffer.alloc(s, dur * s.sampleRate, 1, bufnum:bufnum);
+			buf = Buffer.alloc(s, dur * s.sampleRate, 2, bufnum:bufnum);
 			bufs[key] = buf;
 			NotificationCenter.notify(win, \status, "alloc: " ++ key);
 		});
