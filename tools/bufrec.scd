@@ -1,12 +1,13 @@
 (
 view: {arg name, envir, components;
 
-	var inputs;
+	var inputs, specsView;
 	var filterSlot = 100;
 	var oscfunc, li, oscfunc2;
 	var levelskey = ('/' ++ name ++ 'levels').asSymbol;
 	var durkey = ('/' ++ name ++ 'dur');
 	var recbutton;
+	var specs;
 
 	var view = View()
 	.layout_(VLayout().spacing_(2).margins_(2));
@@ -26,7 +27,7 @@ view: {arg name, envir, components;
 		var imp2 = Impulse.kr(1);
 		var steps = Stepper.kr(imp2, trig, 0, secs.round + 1, 1);
 
-		var sig = RecordBuf.ar(in,
+		var sig = RecordBuf.ar(in * \input.kr(0.dbamp),
 			buf,
 			offset:0,
 			recLevel:\reclevel.kr(1),
@@ -41,7 +42,12 @@ view: {arg name, envir, components;
 		Silence.ar;
 	});
 
+	specs = [
+		\input -> [0, 10, \lin, 0, 1]
+	];
+
 	inputs = components[\multiInputsView].(envir[name], view);
+	specsView = components[\specsView].(name, specs, envir[name], envir, view);
 	view.layout.add(inputs);
 	view.layout.add(VLayout(
 
@@ -90,6 +96,8 @@ view: {arg name, envir, components;
 
 		li = LevelIndicator(bounds:Rect(100, 100, 100, 400));
 	));
+
+	view.layout.add(specsView);
 
 	oscfunc = OSCFunc({arg msg;
 		{
