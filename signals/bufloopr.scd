@@ -32,7 +32,7 @@ view: {arg objName, envir, components;
 		var env = Env([0,suslevel,suslevel,0], [atk,dec,sus,rel].normalizeSum, curve).kr(gate:trig, timeScale:ts);
 
 		var sig = Warp1.ar(
-			numChannels:1,
+			numChannels:2,
 			bufnum:buf,
 			pointer:phasor,
 			freqScale:pitch,
