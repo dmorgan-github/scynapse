@@ -2,10 +2,10 @@
 view: {arg objName, envir, components;
 
 	var load;
-	var dict = List.new;
+	var map = Order.new;
+	var slot = 0;
 	var proxy = NodeProxy.audio(s, 2);
-
-	var view = View().layout_(VLayout().margins_(0).spacing_(0)).minWidth_(200);
+	var view = View().layout_(VLayout().margins_(1).spacing_(1)).minWidth_(300);
 
 	var dragsink = DragSink()
 	.string_("<-  ")
@@ -17,8 +17,9 @@ view: {arg objName, envir, components;
 		var obj = View.currentDrag.value;
 		var node = obj[\node];
 		var name = obj[\name];
-		dict.add( (name:name, node:node) );
+		map.put(slot, (name:name, node:node, controls:List.new));
 		load.();
+		slot = slot + 1;
 	})
 	.maxHeight_(35)
 	.minWidth_(35);
@@ -26,86 +27,119 @@ view: {arg objName, envir, components;
 	var ctrls = View().layout_(GridLayout().margins_(0).spacing_(0));
 	var playView = components[\playView].(objName, proxy, view);
 	var eqView = components[\eqView].(objName, proxy, envir, view);
-
 	var size = 30;
-	var keys = Order.new;
 
 	load = {arg force = false;
 
-		var num = dict.size;
-		var key = dict[num-1][\name];
-		var node = dict[num-1][\node];
+		var currentSlot = slot;
+		var num = map.indices.size;
+		var key = map[currentSlot][\name];
+		var node = map[currentSlot][\node];
+		var controls = map[currentSlot][\controls];
 		var issignal = (node[0].class == Function);
+		var header = StaticText().string_(key).font_(Font(size:8));
+		var temp, rowheader;
 
-		proxy[num] = \mix -> {node.ar};
-		ctrls.layout.add(StaticText().string_(key).font_(Font(size:8)), 0, num, align:\center);
-		num.do({arg i;
-			var row = i + 1;
-			if (row == (num)) {
-				// we're in the new row so add all columns
-				var rowheader = View().layout_(HLayout(
-					StaticText().string_(key + i).font_(Font(size:8)),
-					Knob().action_({arg ctrl;
-						var key = ('mix' ++ num).asSymbol;
-						proxy.set(key, ctrl.value);
-					})
-					.value_(1)
-					.fixedSize_(25)
-				));
-				ctrls.layout.add(rowheader, num, 0);
-				num.do({arg j;
-					var disable = ((issignal && (i == j)) || (dict[j][\node][0].class == Function));
-					ctrls.layout.add(
-						Knob()
-						.fixedSize_(40)
-						.mode_(\vert)
-						.enabled_(disable == false)
-						.action_({arg ctrl;
-							// we go from row as input to column
+		proxy[currentSlot] = \mix -> {node.ar};
+		ctrls.layout.add(header, 0, currentSlot+1, align:\center);
+		controls.add(header);
 
-							// node at current column
-							var current = dict[j][\node];
-							// node at current row
-							var src = dict[i][\node];
-
-							if (ctrl.value > 0) {
-								ctrl.background = Color.blue;
-							} {
-								ctrl.background = Color.grey;
-							};
-
-							if (current[i].isNil) {
-								current[i] = \mix -> {src.ar};
-							};
-							current.set((\mix ++ i).asSymbol, ctrl.value);
-
-						}),
-						num, j+1);
+		// add new row
+		// row header
+		rowheader = View().layout_(HLayout(
+			Button()
+			.states_([["X"]])
+			.action_({
+				controls.do({arg ctrl;
+					ctrl.remove();
 				});
-			} {
-				// we're in a previously created row so just add new col
-				ctrls.layout.add(
-					Knob()
-					.mode_(\vert)
-					.fixedSize_(40)
-					.enabled_(issignal == false)
-					.action_({arg ctrl;
+				// remove current node from matrix output
+				proxy[currentSlot] = nil;
+				map.indicesDo({arg val, key, index;
+					if (key == currentSlot) {
+						map.removeAtSlot(index);
+					};
+					// remove current node as source
+					// from all fx
+					val[\node][currentSlot] = nil;
+				});
+			})
+			.fixedSize_(15),
+			StaticText().string_(key).font_(Font(size:8)),
+			Knob()
+			.mode_(\vert)
+			.action_({arg ctrl;
+				var key = ('mix' ++ currentSlot).asSymbol;
+				proxy.set(key, ctrl.value);
+			})
+			.value_(1)
+			.fixedSize_(25)
+		).margins_(2).spacing_(2));
+		ctrls.layout.add(rowheader.fixedWidth_(100), currentSlot + 1, 0, align:\left);
+		controls.add(rowheader);
 
-						var current = node;
-						var src = dict[i][\node];
+		// add row controls
+		map.indicesDo({arg valj, keyj, j;
 
-						if (ctrl.value > 0) {
-							ctrl.background = Color.blue;
-						} {
-							ctrl.background = Color.grey;
-						};
+			var disable = ((issignal && (i == j)) || (map[keyj][\node][0].class == Function));
+			temp = Knob()
+			.fixedSize_(40)
+			.mode_(\vert)
+			.enabled_(disable == false)
+			.action_({arg ctrl;
+				// we go from row as input to column
+				// node at current column
+				var current = map[keyj][\node];
+				// node at current row
+				var src = map[currentSlot][\node];
 
-						if (current[i].isNil) {
-							current[i] = \mix -> {src.ar};
-						};
-						current.set((\mix ++ i).asSymbol, ctrl.value);
-					}),
-					row, num);
+				if (ctrl.value > 0) {
+					ctrl.background = Color.blue;
+				} {
+					ctrl.background = Color.grey;
+				};
+
+				if (current[currentSlot].isNil) {
+					current[currentSlot] = \mix -> {src.ar};
+				};
+				current.set((\mix ++ currentSlot).asSymbol, ctrl.value);
+			});
+			// add to current slot row + 1 for header row
+			ctrls.layout.add(temp, currentSlot+1, keyj+1);
+			// add row controls to previously created columns
+			map[keyj][\controls].add(temp);
+			// add row controls to current object
+			controls.add(temp);
+		});
+
+		// add new control to existing columns
+		map.indicesDo({arg val, keyi, i;
+
+			if (keyi < currentSlot) {
+
+				temp = Knob()
+				.mode_(\vert)
+				.fixedSize_(40)
+				.enabled_(issignal == false)
+				.action_({arg ctrl;
+
+					var current = node;
+					var src = map[keyi][\node];
+
+					if (ctrl.value > 0) {
+						ctrl.background = Color.blue;
+					} {
+						ctrl.background = Color.grey;
+					};
+
+					if (current[keyi].isNil) {
+						current[keyi] = \mix -> {src.ar};
+					};
+					current.set((\mix ++ keyi).asSymbol, ctrl.value);
+				});
+				ctrls.layout.add(temp, keyi+1, currentSlot+1);
+				map[keyi][\controls].add(temp);
+				controls.add(temp);
 			}
 		});
 	};
@@ -120,6 +154,11 @@ view: {arg objName, envir, components;
 		envir[objName].clear(envir[objName].fadeTime);
 		{
 			"destroy: ".debug(objName);
+			map.indicesDo({arg vali, keyi, i;
+				map.indicesDo({arg valj, keyj, j;
+					vali[\node][keyj] = nil;
+				});
+			});
 			envir[objName] = nil;
 		}.defer(envir[objName].fadeTime + 1);
 	});
