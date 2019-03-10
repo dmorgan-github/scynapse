@@ -54,6 +54,7 @@ view: {arg objName, envir, components;
 				node = nil
 			});
 		}.defer();
+		NotificationCenter.notify(view, \close, objName);
 	});
 
 }

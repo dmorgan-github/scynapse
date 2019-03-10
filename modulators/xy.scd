@@ -48,6 +48,7 @@ view: {arg name, envir;
 			node.free;
 			node = nil;
 		});
+		NotificationCenter.notify(view, \close, name);
 	});
 }
 )

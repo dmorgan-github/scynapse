@@ -123,6 +123,7 @@ view: {arg name, envir, components;
 		envir[name] = nil;
 		oscfunc.free;
 		oscfunc2.free;
+		NotificationCenter.notify(view, \close, name);
 	});
 }
 )

@@ -163,6 +163,7 @@ view: {arg objName, envir, components;
 
 	win.onClose_({
 		"destroy: ".debug(objName);
+		NotificationCenter.notify(win, \close, objName);
 	});
 }
 )

@@ -672,6 +672,7 @@ view: {arg objName, envir, components;
 			"destroy: ".debug(objName);
 			envir[objName] = nil;
 		}.defer(envir[objName].fadeTime + 1);
+		NotificationCenter.notify(view, \close, objName);
 	});
 };
 )

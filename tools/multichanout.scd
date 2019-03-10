@@ -30,6 +30,7 @@ view: {arg objName, envir, components;
 			node.free;
 			node = nil;
 		});
+		NotificationCenter.notify(view, \close, objName);
 	})
 }
 )

@@ -19,6 +19,7 @@ view: {arg objName, envir, components;
 			"destroy: ".debug(objName);
 			envir[objName] = nil;
 		}.defer();
+		NotificationCenter.notify(view, \close, objName);
 	});
 }
 )

@@ -74,6 +74,7 @@ view: {arg objName, envir, components;
 			envir[objName] = nil;
 			sendbus.free;
 		}.defer(envir[objName].fadeTime + 1);
+		NotificationCenter.notify(view, \close, objName);
 	});
 
 }

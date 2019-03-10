@@ -188,6 +188,7 @@ view: {arg name, envir;
 			node = nil;
 			envir[name] = nil;
 		}.defer(node.fadeTime + 1);
+		NotificationCenter.notify(view, \close, name);
 	});
 	view;
 };

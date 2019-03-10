@@ -78,6 +78,7 @@ view: {arg objName, envir, components;
 			dels.free;
 			fb.free;
 		}.defer(envir[objName].fadeTime + 1);
+		NotificationCenter.notify(view, \close, objName);
 	});
 }
 )

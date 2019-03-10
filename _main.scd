@@ -82,7 +82,6 @@ Fdef(\scynapse, {arg environment;
 				rec.unpause;
 			});
 		}.defer(1);
-
 	};
 
 	var stopRecordStems = {
@@ -96,6 +95,9 @@ Fdef(\scynapse, {arg environment;
 
 		recorders = List.new;
 	};
+
+	var doclist = View().layout_(VLayout(nil)).minWidth_(100);
+	var docmap = ();
 
 	var findView = {arg path;
 
@@ -138,6 +140,7 @@ Fdef(\scynapse, {arg environment;
 		var status = StaticText().string_("").font_(Font().size_(9));
 		var color = Color.rand;
 		var envir = getenvir.();
+		var opendoc;
 
 		envir.keysValuesDo({arg k,v;
 			if (v.class == NodeProxy and: k.asString.beginsWith(objName) )  {
@@ -145,7 +148,7 @@ Fdef(\scynapse, {arg environment;
 			}
 		});
 
-		objName = (objName ++ count.asString).asSymbol;
+		objName = (objName ++ '_' ++ count.asString).asSymbol;
 
 		// if the module provides its own view
 		// we can load it directly
@@ -165,10 +168,18 @@ Fdef(\scynapse, {arg environment;
 		} {
 
 			if (view.class == View) {
-				win = View().layout_(VLayout().spacing_(0).margins_(0)).palette_(QPalette.dark).name_(objName);//.minWidth_(300);
+				win = View().layout_(VLayout().spacing_(0).margins_(0)).palette_(QPalette.dark).name_(objName);
 
 				NotificationCenter.register(view, \status, win, {arg msg;
 					status.string_(msg);
+				});
+
+				NotificationCenter.register(view, \close, win, {arg msg;
+					var key = msg.asSymbol;
+					if (docmap[key].isNil.not){
+						docmap[key].remove();
+					};
+					msg.debug("onclose");
 				});
 
 				win.layout.add(
@@ -206,6 +217,12 @@ Fdef(\scynapse, {arg environment;
 						}.defer();
 					});
 				};
+
+				opendoc = StaticText().string_(objName).mouseUpAction_({
+					win.front;
+				});
+				doclist.layout.insert(opendoc, 0);
+				docmap[objName] = opendoc;
 
 				win.front;
 			} {
@@ -337,6 +354,7 @@ Fdef(\scynapse, {arg environment;
 		};
 
 		view.layout.add(VLayout(ctrlView, scrollView));
+		view.layout.add(doclist);
 		view.layout.add(
 			ServerMeterView.new(s, win, numIns:0, numOuts:2).view.minHeight_(50).minWidth_(75)
 		);

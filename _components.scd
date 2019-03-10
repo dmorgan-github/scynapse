@@ -3,8 +3,10 @@
 	(
 		eqView: {arg name, node, envir, containerView;
 
-			var view = View().layout_(VLayout().spacing_(1).margins_(1)).background_(Color.grey.alpha_(0.6));
-			var userview = UserView();//.minHeight_(100);
+			var view = View()
+			.layout_(VLayout().spacing_(1).margins_(1))
+			.background_(Color.grey.alpha_(0.6));
+			var userview = UserView();
 			var lofreq = 339;
 			var hifreq = 4000;
 			var minfreq = 20;
@@ -14,6 +16,7 @@
 			var midfreq = (lofreq+hifreq)/2;
 			var stack, fsv;
 
+			/*
 			node.filter(110, {arg in;
 
 				var sig = in;
@@ -53,13 +56,11 @@
 				Pen.lineTo(hixpos@height);
 				Pen.fillStroke;
 			};
+			*/
 
+			/*
 			stack = StackLayout(
-				userview
-				//.fixedWidth_(250)
-				//.fixedHeight_(50)
-				,
-
+				userview,
 				fsv = FreqScopeView()
 				.active_(true)
 				.freqMode_(1)
@@ -68,8 +69,31 @@
 				//.fixedHeight_(50)
 			)
 			.mode_(1);
+			*/
 
-			view.layout.add(stack);
+			//view.layout.add(
+			//	VLayout(
+			//		ChannelEQ(numChannels:2, bus:node.bus.index, target:node.group)
+			//		.gui.window.view.minHeight_(350/1.6).minWidth_(505/1.5)
+			//	)
+			//);
+
+			view.layout.add(
+				StackLayout(
+
+					ChannelEQ(numChannels:2, bus:node.bus.index, target:node.group)
+					.gui.window.view.minHeight_(350/1.6).minWidth_(505/1.5),
+
+					fsv = FreqScopeView()
+					.active_(true)
+					.freqMode_(1)
+					.inBus_(node.bus.index)
+				)
+				.mode_(1)
+			);
+
+			//view.layout.add(stack);
+			/*
 			view.layout.add(HLayout(
 
 				RoundButton()
@@ -116,7 +140,8 @@
 				.mode_(\vert)
 				.value_(0.linlin(mindb,maxdb,0,1))
 			));
-
+			*/
+			/*
 			view.layout.add(HLayout(
 				NumberBox().action_({arg ctrl;
 
@@ -155,10 +180,11 @@
 				.clipLo_(minfreq)
 				.clipHi_(maxfreq),
 			));
+			*/
 
 			view.onClose_({
-				["eqView", fsv].debug("close ");
-				fsv.kill;
+				//["eqView", fsv].debug("close ");
+				//fsv.kill;
 			});
 
 			view;
@@ -168,7 +194,7 @@
 
 			var mappers = ();
 			var view = View()
-			.layout_(GridLayout().margins_(1).spacing_(1)).background_(Color.grey.alpha_(0.3))
+			.layout_(GridLayout().margins_(0).spacing_(0)).background_(Color.grey.alpha_(0.3))
 			.onClose_({
 				specs.do({arg assoc;
 					var key = assoc.key;

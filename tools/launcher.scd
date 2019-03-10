@@ -1,5 +1,5 @@
 (
-Fdef(\launcher, {arg tracks=8, scenes=8;
+Fdef(\launcher, {arg objName, envir, components, tracks=8, scenes=8;
 	var cols = scenes;
 	var rows = tracks;
 	var buttons = Array.fill(tracks*cols, {Button()});
@@ -61,11 +61,13 @@ Fdef(\launcher, {arg tracks=8, scenes=8;
 			})
 		)
 	));
-	view.alwaysOnTop_(true).front;
+	view.onClose_({
+		NotificationCenter.notify(view, \close, objName);
+	}).alwaysOnTop_(true).front;
 });
 (
-view: {
-	Fdef(\launcher).();
+view: {arg objName, envir, components;
+	Fdef(\launcher).(objName, envir, components);
 }
 )
 )

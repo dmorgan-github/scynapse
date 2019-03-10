@@ -5,7 +5,8 @@ view: {arg objName, envir, components;
 	var map = Order.new;
 	var slot = 0;
 	var proxy = NodeProxy.audio(s, 2);
-	var view = View().layout_(VLayout().margins_(1).spacing_(1)).minWidth_(300);
+	var view = View().layout_(VLayout().margins_(1).spacing_(1));
+	var slotoffset = 50;
 
 	var dragsink = DragSink()
 	.string_("<-  ")
@@ -29,7 +30,7 @@ view: {arg objName, envir, components;
 	var eqView = components[\eqView].(objName, proxy, envir, view);
 	var size = 30;
 
-	load = {arg force = false;
+	load = {
 
 		var currentSlot = slot;
 		var num = map.indices.size;
@@ -40,7 +41,7 @@ view: {arg objName, envir, components;
 		var header = StaticText().string_(key).font_(Font(size:8));
 		var temp, rowheader;
 
-		proxy[currentSlot] = \mix -> {node.ar};
+		proxy[slotoffset + currentSlot] = \mix -> {node.ar};
 		ctrls.layout.add(header, 0, currentSlot+1, align:\center);
 		controls.add(header);
 
@@ -54,7 +55,7 @@ view: {arg objName, envir, components;
 					ctrl.remove();
 				});
 				// remove current node from matrix output
-				proxy[currentSlot] = nil;
+				proxy[slotoffset + currentSlot] = nil;
 				map.indicesDo({arg val, key, index;
 					if (key == currentSlot) {
 						map.removeAtSlot(index);
@@ -62,6 +63,8 @@ view: {arg objName, envir, components;
 					// remove current node as source
 					// from all fx
 					val[\node][currentSlot] = nil;
+					// remove sources from current node
+					node[key] = nil;
 				});
 			})
 			.fixedSize_(15),
@@ -69,7 +72,7 @@ view: {arg objName, envir, components;
 			Knob()
 			.mode_(\vert)
 			.action_({arg ctrl;
-				var key = ('mix' ++ currentSlot).asSymbol;
+				var key = ('mix' ++ (slotoffset + currentSlot)).asSymbol;
 				proxy.set(key, ctrl.value);
 			})
 			.value_(1)
@@ -161,6 +164,7 @@ view: {arg objName, envir, components;
 			});
 			envir[objName] = nil;
 		}.defer(envir[objName].fadeTime + 1);
+		NotificationCenter.notify(view, \close, objName);
 	});
 
 	view;

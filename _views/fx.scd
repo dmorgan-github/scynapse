@@ -26,6 +26,7 @@ view: {arg name, envir, config, components;
 			config[\destroy].value(config);
 			envir[name] = nil;
 		}.defer(envir[name].fadeTime + 1);
+		NotificationCenter.notify(mainView, \close, name);
 	});
 
 	eq = components[\eqView].(name, envir[name], envir, mainView;);

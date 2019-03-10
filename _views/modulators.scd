@@ -13,6 +13,7 @@ view: {arg name, envir, config, components;
 		envir[name].clear;
 		envir[name] = nil;
 		"destroy: ".debug(name);
+		NotificationCenter.notify(view, \close, name);
 	});
 
 	subview = components[\specsView].(name, config[\specs], envir[name], envir, view);
