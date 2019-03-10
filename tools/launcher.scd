@@ -61,9 +61,7 @@ Fdef(\launcher, {arg objName, envir, components, tracks=8, scenes=8;
 			})
 		)
 	));
-	view.onClose_({
-		NotificationCenter.notify(view, \close, objName);
-	}).alwaysOnTop_(true).front;
+	view.alwaysOnTop_(true).front;
 });
 (
 view: {arg objName, envir, components;

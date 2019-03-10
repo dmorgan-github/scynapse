@@ -36,9 +36,6 @@ view: {arg objName, envir, components;
 	});
 
 	check.();
-
-	view.onClose_({
-		NotificationCenter.notify(view, \close, objName);
-	});
+	view;
 }
 )

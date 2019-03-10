@@ -23,15 +23,7 @@ view: {arg objName, envir, components;
 		nodes.add(node);
 	});
 
-	view.onClose_({
-		"destroy".debug("multichanout");
-		nodes.do({arg node;
-			node.clear;
-			node.free;
-			node = nil;
-		});
-		NotificationCenter.notify(view, \close, objName);
-	})
+	view;
 }
 )
 //[\view].("", ()).front;

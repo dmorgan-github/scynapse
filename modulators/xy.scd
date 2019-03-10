@@ -41,15 +41,7 @@ view: {arg name, envir;
 		NotificationCenter.notify(view, \status, "x: " ++ ctrl.x ++ " y: " ++ ctrl.y);
 	}));
 
-	view.onClose_({
-		"destroy".debug("xy");
-		[nodeX, nodeY].do({arg node;
-			node.clear;
-			node.free;
-			node = nil;
-		});
-		NotificationCenter.notify(view, \close, name);
-	});
+	view;
 }
 )
 //[\view].("", ()).front;

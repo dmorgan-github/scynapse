@@ -13,13 +13,6 @@ view: {arg objName, envir, components;
 	}).normalColor_(Color.white));
 
 	envir[objName] = node;
-	view.onClose_({
-		envir[objName].clear();
-		{
-			"destroy: ".debug(objName);
-			envir[objName] = nil;
-		}.defer();
-		NotificationCenter.notify(view, \close, objName);
-	});
+	view;
 }
 )

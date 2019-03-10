@@ -7,17 +7,7 @@ view: {arg name, envir, config, components;
 	envir[name].fadeTime = 1;
 	envir[name][0] = config[\synth];
 
-	mainView = View().layout_(VLayout().margins_(2).spacing_(2))
-	.onClose_({
-		envir[name].clear(envir[name].fadeTime);
-		{
-			"destroy: ".debug(name);
-			config[\destroy].value(config);
-			envir[name] = nil;
-		}.defer(envir[name].fadeTime + 1);
-		NotificationCenter.notify(view, \close, name);
-	});
-
+	mainView = View().layout_(VLayout().margins_(2).spacing_(2));
 	eq = components[\eqView].(name, envir[name], envir, mainView;);
 	controls = components[\specsView].(name, config[\specs], envir[name], envir, mainView);
 

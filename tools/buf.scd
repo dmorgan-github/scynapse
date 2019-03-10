@@ -160,11 +160,7 @@ view: {arg objName, envir, components;
 	addRow.();
 
 	win.layout.add(view);
-
-	win.onClose_({
-		"destroy: ".debug(objName);
-		NotificationCenter.notify(win, \close, objName);
-	});
+	win;
 }
 )
 

@@ -182,14 +182,6 @@ view: {arg name, envir;
 	view.layout.add(stepGrid.());
 	view.layout.add(partGrid.());
 	view.layout.add(status);
-	view.onClose_({
-		node.clear(fadeTime:node.fadeTime);
-		{
-			node = nil;
-			envir[name] = nil;
-		}.defer(node.fadeTime + 1);
-		NotificationCenter.notify(view, \close, name);
-	});
 	view;
 };
 )
