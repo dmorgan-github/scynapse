@@ -44,6 +44,17 @@ view: {arg objName, envir, components;
 	view.layout.add(ctrlView);
 	view.layout.add(specsView);
 
+	NotificationCenter.register(view, \close, view, {arg msg;
+		msg.debug("clean up");
+		nodes.do({arg node;
+			node.clear();
+			node = nil
+		});
+	});
+
+	view;
+
+	/*
 	view.onClose_({
 		envir[objName].clear();
 		{
@@ -56,6 +67,7 @@ view: {arg objName, envir, components;
 		}.defer();
 		NotificationCenter.notify(view, \close, objName);
 	});
+	*/
 
 }
 )

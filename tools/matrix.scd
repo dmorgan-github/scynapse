@@ -151,20 +151,15 @@ view: {arg objName, envir, components;
 	view.layout.add(eqView);
 	view.layout.add(dragsink);
 	view.layout.add(ctrls);
-
 	envir[objName] = proxy;
-	view.onClose_({
-		envir[objName].clear(envir[objName].fadeTime);
-		{
-			"destroy: ".debug(objName);
-			map.indicesDo({arg vali, keyi, i;
-				map.indicesDo({arg valj, keyj, j;
-					vali[\node][keyj] = nil;
-				});
+
+	NotificationCenter.register(view, \close, view, {arg msg;
+		msg.debug("clean up");
+		map.indicesDo({arg vali, keyi, i;
+			map.indicesDo({arg valj, keyj, j;
+				vali[\node][keyj] = nil;
 			});
-			envir[objName] = nil;
-		}.defer(envir[objName].fadeTime + 1);
-		NotificationCenter.notify(view, \close, objName);
+		});
 	});
 
 	view;

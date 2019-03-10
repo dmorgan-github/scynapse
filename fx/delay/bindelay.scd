@@ -70,15 +70,16 @@ view: {arg objName, envir, components;
 
 	envir[objName] = node;
 
-	view.onClose_({
-		envir[objName].clear(envir[objName].fadeTime);
+	NotificationCenter.register(view, \close, view, {arg msg;
+		msg.debug("clean up");
+		// not sure why this needs to be deferred
+		// otherwise it crashes the server
 		{
-			"destroy: ".debug(objName);
-			envir[objName] = nil;
 			dels.free;
 			fb.free;
-		}.defer(envir[objName].fadeTime + 1);
-		NotificationCenter.notify(view, \close, objName);
+		}.defer(5);
 	});
+
+	view;
 }
 )

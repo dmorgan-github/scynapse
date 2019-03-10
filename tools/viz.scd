@@ -90,11 +90,11 @@ view: {arg objName, envir, components;
 
     //--window management
 	uv.clearOnRefresh = false;	//do not erase - just draw on top of
-	win.onClose= {
-		node.clear;
-		node = nil;
+
+	NotificationCenter.register(view, \close, view, {arg msg;
+		msg.debug("clean up");
 		buf.free;
-	};
+	});
 
 	//win.asView.front;
 	//CmdPeriod.doOnce({if(w.isClosed.not, {w.close})});

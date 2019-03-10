@@ -117,13 +117,12 @@ view: {arg name, envir, components;
 		}.defer;
 	}, durkey, s.addr);
 
-	view.onClose_({
-		"destroy: ".debug(name);
-		envir[name].clear;
-		envir[name] = nil;
+	NotificationCenter.register(view, \close, view, {arg msg;
+		msg.debug("clean up");
 		oscfunc.free;
 		oscfunc2.free;
-		NotificationCenter.notify(view, \close, name);
 	});
+
+	view;
 }
 )

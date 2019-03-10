@@ -46,11 +46,7 @@ view: {arg objName, envir, components;
 		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 	});
 
-	var view = View().layout_(VLayout().margins_(2).spacing_(2))
-	.onClose_({
-		node.clear;
-		node = nil;
-	});
+	var view = View().layout_(VLayout().margins_(2).spacing_(2));
 
 	var controlsView = {
 

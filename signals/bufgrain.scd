@@ -108,16 +108,11 @@ view: {arg objName, envir, components;
 
 	envir[objName] = node;
 
-	view.onClose_({
-		envir[objName].clear(envir[objName].fadeTime);
-		{
-			"destroy: ".debug(objName);
-			envbufs.do({arg k,v;
-				v.free;
-			});
-			envir[objName] = nil;
-		}.defer(envir[objName].fadeTime + 1);
-		NotificationCenter.notify(view, \close, objName);
+	NotificationCenter.register(view, \close, view, {arg msg;
+		msg.debug("clean up");
+		envbufs.do({arg k,v;
+			v.free;
+		});
 	});
 
 	view;
