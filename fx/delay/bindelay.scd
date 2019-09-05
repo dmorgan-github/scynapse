@@ -29,11 +29,6 @@ view: {arg objName, envir, components;
 	];
 
 	var view = View().layout_(VLayout());
-
-	var playView = components[\playView].(objName, node, view);
-
-	var multiInputsView = components[\multiInputsView].(node, view);
-
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
 
 	var delayView = MultiSliderView().action_({arg ctrl;
@@ -62,8 +57,6 @@ view: {arg objName, envir, components;
 	.indexThumbSize_(300/size)
 	.gap_(0);
 
-	view.layout.add(playView);
-	view.layout.add(multiInputsView);
 	view.layout.add(delayView);
 	view.layout.add(fbView);
 	view.layout.add(specsView);

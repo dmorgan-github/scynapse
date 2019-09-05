@@ -81,7 +81,6 @@ view: {arg objName, envir, components;
 
 	var envkeys = envbufs.keys.asArray;
 	var view = View().layout_(VLayout().margins_(2).spacing_(2));
-	var playView = components[\playView].(objName, node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
 	var buttonsView = View().layout_(HLayout(
 		Button().states_([["o"], ["||"]]).action_({arg ctrl;
@@ -103,7 +102,6 @@ view: {arg objName, envir, components;
 	view.layout.add(PopUpMenu().items_(envkeys).action_({arg ctrl;
 		node.set(\envbuf, envbufs[ctrl.item.asSymbol].bufnum)
 	}).value_(envkeys.indexOf(\hann)));
-	view.layout.add(playView);
 	view.layout.add(specsView);
 
 	envir[objName] = node;

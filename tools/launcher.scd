@@ -1,5 +1,5 @@
 (
-Fdef(\launcher, {arg objName, envir, components, tracks=8, scenes=8;
+Fdef(\launcher, {arg objName, envir, components, tracks=12, scenes=4;
 	var cols = scenes;
 	var rows = tracks;
 	var buttons = Array.fill(tracks*cols, {Button()});
@@ -27,6 +27,7 @@ Fdef(\launcher, {arg objName, envir, components, tracks=8, scenes=8;
 
 						})
 					})
+					.maxWidth_(55)
 				})
 			]
 			++
@@ -40,22 +41,24 @@ Fdef(\launcher, {arg objName, envir, components, tracks=8, scenes=8;
 					.states_([[key,nil,Color.gray],[key,nil,Color.blue]])
 					.action_({arg ctrl;
 						if (ctrl.value == 1) {
-							"on".debug(key);
 							buttons.clump(cols)[num].do({arg btn;
 								if (btn != ctrl) {
 									btn.valueAction_(0);
 								}
 							});
-							if (Pdef(key).source.isNil) {
-								ctrl.value = 0
-							}{
-								Pdef(key).play;
-							}
+
+							Evt.trigger(key, 1);
+							//if (Pdef(key).source.isNil) {
+							//	ctrl.value = 0
+							//}{
+							//	Pdef(key).play;
+							//}
 						}{
-							"off".debug(key);
-							Pdef(key).stop;
+							//Pdef(key).stop;
+							Evt.trigger(key, 0);
 						}
 					})
+					.maxWidth_(55)
 
 				});
 			})

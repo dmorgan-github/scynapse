@@ -56,9 +56,7 @@ view:{arg objName, envir, components;
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var playView = components[\playView].(objName, node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
-	var eqView = components[\eqView].(objName, node, envir, view);
 
 	var ctrls = (0..5).collect({arg num;
 		HLayout(
@@ -88,9 +86,7 @@ view:{arg objName, envir, components;
 		HLayout(*ctrls[3..5])
 	)).minHeight_(120);
 
-	view.layout.add(playView);
 	view.layout.add(resView);
-	view.layout.add(eqView);
 	view.layout.add(specsView);
 
 	envir[objName] = node;

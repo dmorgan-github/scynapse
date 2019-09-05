@@ -16,14 +16,9 @@ view: {arg objName, envir, components;
 		\center -> [-1, 1, \lin, 0, 0]
 	];
 
-	var playView = components[\playView].(objName, node, view);
-	var eqView = components[\eqView].(objName, node, envir, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
-
 	envir[objName] = node;
 	view.layout.add(StaticText().string_("Sound In").minWidth_(50));
-	view.layout.add(playView);
-	view.layout.add(eqView);
 	view.layout.add(specsView);
 	view;
 }

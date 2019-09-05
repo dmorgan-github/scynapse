@@ -13,12 +13,6 @@ view: {arg objName, envir, components;
 			vol: [0,4,\lin,0,1]
 		);
 
-		var playView = components[\playView].(val + 1, node, view);
-		var multiInputsView = components[\multiInputsView].(node, view);
-
-		myView.layout.add(playView.maxWidth_(150));
-		myView.layout.add(multiInputsView.maxWidth_(150));
-
 		view.layout.add(myView);
 		nodes.add(node);
 	});

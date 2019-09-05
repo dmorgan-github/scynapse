@@ -65,8 +65,6 @@ view: {arg objName, envir, components;
 	];
 
 	var view = View().layout_(VLayout().margins_(2).spacing_(2));
-	var playView = components[\playView].(objName, node, view);
-	var inputsView = components[\multiInputsView].(node, view);//components[\inputsView].(node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
 	var buttonsView = View().layout_(HLayout(
 		Button().states_([["o"], ["||"]]).action_({arg ctrl;
@@ -85,8 +83,6 @@ view: {arg objName, envir, components;
 		}),
 	).margins_(2).spacing_(2));
 
-	view.layout.add(playView);
-	view.layout.add(inputsView);
 	view.layout.add(buttonsView);
 	view.layout.add(specsView);
 
