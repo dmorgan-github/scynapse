@@ -16,73 +16,11 @@
 			var midfreq = (lofreq+hifreq)/2;
 			var stack, fsv;
 
-			/*
-			node.filter(110, {arg in;
-
-				var sig = in;
-
-				var lo_freq = \lo_freq.kr(100).lag(0.2);
-				var lo_db = \lo_db.kr(0).lag(0.2);
-
-				var mid_freq = \mid_freq.kr(1000).lag(0.2);
-				var mid_db = \mid_db.kr(0).lag(0.2);
-
-				var hi_freq = \hi_freq.kr(10000).lag(0.2);
-				var hi_db = \hi_db.kr(0).lag(0.2);
-
-				sig = BPeakEQ.ar(sig, lo_freq, 1, lo_db);
-				sig = BPeakEQ.ar(sig, mid_freq, 1, mid_db);
-				sig = BPeakEQ.ar(sig, hi_freq, 1, hi_db);
-				sig = RemoveBadValues.ar(sig);
-				sig;
-
-			}).set(\wet110, 0);
-
-			userview.drawFunc = {arg ctrl;
-
-				var width = ctrl.bounds.width;
-				var height = ctrl.bounds.height;
-
-				var lowxpos = lofreq.explin(minfreq,maxfreq,0,width);
-				var hixpos = hifreq.explin(minfreq,maxfreq,0,width);
-
-				Pen.strokeColor = Color.red;
-				Pen.moveTo(lowxpos@0);
-				Pen.lineTo(lowxpos@height);
-				Pen.fillStroke;
-
-				Pen.strokeColor = Color.blue;
-				Pen.moveTo(hixpos@0);
-				Pen.lineTo(hixpos@height);
-				Pen.fillStroke;
-			};
-			*/
-
-			/*
-			stack = StackLayout(
-				userview,
-				fsv = FreqScopeView()
-				.active_(true)
-				.freqMode_(1)
-				.inBus_(node.bus.index)
-				//.fixedWidth_(250)
-				//.fixedHeight_(50)
-			)
-			.mode_(1);
-			*/
-
-			//view.layout.add(
-			//	VLayout(
-			//		ChannelEQ(numChannels:2, bus:node.bus.index, target:node.group)
-			//		.gui.window.view.minHeight_(350/1.6).minWidth_(505/1.5)
-			//	)
-			//);
-
 			view.layout.add(
 				StackLayout(
 
 					ChannelEQ(numChannels:2, bus:node.bus.index, target:node.group)
-					.gui.window.view.minHeight_(350/1.6).minWidth_(505/1.5),
+					.gui.window.view.minHeight_(350/1.6).minWidth_(505/1.5).background_(Color.white.alpha_(0.5)),
 
 					fsv = FreqScopeView()
 					.active_(true)
@@ -90,101 +28,12 @@
 					.inBus_(node.bus.index)
 				)
 				.mode_(1)
+
 			);
 
-			//view.layout.add(stack);
-			/*
-			view.layout.add(HLayout(
-
-				RoundButton()
-				.extrude_(true)
-				.border_(1)
-				.states_([
-					['power', Color.gray(0.2), Color.white(0.75).alpha_(0.25)],
-					['power', Color.red(0.8), Color.white(0.75).alpha_(0.25)]])
-				.action_({arg bt;
-					switch(bt.value,
-					1, { node.set(\wet110, 1) },
-					0, { node.set(\wet110, 0) });
-				})
-				.fixedSize_(size)
-				.value_(0),
-
-				Knob().action_({arg ctrl;
-					var val = ctrl.value;
-					var msg = "lo db " ++ val.linlin(0,1,mindb,maxdb);
-					node.set(\lo_db, val.linlin(0,1,mindb,maxdb));
-					NotificationCenter.notify(containerView, \status, msg);
-				})
-				.fixedSize_(size)
-				.mode_(\vert)
-				.value_(0.linlin(mindb,maxdb,0,1)),
-
-				Knob().action_({arg ctrl;
-					var val = ctrl.value;
-					var msg = "mid db " ++ val.linlin(0,1,mindb,maxdb);
-					node.set(\mid_db, val.linlin(0,1,mindb,maxdb));
-					NotificationCenter.notify(containerView, \status, msg);
-				})
-				.fixedSize_(size)
-				.mode_(\vert)
-				.value_(0.linlin(mindb,maxdb,0,1)),
-
-				Knob().action_({arg ctrl;
-					var val = ctrl.value;
-					var msg = "hi db " ++ val.linlin(0,1,mindb,maxdb);
-					node.set(\hi_db, val.linlin(0,1,mindb,maxdb));
-					NotificationCenter.notify(containerView, \status, msg);
-				})
-				.fixedSize_(size)
-				.mode_(\vert)
-				.value_(0.linlin(mindb,maxdb,0,1))
-			));
-			*/
-			/*
-			view.layout.add(HLayout(
-				NumberBox().action_({arg ctrl;
-
-					lofreq = ctrl.value;
-					midfreq = (lofreq+hifreq)/2;
-
-					node.set(\lo_freq, lofreq);
-					node.set(\mid_freq, midfreq);
-
-					userview.refresh;
-				})
-				.value_(lofreq)
-				.normalColor_(Color.white)
-				.font_(Font(size:8))
-				.fixedHeight_(size)
-				.maxWidth_(50)
-				.clipLo_(minfreq)
-				.clipHi_(maxfreq),
-
-				NumberBox().action_({arg ctrl;
-
-					hifreq = ctrl.value;
-					midfreq = (lofreq+hifreq)/2;
-
-					node.set(\hi_freq, hifreq);
-					node.set(\mid_freq, midfreq);
-
-					userview.refresh;
-				})
-				.value_(hifreq)
-				.normalColor_(Color.white)
-				.font_(Font(size:8))
-				.maxWidth_(50)
-				.fixedHeight_(size)
-				.align_(\right)
-				.clipLo_(minfreq)
-				.clipHi_(maxfreq),
-			));
-			*/
-
 			view.onClose_({
-				//["eqView", fsv].debug("close ");
-				//fsv.kill;
+				["eqView", fsv].debug("close ");
+				fsv.kill;
 			});
 
 			view;
@@ -236,7 +85,7 @@
 					slider = Slider()
 					.orientation_(\horizontal)
 					.fixedHeight_(size)
-					.minWidth_(25)
+					.minWidth_(60)
 					.thumbSize_(7)
 					.background_(Color.white.alpha_(0)),
 
@@ -401,10 +250,11 @@
 
 			var height = 20;
 			var wetKey = ("wet" ++ 100).asSymbol;
-			var view = View().layout_(HLayout().margins_(4).spacing_(4));
+			var view = View().layout_(HLayout().margins_(1).spacing_(1));
 			var outBus = 0;
 			var privateBus = node.bus.index;
 
+			/*
 			view.layout.add(
 				Knob()
 				.fixedSize_(size)
@@ -416,7 +266,9 @@
 					node.vol = val;
 				})
 			);
+			*/
 
+			/*
 			view.layout.add(
 				Knob()
 				.fixedSize_(size)
@@ -427,7 +279,9 @@
 					NotificationCenter.notify(containerView, \status, "wet: " ++ ctrl.value.asString);
 				})
 			);
+			*/
 
+			/*
 			view.layout.add(
 				NumberBox()
 				.fixedSize_(size)
@@ -442,11 +296,12 @@
 					NotificationCenter.notify(containerView, \status, "fadetime: " ++ val.asString);
 				})
 			);
+			*/
 
 			view.layout.add(
 				Button()
 				.fixedSize_(size)
-				.states_([ [">", Color.white], ["[]", Color.white, Color.blue] ])
+				.states_([ [nil, Color.green, Color.green], [nil, Color.red, Color.red] ])
 				.action_({arg ctrl;
 					if (ctrl.value == 1) {
 						node.play(fadeTime:node.fadeTime);
@@ -456,6 +311,7 @@
 				})
 			);
 
+			/*
 			view.layout.add(
 				Button()
 				.fixedSize_(size)
@@ -468,15 +324,19 @@
 					}
 				})
 			);
+			*/
 
+			/*
 			view.layout.add(
 				Button()
-				.fixedSize_(size)
-				.states_([ ["sc"] ])
+				.fixedHeight_(size)
+				.fixedWidth_(size*3)
+				.states_([ ["scope"] ])
 				.action_({arg ctrl;
 					node.scope;
 				})
 			);
+			*/
 
 			view.layout.add(nil);
 
@@ -615,6 +475,6 @@
 			view;
 		}
 
-	);//[\playView].( \bobo, (), View()).front;
+	);
 
 }.();

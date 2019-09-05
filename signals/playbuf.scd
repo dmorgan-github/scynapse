@@ -3,7 +3,7 @@ view: {arg objName, envir, components;
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
 	var specs;
-	var playView, specsView;
+	var specsView;
 
 	var node = NodeProxy.audio(s, 1).source_({
 		var buf = \buf.kr();
@@ -22,10 +22,7 @@ view: {arg objName, envir, components;
 	];
 
 	envir[objName] = node;
-	playView = components[\playView].(objName, node, view);
 	specsView = components[\specsView].(objName, specs, node, envir, view);
-
-	view.layout.add(playView);
 	view.layout.add(specsView);
 	view;
 }

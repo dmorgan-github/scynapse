@@ -99,11 +99,6 @@ view: {arg objName, envir, components;
 	//win.asView.front;
 	//CmdPeriod.doOnce({if(w.isClosed.not, {w.close})});
 	uv.animate = true;
-
-	multiInputsView = components[\multiInputsView].(node, view);
-
-	view.layout.add(multiInputsView);
-
 	view.layout.add(win.asView);
 
 	view.layout.add(HLayout(

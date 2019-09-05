@@ -1,7 +1,7 @@
 (
 synth: {arg sig_in;
 
-	var in = sig_in * \input.kr(1);
+	var in = sig_in * \input.ar(1);
 	var sig = LADSPA.ar(1, 1201,
 		\numvoices.kr(2), //\numvoices.kr.range(\numvoices_min.kr(1), \numvoices_max.kr(8)).lag(0.1),
 		\delay.kr(10),

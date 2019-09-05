@@ -22,17 +22,18 @@ view: {arg objName, envir, components;
 		var sus = \sus.kr(1);
 		var rel = \rel.kr(1);
 		var ts = \ts.kr(1);
-		var speed = \stretch.kr(1);
+		//var speed = \stretch.kr(1);
 		var pitch = \pitch.kr(1);
-		var numframes = BufFrames.kr(buf);
-		var startframe = numframes * start;
-		var endframe = numframes * end;
-		var dur = (endframe - startframe) / BufSampleRate.kr(buf);
-		var phasor = Env([start,start,end], [0, dur * speed], warp).kr(gate:trig);
-		var env = Env([0,suslevel,suslevel,0], [atk,dec,sus,rel].normalizeSum, curve).kr(gate:trig, timeScale:ts);
-
+		//var numframes = BufFrames.kr(buf);
+		var startframe = start;//numframes * start;
+		//var endframe = numframes * end;
+		//var dur = (endframe - startframe) / BufSampleRate.kr(buf);
+		//var phasor = Env([start,start,end], [0, dur * speed], warp).ar(gate:trig);
+		var env = Env([0,suslevel,suslevel,0], [atk,dec,sus,rel].normalizeSum, curve).ar(gate:trig, timeScale:ts);
+		var sig = PlayBuf.ar(1, buf, pitch, trig, startframe, 0);
+		/*
 		var sig = Warp1.ar(
-			numChannels:2,
+			numChannels:1,
 			bufnum:buf,
 			pointer:phasor,
 			freqScale:pitch,
@@ -41,7 +42,10 @@ view: {arg objName, envir, components;
 			overlaps:16,
 			windowRandRatio:0.2,
 			interp:4
-		) * env * \amp.kr(-8.dbamp);
+		);
+		*/
+
+		sig = sig * env * \amp.kr(-8.dbamp);
 
 		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
 	});
@@ -74,8 +78,8 @@ view: {arg objName, envir, components;
 		.receiveDragHandler_({arg v;
 
 			var obj = View.currentDrag.value;
-			var bufnum = obj[\bufnum];
-			var name = obj[\name];
+			var bufnum = obj[\bufnum].value;
+			var name = obj[\name].value;
 
 			if (bufnum.isNil.not) {
 
@@ -106,9 +110,8 @@ view: {arg objName, envir, components;
 
 	var specs = [
 		\distance -> [0.1, 64, \lin, 0, 4],
-		\start -> [0, 1, \lin, 0, 0],
-		\end -> [0, 1, \lin, 0, 1],
-		\warp -> [-24, 24, \lin, 0, 0],
+		//\start -> [0, 1, \lin, 0, 0],
+		//\end -> [0, 1, \lin, 0, 1],
 		\atk -> [0, 1, \lin, 0, 0.001],
 		\dec -> [0, 1, \lin, 0, 0],
 		\sus -> [0, 1, \lin, 0, 1],
@@ -118,14 +121,11 @@ view: {arg objName, envir, components;
 		\ts -> [0, 64, \lin, 0, 1],
 		\amp -> [0, 1, \lin, 0, 0.3],
 		\pitch -> [0.1, 4, \lin, 0, 1],
-		\stretch -> [0.1, 64, \lin,0, 1],
 		\spread -> [0, 1, \lin, 0, 1],
 		\center -> [-1, 1, \lin, 0, 0]
 	];
 
-	var playView = components[\playView].(objName, node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
-	var eqView = components[\eqView].(objName, node, envir, view);
 
 	var sfv = SoundFileView()
 	.background_(Color.gray(0.3))
@@ -134,20 +134,21 @@ view: {arg objName, envir, components;
 	.resize_(5)
 	.gridResolution_(0.0)
 	.fixedSize_(width@75)
-	.mouseUpAction = ({arg view;
+	.mouseUpAction = ({arg ctrl;
 		var loFrames, hiFrames;
-		loFrames = view.selection(0)[0];
-		hiFrames = view.selection(0)[1] + loFrames;
-		node.set(\lo, loFrames, \hi, hiFrames);
+		var msg;
+		loFrames = ctrl.selection(0)[0];
+		hiFrames = ctrl.selection(0)[1] + loFrames;
+		node.set(\start, loFrames, \end, hiFrames);
+		msg = "start: %, end: %".format(loFrames, hiFrames);
+		NotificationCenter.notify(view, \status, msg);
 	});
 	sfv.setSelectionColor(0, Color.blue(alpha:0.5));
-
-	view.layout.add(playView);
-	view.layout.add(eqView);
 	view.layout.add(controlsView.());
 	view.layout.add(sfv);
 	view.layout.add(specsView);
 
+	node.mold;
 	envir[objName] = node;
 
 	view;

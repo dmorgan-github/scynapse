@@ -38,13 +38,9 @@ view: {arg objName, envir, components;
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var playView = components[\playView].(objName, node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
-	var eqView = components[\eqView].(objName, node, envir, view);
 
 	envir[objName] = node;
-	view.layout.add(playView);
-	view.layout.add(eqView);
 	view.layout.add(specsView);
 
 	view;

@@ -19,18 +19,12 @@ view: {arg name, envir, config, components;
 	config[\init].value(config);
 	envir[name][filterSlot] = \filter -> func.value;
 	view = View().layout_(VLayout().margins_(2).spacing_(2));
-
-	eq = components[\eqView].(name, envir[name], envir, view;);
-	inputs = components[\multiInputsView].(envir[name], view);
 	controls = components[\specsView].(name, config[\specs], envir[name], envir, view);
 
 	horizontalView = View().layout_(HLayout().margins_(2).spacing_(2));
 	horizontalView.layout.add(controls);
 
 	// main
-	view.layout.add(components[\playView].(name, envir[name], view));
-	view.layout.add(inputs);
-	view.layout.add(eq);
 	view.layout.add(horizontalView);
 
 	NotificationCenter.register(view, \close, view, {arg msg;

@@ -1,7 +1,7 @@
 (
-Fdef(\scynapse, {arg environment;
+Fdef(\scynapse, {arg environment, rootpath;
 
-	var rootpath = PathName(Document.current.path).parentPath;
+	//var rootpath = PathName(Document.current.path).parentPath;
 	var viewsPath = rootpath ++ "_views/";
 	var recorders = List.new;
 	var proxyspace = \p;
@@ -44,6 +44,7 @@ Fdef(\scynapse, {arg environment;
 		});
 	};
 
+	/*
 	var alwaysOnTop = {arg view;
 
 		Button().states_([ ["--"], ["__"] ]).action_({arg ctrl;
@@ -54,6 +55,7 @@ Fdef(\scynapse, {arg environment;
 			}
 		}).maxSize_(15);
 	};
+	*/
 
 	var recordStems = {
 
@@ -184,7 +186,7 @@ Fdef(\scynapse, {arg environment;
 
 				win.layout.add(
 					HLayout(
-						alwaysOnTop.(win),
+						//alwaysOnTop.(win),
 						StaticText().string_(objName ++
 							if (envir[objName].isNil.not) {
 								" (bus: " ++ envir[objName].bus.index.asString ++ ")";
@@ -193,13 +195,23 @@ Fdef(\scynapse, {arg environment;
 							}
 						),
 						if (envir[objName] != nil) {
+							Button()
+							.fixedHeight_(15)
+							.fixedWidth_(15*3)
+							.states_([ ["scope"] ])
+							.action_({arg ctrl;
+								envir[objName].scope;
+							})
+							.font_(Font(size:8));
+						},
+						if (envir[objName] != nil) {
 							DragSource()
 							.background_(color)
 							.object_((node:envir[objName],name:objName,color:color))
 							.string_("-->")
 							.fixedSize_(15)
 							.font_(Font(size:8))
-							.align_(\right)
+							.align_(\right);
 						}
 					)
 				);
@@ -210,11 +222,15 @@ Fdef(\scynapse, {arg environment;
 				if (view.onClose.isNil) {
 					"adding default close handler".debug("loadView");
 					win.onClose_({
-						envir[objName].clear();
-						{
-							"destroy: ".debug(objName);
-							envir[objName] = nil;
-						}.defer(envir[objName].fadeTime + 1);
+						if (envir[objName].class == NodeProxy) {
+							envir[objName].clear();
+							{
+								envir[objName] = nil;
+								envir.removeAt(objName);
+								"destroy: ".debug(objName);
+								envir[objName] = nil;
+							}.defer(envir[objName].fadeTime + 1);
+						};
 						NotificationCenter.notify(view, \close, objName);
 					});
 				};
@@ -249,6 +265,7 @@ Fdef(\scynapse, {arg environment;
 
 		var ctrlView = View().layout_(HLayout(
 
+			/*
 			Button()
 			.states_([ ["--"], ["__"] ]).action_({arg ctrl;
 				if (ctrl.value == 1) {
@@ -258,6 +275,7 @@ Fdef(\scynapse, {arg environment;
 				}
 			})
 			.fixedSize_(20@20),
+			*/
 
 			Button()
 			.states_([ ["rec"], ["stop", Color.red] ] )
@@ -364,7 +382,6 @@ Fdef(\scynapse, {arg environment;
 	};
 
 	show.(rootpath);
-
 });
 )
 

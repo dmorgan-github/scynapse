@@ -128,7 +128,6 @@ view: {arg objName, envir, components;
 		\center -> [-1, 1, \lin, 0, 0]
 	];
 
-	var playView = components[\playView].(objName, node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
 	node.set(\replyid, replyid);
 
@@ -171,7 +170,6 @@ view: {arg objName, envir, components;
 		}.defer;
 	},'/tr');
 
-	view.layout.add(playView);
 	view.layout.add(controlsView.());
 	view.layout.add(buttonView);
 	view.layout.add(sfv);

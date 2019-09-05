@@ -30,10 +30,7 @@ view: {arg objName, envir, components;
 
 	var dragsink;
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var playView = components[\playView].(objName, node, view);
-	var multiInputsView = components[\multiInputsView].(node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
-	var eqView = components[\eqView].(objName, node, envir, view);
 	var ctrlView = View().layout_(HLayout(
 
 		DragSource()
@@ -60,10 +57,6 @@ view: {arg objName, envir, components;
 	));
 
 	envir[objName] = node;
-	//view.layout.add(StaticText().string_(sendbus.index));
-	view.layout.add(playView);
-	view.layout.add(multiInputsView);
-	view.layout.add(eqView);
 	view.layout.add(ctrlView);
 	view.layout.add(specsView);
 

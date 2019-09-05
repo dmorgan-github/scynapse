@@ -54,9 +54,7 @@ view: {arg objName, envir, components;
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var playView = components[\playView].(objName, node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
-	var eqView = components[\eqView].(objName, node, envir, view);
 	var pulseView = View().layout_(HLayout(
 		NumberBox().maxDecimals_(0).action_({arg ctrl;
 			var num = ctrl.value;
@@ -67,8 +65,6 @@ view: {arg objName, envir, components;
 	));
 
 	envir[objName] = node;
-	view.layout.add(playView);
-	view.layout.add(eqView);
 	view.layout.add(pulseView);
 	view.layout.add(specsView);
 	view;

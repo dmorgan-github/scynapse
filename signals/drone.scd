@@ -45,9 +45,7 @@ view: {arg objName, envir, components;
 	];
 
 	var view = View().layout_(VLayout().spacing_(2).margins_(2));
-	var playView = components[\playView].(objName, node, view);
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
-	var eqView = components[\eqView].(objName, node, envir, view);
 	var multi = MultiSliderView().size_(harms).elasticMode_(1).isFilled_(true).fillColor_(Color.grey);
 	var pulseView = View().layout_(VLayout(
 		NumberBox().maxDecimals_(0).action_({arg ctrl;
@@ -67,8 +65,6 @@ view: {arg objName, envir, components;
 	));
 
 	envir[objName] = node;
-	view.layout.add(playView);
-	view.layout.add(eqView);
 	view.layout.add(pulseView);
 	view.layout.add(specsView);
 
