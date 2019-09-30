@@ -254,7 +254,6 @@
 			var outBus = 0;
 			var privateBus = node.bus.index;
 
-			/*
 			view.layout.add(
 				Knob()
 				.fixedSize_(size)
@@ -266,7 +265,6 @@
 					node.vol = val;
 				})
 			);
-			*/
 
 			/*
 			view.layout.add(
@@ -281,7 +279,6 @@
 			);
 			*/
 
-			/*
 			view.layout.add(
 				NumberBox()
 				.fixedSize_(size)
@@ -296,7 +293,6 @@
 					NotificationCenter.notify(containerView, \status, "fadetime: " ++ val.asString);
 				})
 			);
-			*/
 
 			view.layout.add(
 				Button()

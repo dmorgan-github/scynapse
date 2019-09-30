@@ -57,6 +57,7 @@ Fdef(\scynapse, {arg environment, rootpath;
 	};
 	*/
 
+	/*
 	var recordStems = {
 
 		var key = Date.getDate.asSortableString;
@@ -85,7 +86,9 @@ Fdef(\scynapse, {arg environment, rootpath;
 			});
 		}.defer(1);
 	};
+	*/
 
+	/*
 	var stopRecordStems = {
 
 		recorders.do({arg rec;
@@ -97,6 +100,7 @@ Fdef(\scynapse, {arg environment, rootpath;
 
 		recorders = List.new;
 	};
+	*/
 
 	var doclist = View().layout_(VLayout(nil)).minWidth_(100);
 	var docmap = ();
@@ -198,6 +202,16 @@ Fdef(\scynapse, {arg environment, rootpath;
 							Button()
 							.fixedHeight_(15)
 							.fixedWidth_(15*3)
+							.states_([ ["plot"] ])
+							.action_({arg ctrl;
+								envir[objName].plot;
+							})
+							.font_(Font(size:8));
+						},
+						if (envir[objName] != nil) {
+							Button()
+							.fixedHeight_(15)
+							.fixedWidth_(15*3)
 							.states_([ ["scope"] ])
 							.action_({arg ctrl;
 								envir[objName].scope;
@@ -282,6 +296,7 @@ Fdef(\scynapse, {arg environment, rootpath;
 			.action_({arg ctrl; if (ctrl.value == 1) {s.record} {s.stopRecording} })
 			.fixedSize_(35@20),
 
+			/*
 			Button()
 			.states_([ ["stems"], ["stop", Color.red] ] )
 			.action_({arg ctrl;
@@ -292,20 +307,25 @@ Fdef(\scynapse, {arg environment, rootpath;
 				}
 			})
 			.fixedSize_(40@20),
+			*/
 
+			/*
 			NumberBox().action_({arg ctrl;
 				fadeTime = ctrl.value;
 			})
 			.value_(fadeTime)
 			.normalColor_(Color.white)
 			.fixedSize_(25@20),
+			*/
 
+			/*
 			Button().states_([["[]"]]).action_({
 				envir.keysValuesDo({arg k, v;
 					v.stop(fadeTime:fadeTime);
 				})
 			})
 			.fixedSize_(20@20);
+			*/
 		));
 
 		scrollView = ScrollView()

@@ -1,7 +1,7 @@
 (
 view: {arg name, envir, components;
 
-	var specsView;
+	var specsView, inputView;
 	var filterSlot = 100;
 	var oscfunc, li, oscfunc2;
 	var levelskey = ('/' ++ name ++ 'levels').asSymbol;
@@ -47,6 +47,10 @@ view: {arg name, envir, components;
 	];
 
 	specsView = components[\specsView].(name, specs, envir[name], envir, view);
+	inputView = components[\multiInputsView].(envir[name], view);
+
+	view.layout.add(inputView);
+
 	view.layout.add(VLayout(
 
 		DragSink()

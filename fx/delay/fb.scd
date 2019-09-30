@@ -6,8 +6,8 @@ synth: {arg sig_in;
 	var delL = \delL.kr(6).lag(0.1) * 16.reciprocal;
 	var delR = \delR.kr(10).lag(0.1) * 16.reciprocal;
 	var tempo = \tempo.kr(1).lag(0.1);
-	var speed = \speed.kr(0).lag(0.1);
-	var sig = FbC({arg fb; fb * fblevel + in}, 4, [delL, delR] * tempo + speed);
+	var time = \time.kr(0).lag(0.1);
+	var sig = FbC({arg fb; fb * fblevel + in}, 5, [delL, delR] * tempo + time);
 	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
 },
 specs: [
@@ -15,7 +15,7 @@ specs: [
 	\delL -> [1, 16, \lin, 1, 6],
 	\delR -> [1, 16, \lin, 1, 10],
 	\tempo -> [0.001, 4, \lin, 0.0, 1],
-	\speed -> [0.001, 4, \lin, 0.0, 0],
+	\time -> [0.0, 4, \lin, 0.0, 0],
 	\spread -> [0,1,\lin,0, 1],
 	\center -> [-1,1,\lin,0,0],
 	\amp -> [0,1,\lin,0,1],

@@ -17,8 +17,10 @@ view: {arg objName, envir, components;
 	];
 
 	var specsView = components[\specsView].(objName, specs, node, envir, view);
+	var playView = components[\playView].(objName, node, view);
 	envir[objName] = node;
 	view.layout.add(StaticText().string_("Sound In").minWidth_(50));
+	view.layout.add(playView);
 	view.layout.add(specsView);
 	view;
 }
