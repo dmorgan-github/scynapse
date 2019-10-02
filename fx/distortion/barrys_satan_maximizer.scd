@@ -8,22 +8,19 @@
 (
 synth: {arg sig_in;
 
-	var in = sig_in * \input.kr(1);
+	var in = sig_in * \input.ar(1);
 	var sig = LADSPA.ar(1, 1408,
-		[\decayL.kr(10), \decayR.kr(10)],
-		[\kneepointL.kr(-10), \kneepointR.kr(-10)],
+		\decay.ar(10),
+		\kneepoint.ar(-10),
 		in
 	);
 
-	Splay.ar(LeakDC.ar(sig) * 0.1, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(LeakDC.ar(sig) * 0.1, spread:\spread.ar(1), center:\center.ar(0)) * \amp.ar(0.dbamp) * \vol.ar(0.dbamp);
 },
 specs: [
-	\decayL -> [2, 30, \lin, 0, 10],
-	\decayR -> [2, 30, \lin, 0, 10],
-
-	\kneepointL -> [-90, 1, \lin, 0, -30],
-	\kneepointR -> [-90, 1, \lin, 0, -30],
-	\amp -> [0,1,\lin,0,1],
+	\decay -> [2, 30, \lin, 0, 10],
+	\kneepoint -> [-90, 1, \lin, 0, -30],
+	\amp -> [0,4,\lin,0,1],
 	\input -> [0, 10, \lin, 0, 1],
 	\spread -> [0,1,\lin,0, 1],
 	\center -> [-1,1,\lin,0,0]

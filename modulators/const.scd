@@ -1,8 +1,8 @@
 (
 view: {arg objName, envir, components;
 
-	var node = NodeProxy(s, \control, 1).source_({
-		var val = \val.kr;
+	var node = NodeProxy(s, \audio, 1).source_({
+		var val = \val.ar.poll;
 		val;
 	});
 

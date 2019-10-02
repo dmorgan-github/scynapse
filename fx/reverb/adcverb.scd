@@ -2,20 +2,20 @@ AdCVerb.maxTime = 10;
 (
 synth: {arg sig_in;
 
-	var in = sig_in * \input.kr(1);
+	var in = sig_in * \input.ar(1);
 	var sig = AdCVerb.ar(in,
-		revTime:\revTime.kr(3),
-		hfDamping:\hfDamping.kr(0.1),
+		revTime:\revTime.ar(3),
+		hfDamping:\hfDamping.ar(0.1),
 		nOuts:2,
-		predelay:\predelay.kr(0.02),
+		predelay:\predelay.ar(0.02),
 		numCombs:8,
 		numAllpasses:4,
-		inFilter:\inFilter.kr(0.6),
-		combScale:\combScale.kr(3).lag(0.1),
-		apScale:\apScale.kr(3).lag(0.1)
+		inFilter:\inFilter.ar(0.6),
+		combScale:\combScale.ar(3).lag(0.1),
+		apScale:\apScale.ar(3).lag(0.1)
 	);
 
-	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(sig, spread:\spread.ar(1), center:\center.ar(0)) * \amp.ar(0.dbamp) * \vol.ar(0.dbamp);
 },
 specs: [
 	\revTime -> [0.1, 60, \lin, 0.0, 3],
@@ -26,7 +26,7 @@ specs: [
 	\apScale -> [0.1, 10, \lin, 0, 3],
 	\spread -> [0, 1, \lin, 0, 1],
 	\center -> [-1, 1, \lin, 0, 0],
-	\amp -> [0,1,\lin,0,1],
+	\amp -> [0,4,\lin,0,1],
 	\input -> [0, 10, \lin, 0, 1]
 ]
 )

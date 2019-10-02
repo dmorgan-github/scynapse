@@ -8,8 +8,7 @@ view: {arg objName, envir, components;
 	var view = View().layout_(VLayout().margins_(1).spacing_(1));
 	var slotoffset = 50;
 
-	var dragsink = DragSink()
-	.string_("<-  ")
+	var dragsink = TextField()// DragSink()
 	.background_(Color.clear)
 	.canReceiveDragHandler_({
 		true;
@@ -21,9 +20,22 @@ view: {arg objName, envir, components;
 		map.put(slot, (name:name, node:node, controls:List.new));
 		load.();
 		slot = slot + 1;
+		dragsink.string_(name);
 	})
 	.maxHeight_(35)
-	.minWidth_(35);
+	.minWidth_(35)
+	.action_({arg ctrl;
+		var name = ctrl.value.asSymbol;
+		var node = envir[name];
+		if (node.isNil){
+			var msg = "node % doesn't exist in environment".format(name);
+			NotificationCenter.notify(view, \status, msg);
+		} {
+			map.put(slot, (name:name, node:node, controls:List.new));
+			load.();
+			slot = slot + 1;
+		}
+	});
 
 	var ctrls = View().layout_(GridLayout().margins_(0).spacing_(0));
 	var playView = components[\playView].(objName, proxy, view);

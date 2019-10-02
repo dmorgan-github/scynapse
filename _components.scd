@@ -105,7 +105,7 @@
 				};
 
 				if (mappers[k].isNil) {
-					mappers[k] = NodeProxy();
+					mappers[k] = NodeProxy(s, \audio);
 				};
 
 				if (spec == \set) {
@@ -116,7 +116,7 @@
 						var depth = \depth.kr(1);
 						var min = (center + (depth * center).neg);
 						var max = (center + (depth * center));
-						\val.kr.range(min, max).round(spec.step).clip(spec.minval, spec.maxval);
+						\val.ar.linlin(-1, 1, min, max).round(spec.step).clip(spec.minval, spec.maxval);//.poll(0.5, name);
 					};
 					mappers[k].set(
 						\val, spec.default.linlin(spec.minval, spec.maxval, -1, 1),

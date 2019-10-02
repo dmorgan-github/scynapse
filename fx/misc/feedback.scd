@@ -24,7 +24,7 @@ view: {arg objName, envir, components;
 		\delay -> [0, 1, \lin, 0, 0],
 		\spread -> [0, 1, \lin, 0, 1],
 		\center -> [-1, 1, \lin, 0, 0],
-		\amp -> [0,1,\lin,0,1],
+		\amp -> [0,4,\lin,0,1],
 		\input -> [0, 10, \lin, 0, 1]
 	];
 

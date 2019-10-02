@@ -4,7 +4,7 @@ view: {arg name, envir, config, components;
 	var view, subview, presets;
 	var height = 20;
 
-	envir[name] = NodeProxy.control;
+	envir[name] = NodeProxy.audio(s, 1);
 	envir[name].fadeTime = 1;
 	envir[name][0] = config[\synth];
 

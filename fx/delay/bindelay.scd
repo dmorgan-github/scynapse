@@ -9,20 +9,20 @@ view: {arg objName, envir, components;
 	var node = NodeProxy.audio(s, 2)
 	.filter(100, {arg sig_in;
 
-		var in = sig_in * \input.kr(1);
+		var in = sig_in * \input.ar(1);
 		var maxdel = 0.5;
 		var buf = LocalBuf(size * 2, 1).clear;
 		var pulse = Impulse.ar(0.33);
 		var chain = FFT(buf, in, 0.25);
-		chain = PV_BinDelay(chain, maxdel, \dels.kr, \fb.kr, 0.25);
+		chain = PV_BinDelay(chain, maxdel, \dels.ar, \fb.ar, 0.25);
 
-		Splay.ar(IFFT(chain), spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+		Splay.ar(IFFT(chain), spread:\spread.ar(1), center:\center.ar(0)) * \amp.ar(0.dbamp) * \vol.ar(0.dbamp);
 	})
 	.set(\dels, dels, \fb, fb);
 
 	var specs = [
 		\pan -> [-1,1,\lin,0,0],
-		\amp -> [0,1,\lin,0,1],
+		\amp -> [0,4,\lin,0,1],
 		\input -> [0, 10, \lin, 0, 1],
 		\spread -> [0,1,\lin,0, 1],
 		\center -> [-1,1,\lin,0,0],

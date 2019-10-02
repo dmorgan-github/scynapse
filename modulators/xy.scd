@@ -6,12 +6,12 @@ view: {arg name, envir;
 	.minHeight_(245);
 
 	var nodeX = NodeProxy.control.source_({
-		var val = \val.kr(0);
+		var val = \val.ar(0);
 		val;
 	});
 
 	var nodeY = NodeProxy.control.source_({
-		var val = \val.kr(0);
+		var val = \val.ar(0);
 		val;
 	});
 

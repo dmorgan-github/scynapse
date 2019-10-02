@@ -1,29 +1,29 @@
 (
 synth: {arg sig_in;
 
-	var in = sig_in * \input.kr(1);
+	var in = sig_in * \input.ar(1);
 	var input = Mix.ar(in);
 	var sig = LADSPA.ar(1, 1211,
 
-		\tape_speed.kr(1),
+		\tape_speed.ar(1),
 		0.ampdb, //-70
 
-		\tap1_distance.kr(1),
-		\tap1_level.kr(0).ampdb,
+		\tap1_distance.ar(1),
+		\tap1_level.ar(0).ampdb,
 
-		\tap2_distance.kr(2),
-		\tap2_level.kr(0).ampdb,
+		\tap2_distance.ar(2),
+		\tap2_level.ar(0).ampdb,
 
-		\tap3_distance.kr(3),
-		\tap3_level.kr(0).ampdb,
+		\tap3_distance.ar(3),
+		\tap3_level.ar(0).ampdb,
 
-		\tap4_distance.kr(4),
-		\tap4_level.kr(0).ampdb,
+		\tap4_distance.ar(4),
+		\tap4_level.ar(0).ampdb,
 
 		input
 	);
 
-	Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+	Splay.ar(sig, spread:\spread.ar(1), center:\center.ar(0)) * \amp.ar(0.dbamp) * \vol.ar(0.dbamp);
 },
 specs: [
 	\tape_speed -> [0,10,\lin,0,1],
@@ -35,7 +35,7 @@ specs: [
 	\tap3_level -> [0,1,\lin,0,0],
 	\tap4_distance -> [0,4,\lin,0,4],
 	\tap4_level -> [0,1,\lin,0,0],
-	\amp -> [0,1,\lin,0,1],
+	\amp -> [0,4,\lin,0,1],
 	\input -> [0, 10, \lin, 0, 1],
 	\spread -> [0,1,\lin,0, 1],
 	\center -> [-1,1,\lin,0,0],

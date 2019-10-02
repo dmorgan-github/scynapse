@@ -4,9 +4,9 @@ view: {arg objName, envir, components;
 	var view = View().layout_(VLayout());
 
 	var node = NodeProxy.audio(s, 2).source_({
-		var sig = SoundIn.ar([0,1]) * \input.kr(0.dbamp);
-		sig = sig * \amp.kr(0.dbamp);
-		Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
+		var sig = SoundIn.ar([0,1]) * \input.ar(0.dbamp);
+		sig = sig * \amp.ar(0.dbamp);
+		Splay.ar(sig, \spread.ar(1), center:\center.ar(0));
 	});
 
 	var specs = [

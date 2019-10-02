@@ -17,28 +17,28 @@ view: {arg name, envir, components;
 	envir[name].filter(filterSlot, {arg in;
 
 		var trig = \trig.tr(0);
-		var buf = \buf.kr;
-		var run = \run.kr(0);
+		var buf = \buf.ar;
+		var run = \run.ar(0);
 		var secs = (BufFrames.kr(buf) / BufSampleRate.kr(buf));
 
-		var imp = Impulse.kr(10);
-		var delimp = Delay1.kr(imp);
+		var imp = Impulse.ar(10);
+		var delimp = Delay1.ar(imp);
 
-		var imp2 = Impulse.kr(1);
-		var steps = Stepper.kr(imp2, trig, 0, secs.round + 1, 1);
+		var imp2 = Impulse.ar(1);
+		var steps = Stepper.ar(imp2, trig, 0, secs.round + 1, 1);
 
-		var sig = RecordBuf.ar(in * \input.kr(0.dbamp),
+		var sig = RecordBuf.ar(in * \input.ar(0.dbamp),
 			buf,
 			offset:0,
-			recLevel:\reclevel.kr(1),
-			preLevel:\prelevel.kr(0),
+			recLevel:\reclevel.ar(1),
+			preLevel:\prelevel.ar(0),
 			run:run,
 			loop:0,
 			trigger:trig
 		);
 
-		SendReply.kr(imp2 * (steps < secs + 1) * run, durkey, [steps, secs]);
-		SendReply.kr(imp, levelskey, [Amplitude.kr(sig), K2A.ar(Peak.ar(sig, delimp).lag(0, 3))]);
+		SendReply.ar(imp2 * (steps < secs + 1) * run, durkey, [steps, secs]);
+		SendReply.ar(imp, levelskey, [Amplitude.ar(sig), K2A.ar(Peak.ar(sig, delimp).lag(0, 3))]);
 		Silence.ar;
 	});
 

@@ -11,34 +11,45 @@ view: {arg objName, envir, components;
 	var windowSize = 4096;
 	var env = Env.perc;
 	var envbuf = Buffer.sendCollection(s, env.discretize(windowSize), 1);
+	var numchannels = 1;
+	var numstarts = 4;
 
 	// Node
-	var srcfunc = {arg numchannels = 1;
-		"numchannesl: %".format(numchannels).debug(objName);
+	var srcfunc = {arg numchannels=1, numstarts=4;
+		"numchannesl: %, numstarts: %".format(numchannels, numstarts).debug(objName);
 
 		{
-			var tempo = \bpm.kr(1) * 60.reciprocal;
-			var trig = (Impulse.kr(tempo) + \trig.tr(0));
+			var pos = \pos.ar(0).unipolar;
 			var buf = \buf.kr(0);
-			var rnd = \rnd.kr(0);
 			var numframes = BufFrames.kr(buf);
-			var start = (\start.kr(0) * 1-rnd) + (rnd * Demand.kr(trig, 0, Dwhite(0, 1)) * numframes);
-			var loop = \loop.kr(1);
-			var rev = \rev.kr(0);
-			var rate = \rate.kr(1) * BufRateScale.kr(buf) * Demand.kr(trig, 0, Dwrand([-1, 1], [rev, 1-rev], inf));
+			var start =  numstarts.collect({arg i;
+				var key = ('s' ++ i).asSymbol;
+				key.ar(0);
+			}) * numframes;
+
+			var num = start.size;
+			var trig = num.collect({arg i;
+				var lo = i * num.reciprocal;
+				var hi = num.reciprocal * (i + 1);
+				var trig = Trig1.ar(InRange.ar(pos, lo, hi), 1/44100);
+				SendReply.ar(trig, osckey, [i], 1905);
+				trig;
+			});
+
+			var rev = \rev.ar(0);
+			var rate = \rate.ar(1) * BufRateScale.kr(buf) * Demand.ar(trig, 0, Dwrand([-1, 1], [rev, 1-rev], inf));
 			var ts = \ts.kr(1);
-			var phase = Env([0,0,windowSize],[0,1],0).ar(gate:trig, timeScale:ts * tempo.reciprocal);
+			var env = Env([0,0,windowSize],[0,1],0).ar(gate:trig, timeScale:ts);
+			//var speed = (numframes - start)/BufSampleRate.kr(buf) * rate.reciprocal.abs;
+			//var replyphase = Env([0, 0, 1],[0,speed],0).ar(gate:trig, timeScale:rate.abs);
 
-			var speed = (numframes - start)/BufSampleRate.kr(buf) * rate.reciprocal.abs;
-			var replyphase = Env([0, 0, 1],[0,speed],0).ar(gate:trig, timeScale:rate.abs);
+			var aeg = BufRd.ar(1, envbuf, env);
+			var sig = PlayBufCF.ar(numchannels, buf, rate, trig, start, 0);
+			sig = sig.flatten * aeg * \amp.ar(-8.dbamp);
 
-			var env = BufRd.ar(1, envbuf, phase);
-			var sig = PlayBufCF.ar(numchannels, buf, rate, trig, start, loop);
-			sig = sig * env * \amp.kr(-8.dbamp);
-
-			SendReply.kr(Impulse.kr(50), osckey,
-				[replyphase.linlin(0, 1, start,  numframes - (numframes * rev))], 1905);
-			Splay.ar(sig, \spread.kr(1), center:\center.kr(0));
+			//SendReply.kr(Impulse.kr(50), osckey,
+			//	[replyphase.linlin(0, 1, start,  numframes - (numframes * rev))], 1905);
+			Splay.ar(sig, \spread.ar(1), center:\center.ar(0));
 		};
 	};
 	var node = NodeProxy.audio.source_(srcfunc.());
@@ -76,14 +87,14 @@ view: {arg objName, envir, components;
 
 			if (bufnum.isNil.not) {
 
-				var buf = s.cachedBufferAt(bufnum);
+				buf = s.cachedBufferAt(bufnum);
 				buf.loadToFloatArray(action:{arg a;
 					{
 						sfv.setData(a, channels: buf.numChannels);
 						sfv.setSelection (0, [0, buf.numFrames]);
 
-						node.source = srcfunc.(buf.numChannels);
-						node.set(\buf, buf.bufnum, \start, 0, \trig, 1);
+						node.source = srcfunc.(buf.numChannels, numstarts);
+						node.set(\buf, buf.bufnum);
 
 						sfv.mouseUpAction.value(sfv);
 					}.defer
@@ -105,9 +116,10 @@ view: {arg objName, envir, components;
 	};
 
 	var specs = [
-		\bpm -> [1, 300, \lin, 0, 60],
-		\rnd -> [0, 1, \lin, 0, 0],
-		\ts -> [0, 1, \lin, 0, 1],
+		//\bpm -> [1, 300, \lin, 0, 60],
+		//\rnd -> [0, 1, \lin, 0, 0],
+		\pos -> \set,//[0, 1, \lin, 0, 0],
+		\ts -> [0, 10, \lin, 0, 1],
 		\amp -> [0, 10, \lin, 0, 0.3],
 		\rate -> [0.1, 4, \lin, 0, 1],
 		\rev -> [0, 1, \lin, 0, 0],
@@ -137,7 +149,13 @@ view: {arg objName, envir, components;
 	});
 
 	var oscfunc = OSCFunc({arg msg;
-		{ sfv.timeCursorPosition = msg[3] }.defer(0.001)
+		{
+			//sfv.timeCursorPosition = msg[3]
+			var index = msg[3];
+			var pos = positions[index] * buf.numFrames;
+			sfv.timeCursorPosition = pos;
+			msv.index = index;
+		}.defer(0.001)
 	}, osckey);
 
 	var eview = EnvelopeView()
@@ -160,28 +178,30 @@ view: {arg objName, envir, components;
 				var newvals = Array.fill(size, {0.0});
 				positions = positions ++ newvals;
 			}{
-				var size = positions.size;
-				var toremove = size - newsize;
-				toremove.do({arg i;
-					var index = size + i - 1;
-					positions.removeAt(index);
-				});
+				positions = positions[0..(newsize.asInt-1)];
 			};
-			msv.value_(positions)
+			msv.value_(positions);
+			node.source = srcfunc.(buf.numChannels, positions.size);
 		}),
 		Button().action_({arg ctrl;
 			positions = Array.fill(positions.size, {rrand(0.0, 1.0)});
-			msv.value_(positions);
+			//msv.value_(positions);
+			msv.valueAction_(positions);
 		})
 	));
 	stepsView.layout.add(msv
 		.elasticMode_(1)
+		.showIndex_(true)
 		.value_(positions)
-		.thumbSize_(300/4)
+		.thumbSize_(300/positions.size)
 		.drawRects_(true)
 		.isFilled_(true)
 		.action_({arg ctrl;
 			positions = ctrl.value;
+			positions.do({arg val, i;
+				var key = ('s' ++ i).asSymbol;
+				node.set(key, val);
+			});
 		})
 	);
 

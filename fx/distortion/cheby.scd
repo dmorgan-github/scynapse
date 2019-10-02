@@ -11,11 +11,11 @@ view: {arg objName, envir, components;
 
 	var node = NodeProxy.audio(s, 2)
 	.filter(100, {arg sig_in;
-		var in = sig_in * \input.kr(1);
-		var buf = \buf.kr(0);
+		var in = sig_in * \input.ar(1);
+		var buf = \buf.ar(0);
 		var sig = Shaper.ar(buf, in);
 		sig = LeakDC.ar(sig);
-		Splay.ar(sig, spread:\spread.kr(1), center:\center.kr(0)) * \amp.kr(0.dbamp) * \vol.kr(0.dbamp);
+		Splay.ar(sig, spread:\spread.ar(1), center:\center.ar(0)) * \amp.ar(0.dbamp) * \vol.ar(0.dbamp);
 	})
 	.set(\buf, buf);
 
@@ -33,7 +33,7 @@ view: {arg objName, envir, components;
 	.gap_(0);
 
 	var specs = [
-		\amp -> [0,1,\lin,0,1],
+		\amp -> [0,4,\lin,0,1],
 		\input -> [0, 10, \lin, 0, 1],
 		\spread -> [0,1,\lin,0, 1],
 		\center -> [-1,1,\lin,0,0],
