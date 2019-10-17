@@ -10,7 +10,7 @@ synth: {arg sig_in;
 	Splay.ar(sig, spread:\spread.ar(1), center:\center.ar(0)) * \amp.ar(0.dbamp) * \vol.ar(0.dbamp);
 },
 specs: [
-	\freq -> [0.0, 8000, \lin, 0.0, 3],
+	\freq -> [0.0, 800, \lin, 0.0, 3],
 	\depth -> [0, 1, \lin, 0, 0],
 	\spread -> [0,1,\lin,0, 1],
 	\center -> [-1,1,\lin,0,0],

@@ -25,7 +25,7 @@ view: {arg objName, envir, components;
 	.maxHeight_(35)
 	.minWidth_(35)
 	.action_({arg ctrl;
-		var name = ctrl.value.asSymbol;
+		var name = ctrl.value.replace($\\, "").asSymbol;
 		var node = envir[name];
 		if (node.isNil){
 			var msg = "node % doesn't exist in environment".format(name);
