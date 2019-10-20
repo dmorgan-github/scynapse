@@ -186,7 +186,7 @@ view: {arg objName, envir, components;
 			var li = LevelIndicator(bounds:Rect(width:20, height:18)).value_(controlSpec.unmap(myval));
 			var labelView = StaticText().string_(label ++ ": ").font_(font).stringColor_(Color.white);
 			var st = StaticText().string_(myval).font_(font).stringColor_(Color.white);
-			var nb = NumberBox().font_(font).value_(myval);
+			var nb = NumberBox().font_(font).value_(myval).background_(Color.white);
 
 			envir[key] = myval;
 			stack = StackLayout(
@@ -206,27 +206,30 @@ view: {arg objName, envir, components;
 				)
 				.mouseMoveAction_({arg ctrl, x, y, mod;
 					var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+					var mappedVal = controlSpec.map(val);
 					if (mod == 0) {
 						li.value = val;
-						st.string_(val);
-						nb.value = val;
-						envir[key] = controlSpec.map(myval);
+						st.string_(mappedVal);
+						nb.value = mappedVal;
+						envir[key] = mappedVal;
 					}
 				})
 				.mouseUpAction_({arg ctrl, x, y, mod;
 					var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+					var mappedVal = controlSpec.map(val);
 					if (mod == 0) {
 						li.value = val;
-						st.string_(val);
-						nb.value = val;
-						envir[key] = controlSpec.map(myval);
+						st.string_(mappedVal);
+						nb.value = mappedVal;
+						envir[key] = mappedVal;
 					}
 				}),
 				nb
 				.action_({arg ctrl;
-					li.value = ctrl.value;
-					st.string_(ctrl.value);
-					envir[key] = myval;
+					var val = ctrl.value;
+					li.value = controlSpec.unmap(val);
+					st.string_(val);
+					envir[key] = val;
 					stack.index = 0;
 				}),
 			).mode_(\stackOne)
@@ -257,13 +260,13 @@ view: {arg objName, envir, components;
 			ctrlView.(\res, \res, Color.blue),
 			ctrlView.(\freqamt, \freqamt, Color.blue),
 			nil
-		).margins_(2).spacing_(2));
+		).margins_(2).spacing_(1));
 
 		var detuneView = View().layout_(VLayout(
 			ctrlView.(\ddepth, \ddepth, Color.red),
 			ctrlView.(\drate, \drate, Color.red),
 			nil
-		).margins_(2).spacing_(2));
+		).margins_(2).spacing_(1));
 
 		var triView = View().layout_(VLayout(
 			ctrlView.(\tri, \tri, Color.green),
@@ -271,7 +274,7 @@ view: {arg objName, envir, components;
 			ctrlView.(\triwidth, \width, Color.green),
 			ctrlView.(\trifold, \fold, Color.green),
 			nil
-		).margins_(2).spacing_(2));
+		).margins_(2).spacing_(1));
 
 		var sawView = View().layout_(VLayout(
 			ctrlView.(\saw, \saw, Color.cyan),
@@ -279,14 +282,14 @@ view: {arg objName, envir, components;
 			ctrlView.(\sawtimbre, \timbre, Color.cyan),
 			ctrlView.(\sawcurve, \curve, Color.cyan),
 			nil
-		).margins_(2).spacing_(2));
+		).margins_(2).spacing_(1));
 
 		var squareView = View().layout_(VLayout(
 			ctrlView.(\square, \square, Color.magenta),
 			ctrlView.(\squarefreqmul, \freqmul, Color.magenta),
 			ctrlView.(\squarewidth, \width, Color.magenta),
 			nil
-		).margins_(2).spacing_(2));
+		).margins_(2).spacing_(1));
 
 		var sineView = View().layout_(VLayout(
 			ctrlView.(\sine, \sine, Color.yellow),
@@ -297,7 +300,7 @@ view: {arg objName, envir, components;
 			ctrlView.(\ivel, \ivel, Color.yellow),
 			ctrlView.(\idur, \idur, Color.yellow),
 			ctrlView.(\ratio, \ratio, Color.yellow)
-		).margins_(2).spacing_(2));
+		).margins_(2).spacing_(1));
 
 		var noiseView = View().layout_(VLayout(
 			ctrlView.(\noise, \noise, Color.gray),
@@ -306,7 +309,7 @@ view: {arg objName, envir, components;
 		var ampView = View().layout_(VLayout(
 			ctrlView.(\amp, \amp, Color.blue),
 			nil
-		).margins_(2).spacing_(2));
+		).margins_(2).spacing_(1));
 
 		var envView = View().layout_(VLayout(
 			ctrlView.(\atk, \atk, Color.red),
@@ -315,7 +318,7 @@ view: {arg objName, envir, components;
 			ctrlView.(\suslevel, \suslevel, Color.red),
 			ctrlView.(\rel, \rel, Color.red),
 			ctrlView.(\ts, \ts, Color.red),
-		).margins_(2).spacing_(2));
+		).margins_(2).spacing_(1));
 
 		view.layout.add(envView);
 		view.layout.add(filterView);
@@ -329,246 +332,6 @@ view: {arg objName, envir, components;
 		scrollView.canvas = view;
 		scrollView;
 	}.(synthEnvir, objName);
-
-	/*
-	var synthView = {arg envir, name;
-
-		var metadata = SynthDescLib.global.at(\subtractr).metadata;
-		var specs = metadata[\specs];
-		var font = Font("Courier New", 10);
-		var ezknob = {arg key, label;
-
-			var knob = Knob();
-			var nb = NumberBox();
-			var controlSpec = specs[key];
-			var myval = envir[key] ?? controlSpec.default;
-			envir[key] = myval;
-
-			VLayout(
-				knob
-				.action_({arg ctrl;
-					var val = controlSpec.map(ctrl.value);
-					nb.valueAction_(val);
-				})
-				.centered_(true)
-				.mode_(\vert)
-				.value_(controlSpec.unmap(myval))
-				.mouseDownAction_({arg ctrl, x, y, mod, button, clickCount;
-					if (clickCount == 2){
-						var val = controlSpec.default;
-						nb.valueAction_(val);
-					}
-				}),
-				nb
-				.font_(font)
-				.maxWidth_(35)
-				.maxHeight_(20)
-				.action_({arg ctrl;
-					envir[key] = ctrl.value;
-					knob.value = controlSpec.unmap(envir[key]);
-				})
-				.clipLo_(controlSpec.minval)
-				.clipHi_(controlSpec.maxval)
-				.value_(myval),
-				StaticText()
-				.string_(label)
-				.font_(font)
-				.align_(\center)
-			)
-			.margins_(0)
-			.spacing_(0)
-		};
-
-		var view = View().name_(name).layout_(VLayout().margins_(1).spacing_(1))
-		.palette_(QPalette.light);
-
-		var filterView = View().layout_(VLayout(
-			StaticText().string_("filter").font_(font),
-			HLayout(
-				ezknob.(\cutoff, \cutoff),
-				ezknob.(\fvel, \vel),
-				ezknob.(\fcurve, \curve),
-				ezknob.(\res, \res),
-				ezknob.(\freqamt, \freqamt),
-				nil
-			)
-		).margins_(2).spacing_(2))
-		.background_(Color.grey.alpha_(0.2));
-
-		var detuneView = View().layout_(VLayout(
-			StaticText().string_("detune").font_(font),
-			HLayout(
-				ezknob.(\ddepth, \ddepth),
-				ezknob.(\drate, \drate),
-				nil
-			)
-		).margins_(2).spacing_(2));
-
-		var triView = View().layout_(VLayout(
-			StaticText().string_("triangle").font_(font),
-			HLayout(
-				ezknob.(\tri, \tri),
-				ezknob.(\trifreqmul, \freqmul),
-				ezknob.(\triwidth, \width),
-				ezknob.(\trifold, \fold),
-				nil
-			)
-		).margins_(2).spacing_(2))
-		.background_(Color.grey.alpha_(0.2));
-
-		var sawView = View().layout_(VLayout(
-			StaticText().string_("saw").font_(font),
-			HLayout(
-				ezknob.(\saw, \saw),
-				ezknob.(\sawfreqmul, \freqmul),
-				ezknob.(\sawtimbre, \timbre),
-				ezknob.(\sawcurve, \curve),
-				nil
-			)
-		).margins_(2).spacing_(2));
-
-		var squareView = View().layout_(VLayout(
-			StaticText().string_("square").font_(font),
-			HLayout(
-				ezknob.(\square, \square),
-				ezknob.(\squarefreqmul, \freqmul),
-				ezknob.(\squarewidth, \width),
-				nil
-			)
-		).margins_(2).spacing_(2))
-		.background_(Color.grey.alpha_(0.2));
-
-		var sineView = View().layout_(VLayout(
-			StaticText().string_("sine").font_(font),
-			HLayout(
-				ezknob.(\sine, \sine),
-				ezknob.(\sinefreqmul, \freqmul),
-				ezknob.(\sinefold, \fold),
-				ezknob.(\sinefm, \fm),
-				ezknob.(\index, \index),
-				ezknob.(\ivel, \ivel),
-				ezknob.(\idur, \idur),
-				ezknob.(\ratio, \ratio)
-			)
-		).margins_(2).spacing_(2));
-
-		var noiseView = View().layout_(VLayout(
-			StaticText().string_("noise").font_(font),
-			HLayout(
-				ezknob.(\noise, \noise),
-				nil
-			)
-		).margins_(2).spacing_(2))
-		.background_(Color.grey.alpha_(0.2));
-
-		var ampView = View().layout_(VLayout(
-			StaticText().string_("amp").font_(font),
-			HLayout(
-				ezknob.(\amp, \amp),
-				nil
-			)
-		).margins_(2).spacing_(2));
-
-		var envView = View().layout_(HLayout(
-			ezknob.(\atk, \atk),
-			ezknob.(\dec, \dec),
-			ezknob.(\sustain, \sustain),
-			ezknob.(\suslevel, \suslevel),
-			ezknob.(\rel, \rel),
-			ezknob.(\ts, \ts),
-		));
-
-		var env = EnvelopeView();
-		var adsr = Env(
-			[
-				0,
-				1,
-				envir[\suslevel] ?? specs[\suslevel].default,
-				envir[\suslevel] ?? specs[\suslevel].default,
-				0
-			],
-			[
-				envir[\atk] ?? specs[\atk].default,
-				envir[\dec] ?? specs[\dec].default,
-				envir[\sustain] ?? 0.5,
-				envir[\rel] ?? specs[\rel].default
-		], 0);
-		var slider = Slider();
-		var nb = NumberBox();
-		var tsdefault = envir[\ts] ?? specs[\ts].default;
-		var envView = View().layout_(VLayout(
-			env.setEnv(adsr)
-			.action_({arg ctrl;
-				var times = ctrl.asEnv.times;
-				var levels = ctrl.asEnv.levels;
-				var sel = ctrl.selection[0];
-				var atk, dec, sustain, rel, suslevel;
-
-				// this is broken
-				if (sel == 2) {
-					var y = ctrl.value[1];
-					var val = y[sel];
-					levels[3] = val;
-					env.setEnv(Env(levels, times, 0));
-				};
-				if (sel == 3) {
-					var y = ctrl.value[1];
-					var val = y[sel];
-					levels[2] = val;
-					env.setEnv(Env(levels, times, 0));
-				};
-				envir[\atk] = times[0];
-				envir[\dec] = times[1];
-				envir[\sustain] = times[2];
-				envir[\rel] = times[3];
-				envir[\suslevel] = levels[2];
-			})
-			.gridOn_(false)
-			.thumbSize_(15)
-			.fillColor_(Color.blue)
-			.gridColor_(Color.blue)
-			.keepHorizontalOrder_(true),
-			HLayout(
-				slider
-				.orientation_(\horizontal)
-				.action_({arg ctrl;
-					var val = specs[\ts].map(ctrl.value);
-					nb.valueAction_(val);
-				})
-				.thumbSize_(15)
-				.maxHeight_(20)
-				.value_(specs[\ts].unmap(tsdefault))
-				.mouseDownAction_({arg ctrl, x, y, mod, button, clickCount;
-					if (clickCount == 2){
-						nb.valueAction_(specs[\ts].default);
-					};
-					false
-				}),
-				nb
-				.maxWidth_(35)
-				.maxHeight_(20)
-				.action_({arg ctrl;
-					envir[\ts] = ctrl.value;
-					slider.value = specs[\ts].unmap(ctrl.value);
-				})
-				.value_(tsdefault)
-			)
-		).margins_(2).spacing_(2));
-		env.setEditable(0, false);
-
-
-		view.layout.add(envView);
-		view.layout.add(filterView);
-		view.layout.add(detuneView);
-		view.layout.add(triView);
-		view.layout.add(sawView);
-		view.layout.add(squareView);
-		view.layout.add(sineView);
-		view.layout.add(noiseView);
-		view.layout.add(ampView);
-		view;
-	}.(synthEnvir, objName);
-	*/
 
 	envir[objName] = node;
 	envir[objName].play;

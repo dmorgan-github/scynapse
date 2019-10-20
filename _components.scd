@@ -41,6 +41,105 @@
 
 		specsView: {arg name, specs, node, envir, containerView;
 
+			var ctrlView = {arg key, spec, color;
+
+				var controlSpec = spec;
+				var myval = controlSpec.default;
+				var stack, view;
+				var font = Font(size:10);
+				var li = LevelIndicator(bounds:Rect(width:20, height:18)).value_(controlSpec.unmap(myval));
+				var labelView = StaticText().string_(key ++ ": ").font_(font).stringColor_(Color.white);
+				var st = StaticText().string_(myval).font_(font).stringColor_(Color.white);
+				var nb = NumberBox().font_(font).value_(myval).background_(Color.white);
+
+				stack = StackLayout(
+					View()
+					.layout_(
+						StackLayout(
+							View().layout_(HLayout(labelView, st, nil).margins_(1).spacing_(1)),
+							li
+							.style_(\continuous)
+							.meterColor_(color.alpha_(0.5))
+							.warningColor_(color.alpha_(0.5))
+							.criticalColor_(color.alpha_(0.5))
+						)
+						.mode_(\stackAll)
+						.margins_(0)
+						.spacing_(0)
+					)
+					.mouseMoveAction_({arg ctrl, x, y, mod;
+						var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+						var mappedVal = controlSpec.map(val);
+						if (mod == 0) {
+							li.value = val;
+							st.string_(mappedVal);
+							nb.value = mappedVal;
+							node.set(key, mappedVal);
+						}
+					})
+					.mouseUpAction_({arg ctrl, x, y, mod;
+						var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+						var mappedVal = controlSpec.map(val);
+						if (mod == 0) {
+							li.value = val;
+							st.string_(mappedVal);
+							nb.value = mappedVal;
+							node.set(key, mappedVal);
+						}
+					}),
+					nb
+					.action_({arg ctrl;
+						var val = ctrl.value;
+						li.value = controlSpec.unmap(val);
+						st.string_(val);
+						node.set(key, val);
+						stack.index = 0;
+					}),
+				).mode_(\stackOne)
+				.margins_(0)
+				.spacing_(0);
+
+				view = View()
+				.layout_(stack)
+				.mouseDownAction_({arg ctrl, x, y, mod, num, count;
+					if (mod == 262144) {
+						stack.index = 1;
+					}
+				})
+				.fixedWidth_(150)
+				.fixedHeight_(25)
+				.background_(Color.red);
+				view;
+			};
+
+			//var mappers = ();
+			var scrollView = ScrollView(bounds:Rect(0,0,160,300));
+			var view = View().layout_(VLayout().margins_(0.5).spacing_(0.5))
+			.onClose_({
+				specs.do({arg assoc;
+					var key = assoc.key;
+					node.unset(key);
+				});
+				//mappers.do({arg v;
+				//	v.clear;
+				//	v = nil;
+				//});
+			});
+
+			specs.do({arg assoc;
+				var k = assoc.key;
+				var v = assoc.value;
+				var ctrl = ctrlView.(k, v.asSpec, Color.rand);
+				view.layout.add(ctrl);
+			});
+
+			view.layout.add(nil);
+			scrollView.canvas = view;
+			scrollView;
+		},
+
+		specsView2: {arg name, specs, node, envir, containerView;
+
 			var mappers = ();
 			var view = View()
 			.layout_(GridLayout().margins_(0).spacing_(0)).background_(Color.grey.alpha_(0.3))
