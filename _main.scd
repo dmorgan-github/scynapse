@@ -174,7 +174,7 @@ Fdef(\scynapse, {arg environment, rootpath;
 		} {
 
 			if (view.class == View) {
-				win = View().layout_(VLayout().spacing_(0).margins_(0)).palette_(QPalette.dark).name_(objName);
+				win = View().layout_(VLayout().spacing_(0).margins_(0)).background_(Color.black);//.palette_(QPalette.dark).name_(objName);
 
 				NotificationCenter.register(view, \status, win, {arg msg;
 					status.string_(msg);
