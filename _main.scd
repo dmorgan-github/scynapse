@@ -3,6 +3,7 @@ Fdef(\scynapse, {arg environment, rootpath;
 
 	//var rootpath = PathName(Document.current.path).parentPath;
 	var viewsPath = rootpath ++ "_views/";
+	var palette = QPalette.auto(Color.grey, Color.black);
 	var recorders = List.new;
 	var proxyspace = \p;
 	var getenvir = {
@@ -174,7 +175,11 @@ Fdef(\scynapse, {arg environment, rootpath;
 		} {
 
 			if (view.class == View) {
-				win = View().layout_(VLayout().spacing_(0).margins_(0)).palette_(QPalette.auto(Color.grey, Color.black)).name_(objName);
+				win = View().layout_(VLayout().spacing_(0).margins_(0))
+				.palette_(palette)
+				.name_(objName)
+				.minHeight_(250)
+				.background_(Color.rand.alpha_(0.1));
 
 				NotificationCenter.register(view, \status, win, {arg msg;
 					status.string_(msg);
@@ -251,7 +256,8 @@ Fdef(\scynapse, {arg environment, rootpath;
 
 				opendoc = StaticText().string_(objName).mouseUpAction_({
 					win.front;
-				});
+				})
+				.stringColor_(Color.white);
 				doclist.layout.insert(opendoc, 0);
 				docmap[objName] = opendoc;
 
@@ -274,7 +280,7 @@ Fdef(\scynapse, {arg environment, rootpath;
 
 		var draw, scrollView;
 		var win = Window("Browser", Rect(left, top, width, height));
-		var view = win.view.layout_(HLayout().margins_(2).spacing_(2)).palette_(QPalette.dark);
+		var view = win.view.layout_(HLayout().margins_(2).spacing_(2)).palette_(palette);
 		var envir = getenvir.();
 
 		var ctrlView = View().layout_(HLayout(
@@ -334,6 +340,8 @@ Fdef(\scynapse, {arg environment, rootpath;
 		.hasHorizontalScroller_(true);
 		scrollView.decorator = FlowLayout(scrollView.bounds);
 
+		// TODO: this needs to be re-written
+		// to not use the layout decorator mumbojumbo
 		draw = {arg path, view;
 
 			var pathName = PathName.new(path);

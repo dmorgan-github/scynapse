@@ -1,5 +1,6 @@
 {
 	var size = 15;
+
 	(
 		eqView: {arg name, node, envir, containerView;
 
@@ -47,7 +48,7 @@
 				var myval = controlSpec.default;
 				var stack, view;
 				var font = Font(size:10);
-				var li = LevelIndicator(bounds:Rect(width:20, height:18)).value_(controlSpec.unmap(myval));
+				var li = LevelIndicator().value_(controlSpec.unmap(myval));
 				var labelView = StaticText().string_(key ++ ": ").font_(font).stringColor_(Color.white);
 				var st = StaticText().string_(myval).font_(font).stringColor_(Color.white);
 				var nb = NumberBox().font_(font).value_(myval).background_(Color.white);
@@ -62,6 +63,7 @@
 							.meterColor_(color.alpha_(0.5))
 							.warningColor_(color.alpha_(0.5))
 							.criticalColor_(color.alpha_(0.5))
+							.background_(color.alpha_(0.2))
 						)
 						.mode_(\stackAll)
 						.margins_(0)
@@ -75,17 +77,25 @@
 							st.string_(mappedVal);
 							nb.value = mappedVal;
 							node.set(key, mappedVal);
-						}
+						};
 					})
-					.mouseUpAction_({arg ctrl, x, y, mod;
-						var val = x.linlin(0, ctrl.bounds.width, 0, 1);
-						var mappedVal = controlSpec.map(val);
-						if (mod == 0) {
-							li.value = val;
-							st.string_(mappedVal);
-							nb.value = mappedVal;
-							node.set(key, mappedVal);
-						}
+					.mouseDownAction_({arg ctrl, x, y, mod, num, count;
+						var val = controlSpec.default;
+						if (count == 2) {
+							li.value = controlSpec.unmap(val);
+							st.string_(val);
+							nb.value = val;
+							node.set(key, val);
+						} {
+							if (mod == 0) {
+								var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+								var mappedVal = controlSpec.map(val);
+								li.value = val;
+								st.string_(mappedVal);
+								nb.value = mappedVal;
+								node.set(key, mappedVal);
+							};
+						};
 					}),
 					nb
 					.action_({arg ctrl;
@@ -106,10 +116,8 @@
 						stack.index = 1;
 					}
 				})
-				.fixedWidth_(150)
-				.fixedHeight_(25)
-				.background_(Color.red);
-				view;
+				.fixedHeight_(25);
+				view
 			};
 
 			//var mappers = ();
@@ -120,6 +128,7 @@
 					var key = assoc.key;
 					node.unset(key);
 				});
+
 				//mappers.do({arg v;
 				//	v.clear;
 				//	v = nil;
@@ -134,10 +143,11 @@
 			});
 
 			view.layout.add(nil);
-			scrollView.canvas = view;
+			scrollView.canvas = view.background_(Color.clear);
 			scrollView;
 		},
 
+		/*
 		specsView2: {arg name, specs, node, envir, containerView;
 
 			var mappers = ();
@@ -344,6 +354,7 @@
 
 			view;
 		},
+		*/
 
 		playView: {arg name, node, containerView;
 
