@@ -4,7 +4,7 @@ synth: {arg sig_in;
 	var in = sig_in * \input.ar(1);
 	var sig = BLowPass4.ar(in,
 		\freq.ar(1000).clip(20, 20000),
-		rq:\res.ar(1).linlin(0, 1, 1, 0.0001)
+		rq:\res.ar(0).linlin(0, 1, 1, 0.0001)
 	);
 	Splay.ar(sig, spread:\spread.ar(1), center:\center.ar(0)) * \amp.ar(0.dbamp) * \vol.ar(0.dbamp);
 },

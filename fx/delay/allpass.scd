@@ -10,7 +10,7 @@ synth: {arg sig_in;
 },
 specs: [
 	\decay -> [1, 16, \lin, 0, 1],
-	\del -> [0.0, 1.0, \lin, 0, 0.2],
+	\del -> [0.001, 1.0, \lin, 0, 0.2],
 	\tempo -> [0.001, 4, \lin, 0.0, 1],
 	\time -> [0.0, 4, \lin, 0.0, 0],
 	\spread -> [0,1,\lin,0, 1],

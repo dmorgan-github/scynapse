@@ -199,6 +199,7 @@ view: {arg objName, envir, components;
 						.meterColor_(color.alpha_(0.5))
 						.warningColor_(color.alpha_(0.5))
 						.criticalColor_(color.alpha_(0.5))
+						.background_(color.alpha_(0.2))
 					)
 					.mode_(\stackAll)
 					.margins_(0)
@@ -244,8 +245,7 @@ view: {arg objName, envir, components;
 				}
 			})
 			.fixedWidth_(150)
-			.fixedHeight_(25)
-			.background_(Color.red);
+			.fixedHeight_(25);
 			view
 		};
 
@@ -336,6 +336,7 @@ view: {arg objName, envir, components;
 	envir[objName] = node;
 	envir[objName].play;
 	{envir[objName].stop}.defer(5);
+
 	Pdef(\subtractrbase, {arg evt, ndef, monitor=true;
 
 		var metadata = SynthDescLib.global.at(\subtractr).metadata;
