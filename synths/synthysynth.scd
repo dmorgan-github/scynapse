@@ -1,6 +1,8 @@
 (
 view: {arg objName, envir, components;
 
+	var thesynth = \default;
+
 	var synthEnvir = {
 		if (topEnvironment[objName].isNil){
 			topEnvironment[objName] = ();
@@ -23,6 +25,84 @@ view: {arg objName, envir, components;
 	var node = NodeProxy.audio(s, 2);
 	var view = View().layout_(VLayout().margins_(1).spacing_(1));
 	var containerView = View().layout_(VLayout().margins_(0).spacing_(0));
+
+	var gridView = {
+
+		var black = [1,3,6,8,10];
+		var rows = 24;
+		var cols = 16;
+		var data = rows.collect({ cols.collect({0})});
+		var headers = cols.collect({arg col;
+			StaticText().string_("").fixedSize_(12).background_(Color.red);
+		});
+		var keyboard = rows.collect({arg i;
+			var color = Color.grey;
+			var num = rows-1-i;
+			if (black.includes(num.mod(12))) {
+				color = Color.black;
+			};
+			Button()
+			.states_([[nil, nil, color], [nil, nil, Color.white]])
+			.fixedWidth_(20)
+			.fixedHeight_(12)
+			.mouseDownAction_({arg ctrl;
+				ctrl.value = 1;
+			})
+			.mouseUpAction_({arg ctrl;
+				ctrl.value = 1;
+			});
+		});
+		var grid = cols.collect({arg col;
+			[headers[col]] ++
+			rows.collect({arg row;
+				Button()
+				.fixedSize_(12)
+				.states_([ [nil, nil, Color.white], [nil, nil, Color.blue] ])
+				.action_({arg ctrl;
+					data[rows-1-row][col] = ctrl.value;
+				})
+			})
+		});
+		var view = View()
+		.layout_(GridLayout.columns([nil] ++ keyboard, *grid).margins_(0).spacing_(1));
+
+		var rout = Prout({
+			var degrees = List.new;
+			inf.do({arg i;
+				var col = i.mod(cols);
+				{
+					if (i > 0) {
+						var prev = (i-1).mod(cols);
+						headers[prev].background_(Color.red);
+					};
+					headers[col].background_(Color.white);
+				}.defer;
+				degrees.do({arg degree;
+					{
+						degree = degree-23*(-1);
+						keyboard[degree].value = 0;
+					}.defer;
+				});
+				degrees.clear;
+				rows.do({arg row;
+					var degree = rows-1-row;
+					var cell = data[degree][col];
+					if (cell == 1) {
+						degrees.add(degree);
+						{
+							keyboard[row].value = 1;
+						}.defer;
+					}
+				});
+				if (degrees.size == 0) {
+					Rest().yield;
+				} {
+					degrees.yield;
+				}
+			});
+		});
+		[view, rout];
+	}.();
 
 	var synthView = {arg envir, name, synth;
 
@@ -138,7 +218,7 @@ view: {arg objName, envir, components;
 		Pdef(objName, {arg monitor=false;
 			Pbind(
 				\dur, 1,
-				\degree, 0,
+				\degree, gridView[1],
 				\octave, 5,
 				\vel, 1,
 			) <> Pdef(\synthysynthbase) <> (evt:synthEnvir, ndef:objName, monitor:monitor)
@@ -151,15 +231,77 @@ view: {arg objName, envir, components;
 
 	var update = {arg synth;
 		var view = synthView.(synthEnvir, objName, synth);
+		thesynth = synth;
 		containerView.removeAll;
 		containerView.layout.add(view);
 	};
+
+	/*
+	var keyboardView = {
+
+		var map = (
+			'z': 0,'s': 1,'x': 2,'d': 3,'c': 4,'v': 5,'g': 6,'b': 7,'h': 8,'n': 9,'j': 10,'m': 11,',': 12,
+			'q': 12,'2': 13,'w': 14,'3': 15,'e': 16,'r': 17,'5': 18,'t': 19,'6': 20,'y': 21,'7': 22,'u': 23,'i': 24
+		);
+
+		var midinote = 60;
+		var synths = Order.new;
+		var black = [1,3,6,8,10];
+		var view = View().layout_(VLayout(
+			Button().string_("*").fixedWidth_(20).minHeight_(20).action_({arg ctrl;
+
+			}),
+			Button().string_("+").fixedWidth_(20).fixedHeight_(12),
+			Button().string_("-").fixedWidth_(20).fixedHeight_(12),
+			*(0..23).reverse.collect({arg i;
+				var color = Color.grey;
+				if ((black ++ (black+12)).includes(i)) {
+					color = Color.black;
+				};
+				Button()
+				.states_([[nil, nil, color], [nil, nil, Color.white]])
+				.fixedWidth_(20)
+				.fixedHeight_(12)
+				.mouseDownAction_({arg ctrl;
+					var freq = midinote + i;
+					var args = [\out, node.bus.index, \gate, 1, \freq, freq.midicps] ++ synthEnvir.asPairs();
+					var x = Synth(thesynth.asSymbol, args, target:node.nodeID);
+					synths[freq] = x;
+					ctrl.value = 1;
+				})
+				.mouseUpAction_({arg ctrl;
+					var freq = midinote + i;
+					synths[freq].set(\gate, 0);
+					ctrl.value = 1;
+				});
+			})
+		).margins_(0).spacing_(0.5))
+		.keyDownAction_({arg ctrl, char, mod, uni, keycode, key;
+			var val = map[char.asSymbol];
+			if (val.isNil.not) {
+				var freq = midinote + val;
+				var args = [\out, node.bus.index, \gate, 1, \freq, freq.midicps] ++ synthEnvir.asPairs();
+				var x = Synth(thesynth.asSymbol, args, target:node.nodeID);
+				synths[freq] = x;
+				{x.release}.defer(10)
+			};
+		})
+		.keyUpAction_({arg ctrl, char;
+			var val = map[char.asSymbol];
+			var freq = midinote + val;
+			synths[freq].set(\gate, 0);
+		})
+		.background_(Color.grey.alpha_(0.5));
+		//view.layout.add(nil);
+		view;
+	};
+	*/
 
 	envir[objName] = node;
 	// need to initialize the bus and group
 	// by calling play and then stopping
 	envir[objName].play;
-	{envir[objName].stop}.defer(5);
+	//{envir[objName].stop}.defer(5);
 
 	view.layout.add(PopUpMenu()
 		.items_([" "] ++ validsynths)
@@ -168,7 +310,8 @@ view: {arg objName, envir, components;
 			update.(name.asSymbol);
 	}));
 
-	view.layout.add(containerView);
+	//view.layout.add(Button().states_([["midi", nil, Color.clear],["midi", nil, Color.yellow]]));
+	view.layout.add(HLayout(gridView[0], containerView));
 
 	NotificationCenter.register(view, \close, view, {arg msg;
 		msg.debug("clean up");
