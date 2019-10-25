@@ -8,9 +8,10 @@ view: {arg objName, envir, components;
 		topEnvironment[objName];
 	}.();
 	var synth = \bufplayr_2chan;
-	var view, playView, sfv, busView, specsView;
+	var view, playView, sfv, busView, specsView, dataSinkView;
 	var node = NodeProxy.audio(s, 2);
 
+	/*
 	var seqView = {
 
 		var msv, view, prout, numpos, rnd;
@@ -72,6 +73,7 @@ view: {arg objName, envir, components;
 		[view, prout];
 
 	}.();
+	*/
 
 	var specs = [
 		\atk -> ControlSpec(0, 30, \lin, 0, 0.01),
@@ -90,7 +92,9 @@ view: {arg objName, envir, components;
 	];
 
 	envir[objName] = node;
+
 	Pdef(\bufplayrbase, {arg evt, ndef, monitor=true;
+
 		var node = Ndef(ndef);
 		var myspecs = specs.collect({arg assoc;
 			var key = assoc.key;
@@ -111,10 +115,16 @@ view: {arg objName, envir, components;
 	});
 
 	Pdef(objName, {arg monitor=true;
-		Pbind(
+		var key = (objName ++ '_set').asSymbol;
+		//Pbindef(key,
+		//	\data, 0,
+		//	\pos, Pkey(\data),
+		//) <>
+		Pbindef(key,
 			\buf, Pif(Pfunc({synthEnvir[\buf].isNil}), b, Pfunc({synthEnvir[\buf]})),
 			\dur, Pif(Pfunc({synthEnvir[\dur].isNil}), 1, Pfunc({synthEnvir[\dur]})),
-			\pos, seqView[1]
+			\data, 0,
+			\pos, Pkey(\data)
 		) <> Pdef(\bufplayrbase) <> (evt:synthEnvir, ndef:objName, monitor:monitor)
 	});
 
@@ -175,6 +185,28 @@ view: {arg objName, envir, components;
 		dragSink;
 	};
 
+	dataSinkView = {
+		var dragSink = DragSink()
+		.string_("<-  ")
+		.background_(Color.clear)
+		.canReceiveDragHandler_({
+			var obj = View.currentDrag;
+			var type = obj[\type];
+			(type.isNil.not and: (type == \data));
+		})
+		.receiveDragHandler_({arg v;
+			var obj = View.currentDrag.value;
+			var pattern = obj[\pattern].value;
+			var name = obj[\name].value;
+			var key = (objName ++ '_set').asSymbol;
+			v.string = name;
+			Pbindef(key, \data, pattern)
+		})
+		.maxHeight_(35)
+		.minWidth_(35);
+		dragSink;
+	};
+
 	playView = View().layout_(HLayout(
 
 		NumberBox()
@@ -215,7 +247,8 @@ view: {arg objName, envir, components;
 		playView.(),
 		busView.(),
 		sfv,
-		HLayout(seqView[0].minWidth_(150), specsView.minWidth_(150))
+		dataSinkView.(),
+		HLayout(specsView.minWidth_(150))
 	));
 
 	view;
