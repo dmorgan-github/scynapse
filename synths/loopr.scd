@@ -8,7 +8,7 @@ view: {arg objName, envir, components;
 		topEnvironment[objName];
 	}.();
 	var synth = \bufplayr_2chan;
-	var view, playView, sfv, busView;
+	var view, playView, sfv, busView, specsView;
 	var node = NodeProxy.audio(s, 2);
 
 	var seqView = {
@@ -81,7 +81,6 @@ view: {arg objName, envir, components;
 		\curve -> ControlSpec(-24, 24, \lin, 0, 0),
 		\ts -> ControlSpec(0, 100, \lin, 0, 1),
 		\rate -> ControlSpec(0.1, 4, \lin, 0, 1),
-		\pos -> ControlSpec(0, 1, \lin, 0, 0),
 		\rev -> ControlSpec(0, 1, \lin, 0, 0),
 		\loop -> ControlSpec(0, 1, \lin, 1, 0),
 		\amp -> ControlSpec(0, 10, \lin, 0, 0.3),
@@ -118,6 +117,8 @@ view: {arg objName, envir, components;
 			\pos, seqView[1]
 		) <> Pdef(\bufplayrbase) <> (evt:synthEnvir, ndef:objName, monitor:monitor)
 	});
+
+	specsView = components[\pSpecsView].(objName, specs, synthEnvir, view);
 
 	sfv = SoundFileView()
 	.background_(Color.gray(0.3))
@@ -214,7 +215,7 @@ view: {arg objName, envir, components;
 		playView.(),
 		busView.(),
 		sfv,
-		seqView[0]
+		HLayout(seqView[0].minWidth_(150), specsView.minWidth_(150))
 	));
 
 	view;

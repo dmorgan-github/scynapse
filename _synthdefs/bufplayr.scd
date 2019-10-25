@@ -272,5 +272,6 @@ Pdef(\bufplayr_1).stop;
 
 
 App.saveWorkspace("patches4", rec:true);
+s.stopRecording;
 
 ~loopr_1[\rev] = 0.5
