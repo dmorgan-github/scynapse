@@ -1,5 +1,92 @@
 {
 	var size = 15;
+	var ctrlView = {arg key, spec, color, envir=(), cb={};
+
+		var controlSpec = spec;
+		var myval = envir[key] ?? controlSpec.default;
+
+		var stack, view;
+		var font = Font(size:10);
+		var li = LevelIndicator().value_(controlSpec.unmap(myval));
+		var labelView = StaticText().string_(key ++ ": ").font_(font).stringColor_(Color.white);
+		var st = StaticText().string_(myval).font_(font).stringColor_(Color.white);
+		var nb = NumberBox().font_(font).value_(myval).background_(Color.white);
+
+		envir[key] = myval;
+		stack = StackLayout(
+			View()
+			.layout_(
+				StackLayout(
+					View().layout_(HLayout(labelView, st, nil).margins_(1).spacing_(1)),
+					li
+					.style_(\continuous)
+					.meterColor_(color.alpha_(0.5))
+					.warningColor_(color.alpha_(0.5))
+					.criticalColor_(color.alpha_(0.5))
+					.background_(color.alpha_(0.2))
+				)
+				.mode_(\stackAll)
+				.margins_(0)
+				.spacing_(0)
+			)
+			.mouseMoveAction_({arg ctrl, x, y, mod;
+				var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+				var mappedVal = controlSpec.map(val);
+				if (mod == 0) {
+					li.value = val;
+					st.string_(mappedVal);
+					nb.value = mappedVal;
+					//node.set(key, mappedVal);
+					envir[key] = mappedVal;
+					cb.(key, mappedVal);
+				};
+			})
+			.mouseDownAction_({arg ctrl, x, y, mod, num, count;
+				var val = controlSpec.default;
+				if (count == 2) {
+					li.value = controlSpec.unmap(val);
+					st.string_(val);
+					nb.value = val;
+					//node.set(key, val);
+					envir[key] = val;
+					cb.(key, val);
+				} {
+					if (mod == 0) {
+						var val = x.linlin(0, ctrl.bounds.width, 0, 1);
+						var mappedVal = controlSpec.map(val);
+						li.value = val;
+						st.string_(mappedVal);
+						nb.value = mappedVal;
+						//node.set(key, mappedVal);
+						envir[key] = mappedVal;
+						cb.(key, mappedVal);
+					};
+				};
+			}),
+			nb
+			.action_({arg ctrl;
+				var val = ctrl.value;
+				li.value = controlSpec.unmap(val);
+				st.string_(val);
+				//node.set(key, val);
+				envir[key] = val;
+				cb.(key, val);
+				stack.index = 0;
+			}),
+		).mode_(\stackOne)
+		.margins_(0)
+		.spacing_(0);
+
+		view = View()
+		.layout_(stack)
+		.mouseDownAction_({arg ctrl, x, y, mod, num, count;
+			if (mod == 262144) {
+				stack.index = 1;
+			}
+		})
+		.fixedHeight_(25);
+		view
+	};
 
 	(
 		eqView: {arg name, node, envir, containerView;
@@ -42,6 +129,7 @@
 
 		specsView: {arg name, specs, node, envir, containerView;
 
+			/*
 			var ctrlView = {arg key, spec, color;
 
 				var controlSpec = spec;
@@ -119,6 +207,7 @@
 				.fixedHeight_(25);
 				view
 			};
+			*/
 
 			//var mappers = ();
 			var scrollView = ScrollView(bounds:Rect(0,0,160,300));
@@ -128,17 +217,18 @@
 					var key = assoc.key;
 					node.unset(key);
 				});
-
-				//mappers.do({arg v;
-				//	v.clear;
-				//	v = nil;
-				//});
 			});
+			var cb = {arg key, val;
+				node.set(key, val)
+			};
+
+			// TODO: need to do something with this
+			var moduleEnvir = ();
 
 			specs.do({arg assoc;
 				var k = assoc.key;
 				var v = assoc.value;
-				var ctrl = ctrlView.(k, v.asSpec, Color.rand);
+				var ctrl = ctrlView.(k, v.asSpec, Color.rand, moduleEnvir, cb);
 				view.layout.add(ctrl);
 			});
 
@@ -146,6 +236,24 @@
 			scrollView.canvas = view.background_(Color.clear);
 			scrollView;
 		},
+
+		pSpecsView: {arg name, specs, envir, containerView;
+
+			var scrollView = ScrollView();
+			var view = View().layout_(VLayout().margins_(0.5).spacing_(0.5));
+
+			specs.do({arg assoc;
+				var k = assoc.key;
+				var v = assoc.value;
+				var ctrl = ctrlView.(k, v.asSpec, Color.rand, envir);
+				view.layout.add(ctrl);
+			});
+
+			view.layout.add(nil);
+			scrollView.canvas = view.background_(Color.clear);
+			scrollView;
+		},
+
 
 		/*
 		specsView2: {arg name, specs, node, envir, containerView;
@@ -359,8 +467,7 @@
 		playView: {arg name, node, containerView;
 
 			var height = 20;
-			var wetKey = ("wet" ++ 100).asSymbol;
-			var view = View().layout_(HLayout().margins_(1).spacing_(1));
+			var view = View().layout_(HLayout().margins_(1).spacing_(1)).background_(Color.rand.alpha_(0.2));
 			var outBus = 0;
 			var privateBus = node.bus.index;
 
@@ -375,19 +482,6 @@
 					node.vol = val;
 				})
 			);
-
-			/*
-			view.layout.add(
-				Knob()
-				.fixedSize_(size)
-				.mode_(\vert)
-				.value_(1)
-				.action_({arg ctrl;
-					node.set(wetKey, ctrl.value);
-					NotificationCenter.notify(containerView, \status, "wet: " ++ ctrl.value.asString);
-				})
-			);
-			*/
 
 			view.layout.add(
 				NumberBox()
@@ -410,39 +504,25 @@
 				.states_([ [nil, Color.green, Color.green], [nil, Color.red, Color.red] ])
 				.action_({arg ctrl;
 					if (ctrl.value == 1) {
-						node.play(fadeTime:node.fadeTime);
+						node.play(fadeTime:node.fadeTime, out:outBus);
 					} {
 						node.stop(fadeTime:node.fadeTime);
 					}
 				})
 			);
 
-			/*
 			view.layout.add(
-				Button()
+				NumberBox()
 				.fixedSize_(size)
-				.states_([ ["M", Color.white], ["M", Color.white, Color.new(red:1, green:0.64705882352941, blue:0)] ])
+				.value_(0)
 				.action_({arg ctrl;
-					if (ctrl.value == 1) {
-						node.set(\vol, 0);
-					} {
-						node.set(\vol, 1);
-					}
+					var val = ctrl.value;
+					outBus = val;
+					NotificationCenter.notify(containerView, \status, "out: " ++ val.asString);
 				})
+				.normalColor_(Color.grey)
+				.value_(0);
 			);
-			*/
-
-			/*
-			view.layout.add(
-				Button()
-				.fixedHeight_(size)
-				.fixedWidth_(size*3)
-				.states_([ ["scope"] ])
-				.action_({arg ctrl;
-					node.scope;
-				})
-			);
-			*/
 
 			view.layout.add(nil);
 

@@ -1,77 +1,142 @@
 (
 view: {arg objName, envir, components;
 
-	var buf;
-	var navView;
-	var synth, player;
-	var height = 20;
-	var width = 300;
-	var osckey = ('/' ++ objName ++ '_data').asSymbol;
-
-	var windowSize = 4096;
-	var env = Env.perc;
-	var envbuf = Buffer.sendCollection(s, env.discretize(windowSize), 1);
-	var numchannels = 1;
-	var numstarts = 4;
-
-	// Node
-	var srcfunc = {arg numchannels=1, numstarts=4;
-		"numchannesl: %, numstarts: %".format(numchannels, numstarts).debug(objName);
-
-		{
-			var pos = \pos.ar(0).unipolar;
-			var buf = \buf.kr(0);
-			var numframes = BufFrames.kr(buf);
-			var start =  numstarts.collect({arg i;
-				var key = ('s' ++ i).asSymbol;
-				key.ar(0);
-			}) * numframes;
-
-			var num = start.size;
-			var trig = num.collect({arg i;
-				var lo = i * num.reciprocal;
-				var hi = num.reciprocal * (i + 1);
-				var trig = Trig1.ar(InRange.ar(pos, lo, hi), 1/44100);
-				SendReply.ar(trig, osckey, [i], 1905);
-				trig;
-			});
-
-			var rev = \rev.ar(0);
-			var rate = \rate.ar(1) * BufRateScale.kr(buf) * Demand.ar(trig, 0, Dwrand([-1, 1], [rev, 1-rev], inf));
-			var ts = \ts.kr(1);
-			var env = Env([0,0,windowSize],[0,1],0).ar(gate:trig, timeScale:ts);
-			//var speed = (numframes - start)/BufSampleRate.kr(buf) * rate.reciprocal.abs;
-			//var replyphase = Env([0, 0, 1],[0,speed],0).ar(gate:trig, timeScale:rate.abs);
-
-			var aeg = BufRd.ar(1, envbuf, env);
-			var sig = PlayBufCF.ar(numchannels, buf, rate, trig, start, 0);
-			sig = sig.flatten * aeg * \amp.ar(-8.dbamp);
-
-			//SendReply.kr(Impulse.kr(50), osckey,
-			//	[replyphase.linlin(0, 1, start,  numframes - (numframes * rev))], 1905);
-			Splay.ar(sig, \spread.ar(1), center:\center.ar(0));
+	var synthEnvir = {
+		if (topEnvironment[objName].isNil){
+			topEnvironment[objName] = ();
 		};
-	};
-	var node = NodeProxy.audio.source_(srcfunc.());
+		topEnvironment[objName];
+	}.();
+	var synth = \bufplayr_2chan;
+	var view, playView, sfv, busView;
+	var node = NodeProxy.audio(s, 2);
 
-	var view = View().layout_(VLayout().margins_(2).spacing_(2));
+	var seqView = {
 
-	var controlsView = {
+		var msv, view, prout, numpos, rnd;
 
-		var myView = View().layout_(HLayout().margins_(2).spacing_(2));
-		var dragSink, button;
+		if (synthEnvir[\positions].isNil) {
+			synthEnvir[\positions] = [0, 0, 0, 0];
+		};
 
-		button = Button()
-		.fixedSize_(8)
-		.states_([ ["x"] ])
-		.font_(Font().size_(9))
-		.action_({
-			dragSink.string = "";
-			button.enabled = false;
-		})
-		.enabled_(false);
+		numpos = NumberBox()
+		.normalColor_(Color.white)
+		.minWidth_(25)
+		.value_(synthEnvir[\positions].size)
+		.action_({arg ctrl;
+			var newsize = ctrl.value;
+			var positions = synthEnvir[\positions];
+			if (newsize > positions.size) {
+				var size = newsize - positions.size;
+				var newvals = Array.fill(size, {0.0});
+				positions = positions ++ newvals;
+			}{
+				positions = positions[0..(newsize.asInt-1)];
+			};
+			synthEnvir[\positions] = positions;
+			msv.value_(synthEnvir[\positions]);
+		});
 
-		dragSink = DragSink()
+		rnd = Button().action_({arg ctrl;
+			var positions = synthEnvir[\positions];
+			var new = Array.fill(positions.size, {rrand(0.0, 1.0)});
+			synthEnvir[\positions] = new;
+			msv.valueAction_(synthEnvir[\positions]);
+		});
+
+		msv = MultiSliderView().value_(synthEnvir[\positions])
+		.elasticMode_(1)
+		.showIndex_(true)
+		.value_(synthEnvir[\positions])
+		.thumbSize_(300/synthEnvir[\positions].size)
+		.drawRects_(true)
+		.isFilled_(true)
+		.action_({arg ctrl;
+			synthEnvir[\positions] = ctrl.value;
+		});
+
+		view = View().layout_(VLayout(
+			HLayout(numpos, rnd),
+			msv
+		));
+
+		prout = Prout({
+			inf.do({arg i;
+				var positions = synthEnvir[\positions];
+				var num = i.mod(positions.size);
+				var pos = positions[num];
+				pos.yield;
+				{msv.index = num}.defer;
+			});
+		});
+		[view, prout];
+
+	}.();
+
+	var specs = [
+		\atk -> ControlSpec(0, 30, \lin, 0, 0.01),
+		\sustain -> ControlSpec(0, 30, \lin, 0, 0.5),
+		\rel -> ControlSpec(0, 30, \lin, 0, 0.29),
+		\suslevel -> ControlSpec(0, 1, \lin, 0, 0.7),
+		\curve -> ControlSpec(-24, 24, \lin, 0, 0),
+		\ts -> ControlSpec(0, 100, \lin, 0, 1),
+		\rate -> ControlSpec(0.1, 4, \lin, 0, 1),
+		\pos -> ControlSpec(0, 1, \lin, 0, 0),
+		\rev -> ControlSpec(0, 1, \lin, 0, 0),
+		\loop -> ControlSpec(0, 1, \lin, 1, 0),
+		\amp -> ControlSpec(0, 10, \lin, 0, 0.3),
+		\spread -> ControlSpec(0, 1, \lin, 0, 1),
+		\center -> ControlSpec(-1, 1, \lin, 0, 0),
+		\pan -> ControlSpec(-1, 1, \lin, 0, 0)
+	];
+
+	envir[objName] = node;
+	Pdef(\bufplayrbase, {arg evt, ndef, monitor=true;
+		var node = Ndef(ndef);
+		var myspecs = specs.collect({arg assoc;
+			var key = assoc.key;
+			var spec = assoc.value;
+			if (evt[key].isNil) {
+				evt[key] = spec.default;
+			};
+			[key, Pfunc({evt[key]})]
+		}).flatten ++ [\instrument, synth, \out, Pfunc({node.bus.index}), \group, Pfunc({node.group})];
+
+		if (node.isMonitoring.not and: monitor){
+			node.play;
+		};
+
+		Penvir(evt,
+			Pbind(*myspecs)
+		)
+	});
+
+	Pdef(objName, {arg monitor=true;
+		Pbind(
+			\buf, Pif(Pfunc({synthEnvir[\buf].isNil}), b, Pfunc({synthEnvir[\buf]})),
+			\dur, Pif(Pfunc({synthEnvir[\dur].isNil}), 1, Pfunc({synthEnvir[\dur]})),
+			\pos, seqView[1]
+		) <> Pdef(\bufplayrbase) <> (evt:synthEnvir, ndef:objName, monitor:monitor)
+	});
+
+	sfv = SoundFileView()
+	.background_(Color.gray(0.3))
+	.timeCursorOn_(true)
+	.gridOn_(true)
+	.resize_(5)
+	.gridResolution_(0.0)
+	.mouseUpAction = ({arg ctrl;
+		var loFrames, hiFrames;
+		var msg;
+		//loFrames = ctrl.selection(0)[0];
+		//hiFrames = ctrl.selection(0)[1] + loFrames;
+		//node.set(\start, loFrames, \end, hiFrames, \trig, 1);
+		//msg = "start: %, end: %".format(loFrames, hiFrames);
+		//NotificationCenter.notify(view, \status, msg);
+	});
+
+	busView = {
+		var dragSink = DragSink()
 		.string_("<-  ")
 		.background_(Color.clear)
 		.canReceiveDragHandler_({
@@ -87,172 +152,70 @@ view: {arg objName, envir, components;
 
 			if (bufnum.isNil.not) {
 
-				buf = s.cachedBufferAt(bufnum);
+				var buf = s.cachedBufferAt(bufnum);
 				buf.loadToFloatArray(action:{arg a;
 					{
 						sfv.setData(a, channels: buf.numChannels);
 						sfv.setSelection (0, [0, buf.numFrames]);
-
-						node.source = srcfunc.(buf.numChannels, numstarts);
-						node.set(\buf, buf.bufnum);
-
+						//node.source = srcfunc.(buf.numChannels, numstarts);
+						//node.set(\buf, buf.bufnum);
 						sfv.mouseUpAction.value(sfv);
 					}.defer
 				});
-
 				v.string = name;
-				button.enabled = true;
+				synthEnvir[\buf] = buf;
 			} {
-				var msg = "bufnum % doesn't exist in environment".format(bufnum);
-				NotificationCenter.notify(view, \status, msg);
-				button.enabled = false;
+				//var msg = "bufnum % doesn't exist in environment".format(bufnum);
+				//NotificationCenter.notify(view, \status, msg);
 			}
 		})
 		.maxHeight_(35)
 		.minWidth_(35);
-
-		myView.layout.add(dragSink, button);
-		myView;
+		dragSink;
 	};
 
-	var specs = [
-		//\bpm -> [1, 300, \lin, 0, 60],
-		//\rnd -> [0, 1, \lin, 0, 0],
-		\pos -> \set,//[0, 1, \lin, 0, 0],
-		\ts -> [0, 10, \lin, 0, 1],
-		\amp -> [0, 10, \lin, 0, 0.3],
-		\rate -> [0.1, 4, \lin, 0, 1],
-		\rev -> [0, 1, \lin, 0, 0],
-		\spread -> [0, 1, \lin, 0, 1],
-		\center -> [-1, 1, \lin, 0, 0]
-	];
+	playView = View().layout_(HLayout(
 
-	var specsView = components[\specsView].(objName, specs, node, envir, view);
-	var msv = MultiSliderView();
-	var positions = [0, 0, 0, 0];
-
-	var sfv = SoundFileView()
-	.background_(Color.gray(0.3))
-	.timeCursorOn_(true)
-	.gridOn_(true)
-	.resize_(5)
-	.gridResolution_(0.0)
-	.fixedSize_(width@75)
-	.mouseUpAction = ({arg ctrl;
-		var loFrames, hiFrames;
-		var msg;
-		loFrames = ctrl.selection(0)[0];
-		hiFrames = ctrl.selection(0)[1] + loFrames;
-		node.set(\start, loFrames, \end, hiFrames, \trig, 1);
-		msg = "start: %, end: %".format(loFrames, hiFrames);
-		NotificationCenter.notify(view, \status, msg);
-	});
-
-	var oscfunc = OSCFunc({arg msg;
-		{
-			//sfv.timeCursorPosition = msg[3]
-			var index = msg[3];
-			var pos = positions[index] * buf.numFrames;
-			sfv.timeCursorPosition = pos;
-			msv.index = index;
-		}.defer(0.001)
-	}, osckey);
-
-	var eview = EnvelopeView()
-	.setEnv(env)
-	.action_({arg ctrl;
-		envbuf.setn(0, ctrl.asEnv.discretize(windowSize), 1);
-	});
-
-	var stepsView = View().layout_(HLayout().margins_(1).spacing_(2));
-	stepsView.layout.add(VLayout(
 		NumberBox()
+		.fixedHeight_(15)
+		.fixedWidth_(30)
+		.stringColor_(Color.white)
 		.normalColor_(Color.white)
-		.minWidth_(25)
-		.value_(positions.size)
 		.action_({arg ctrl;
+			synthEnvir[\dur] = ctrl.value;
+		})
+		.value_(synthEnvir[\dur] ?? 1),
 
-			var newsize = ctrl.value;
-			if (newsize > positions.size) {
-				var size = newsize - positions.size;
-				var newvals = Array.fill(size, {0.0});
-				positions = positions ++ newvals;
+		Button()
+		.fixedSize_(15)
+		.states_([[">", nil, nil], ["[]", nil, nil]])
+		.action_({arg ctrl;
+			if (ctrl.value == 1) {
+				Pdef(objName).play;
 			}{
-				positions = positions[0..(newsize.asInt-1)];
-			};
-			msv.value_(positions);
-			node.source = srcfunc.(buf.numChannels, positions.size);
+				Pdef(objName).stop;
+			}
 		}),
-		Button().action_({arg ctrl;
-			positions = Array.fill(positions.size, {rrand(0.0, 1.0)});
-			//msv.value_(positions);
-			msv.valueAction_(positions);
-		})
-	));
-	stepsView.layout.add(msv
-		.elasticMode_(1)
-		.showIndex_(true)
-		.value_(positions)
-		.thumbSize_(300/positions.size)
-		.drawRects_(true)
-		.isFilled_(true)
+		Button()
+		.fixedSize_(15)
+		.states_([["m", nil, nil],["X", nil, nil]])
 		.action_({arg ctrl;
-			positions = ctrl.value;
-			positions.do({arg val, i;
-				var key = ('s' ++ i).asSymbol;
-				node.set(key, val);
-			});
+			if (ctrl.value == 1) {
+				Ndef(objName).play;
+			}{
+				Ndef(objName).stop;
+			}
 		})
-	);
+		.value_(1),
+		nil
+	));
 
-	sfv.setSelectionColor(0, Color.blue(alpha:0.5));
-	view.layout.add(controlsView.());
-	view.layout.add(sfv);
-	view.layout.add(stepsView);
-	view.layout.add(eview);
-	view.layout.add(PopUpMenu()
-		.items_([\triangle, \perc, \sine, \linen, \adsr])
-		.action_({arg val;
-			var window = val.item;
-			switch(window,
-				\triangle, {
-					env = Env.triangle;
-					envbuf.setn(0, env.discretize(windowSize), 1);
-					eview.setEnv(env);
-				},
-				\perc, {
-					env = Env.perc;
-					envbuf.setn(0, env.discretize(windowSize), 1);
-					eview.setEnv(env);
-				},
-				\sine, {
-					env = Env.sine;
-					envbuf.setn(0, env.discretize(windowSize), 1);
-					eview.setEnv(env);
-				},
-				\linen, {
-					env = Env.linen;
-					envbuf.setn(0, env.discretize(windowSize), 1);
-					eview.setEnv(env);
-				},
-				\adsr, {
-					env = Env([0,1,0.5,0.5,0],[0.01,0.3,1,1].normalizeSum,-4);
-					envbuf.setn(0, env.discretize(windowSize), 1);
-					eview.setEnv(env);
-				}
-			)
-		})
-		.value_(1)
-	);
-	view.layout.add(specsView);
-
-	node.mold;
-	envir[objName] = node;
-
-	NotificationCenter.register(view, \close, view, {arg msg;
-		msg.debug("clean up");
-		oscfunc.free;
-	});
+	view = View().layout_(VLayout(
+		playView.(),
+		busView.(),
+		sfv,
+		seqView[0]
+	));
 
 	view;
 };

@@ -79,7 +79,7 @@ view: {arg objName, envir, components;
 				});
 			})
 			.fixedSize_(15),
-			StaticText().string_(key).font_(Font(size:8)),
+			StaticText().string_("(" ++ (slotoffset + currentSlot) ++ ") " + key).font_(Font(size:8)),
 			Knob()
 			.mode_(\vert)
 			.action_({arg ctrl;
@@ -88,7 +88,7 @@ view: {arg objName, envir, components;
 			})
 			.value_(1)
 			.fixedSize_(25)
-		).margins_(2).spacing_(2));
+		).margins_(1).spacing_(1)).background_(Color.rand.alpha_(0.2));
 		ctrls.layout.add(rowheader.fixedWidth_(100), currentSlot + 1, 0, align:\left);
 		controls.add(rowheader);
 
@@ -97,7 +97,7 @@ view: {arg objName, envir, components;
 
 			var disable = ((issignal && (i == j)) || (map[keyj][\node][0].class == Function));
 			temp = Knob()
-			.fixedSize_(40)
+			.fixedSize_(35)
 			.mode_(\vert)
 			.enabled_(disable == false)
 			.action_({arg ctrl;
@@ -133,7 +133,7 @@ view: {arg objName, envir, components;
 
 				temp = Knob()
 				.mode_(\vert)
-				.fixedSize_(40)
+				.fixedSize_(35)
 				.enabled_(issignal == false)
 				.action_({arg ctrl;
 
