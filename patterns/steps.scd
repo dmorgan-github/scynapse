@@ -63,7 +63,6 @@ view: {arg objName, envir, components;
 			msv.value_(positions);
 		});
 
-
 		rnd = Button().action_({arg ctrl;
 			var new = Array.fill(positions.size, {rrand(0.0, 1.0)});
 			positions = new;

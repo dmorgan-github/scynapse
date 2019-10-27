@@ -11,6 +11,7 @@
 		var labelView = StaticText().string_(key ++ ": ").font_(font).stringColor_(Color.white);
 		var st = StaticText().string_(myval).font_(font).stringColor_(Color.white);
 		var nb = NumberBox().font_(font).value_(myval).background_(Color.white);
+		var dragsrc;
 
 		envir[key] = myval;
 		stack = StackLayout(
@@ -36,7 +37,6 @@
 					li.value = val;
 					st.string_(mappedVal);
 					nb.value = mappedVal;
-					//node.set(key, mappedVal);
 					envir[key] = mappedVal;
 					cb.(key, mappedVal);
 				};
@@ -77,14 +77,38 @@
 		.margins_(0)
 		.spacing_(0);
 
-		view = View()
-		.layout_(stack)
-		.mouseDownAction_({arg ctrl, x, y, mod, num, count;
-			if (mod == 262144) {
-				stack.index = 1;
-			}
-		})
-		.fixedHeight_(25);
+		dragsrc = {
+			var obj = (
+				name: key,
+				cb:{arg val;
+					envir[key] = val;
+					cb.(key, val);
+					{
+						li.value = controlSpec.unmap(val);
+						st.string_(val)
+					}.defer;
+				},
+				spec:spec
+			);
+
+			DragSource()
+			.background_(Color.clear)
+			.object_(obj)
+			.string_("-->")
+			.fixedWidth_(25)
+		};
+
+		view = View().layout_(HLayout(
+			View()
+			.layout_(stack)
+			.mouseDownAction_({arg ctrl, x, y, mod, num, count;
+				if (mod == 262144) {
+					stack.index = 1;
+				}
+			}).fixedHeight_(25),
+			dragsrc.(),
+		).margins_(0).spacing_(1));
+
 		view
 	};
 

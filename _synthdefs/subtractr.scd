@@ -6,7 +6,7 @@ SynthDef(\subtractr, {
 	var ddepth = \ddepth.kr(0.1);
 	var drate = \drate.kr(0.1);
 	var detune = LFNoise2.ar(drate.dup(numvoices)).bipolar(ddepth).midiratio;
-	var freq = XLine.ar(\freq.ar - (50 * TWChoose.ar(1, [DC.ar(0), DC.ar(1)], [0.8, 0.2])), \freq.ar, 0.1);
+	var freq = XLine.ar(\freq.ar - (50 * TWChoose.ar(1, [DC.ar(0), DC.ar(1)], [0.8, 0.2])), \freq.ar, 0.1) * PinkNoise.kr(0.05,1);
 
 	var fm = {arg freq;
 		var index = \index.kr(0);

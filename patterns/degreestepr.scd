@@ -9,7 +9,7 @@ view: {arg objName, envir, components;
 	var data = rows.collect({ cols.collect({0})});
 	var grid, headers;
 
-	var getProut = {
+	var getprout = {
 		var prout = Prout({
 			var degrees = List.new;
 			inf.do({arg i;
@@ -22,9 +22,7 @@ view: {arg objName, envir, components;
 					headers[col].background_(Color.white);
 				}.defer;
 				degrees.do({arg degree;
-					{
-						degree = degree-23*(-1);
-					}.defer;
+					degree = degree-23*(-1);
 				});
 				degrees.clear;
 				rows.do({arg row;
@@ -44,29 +42,23 @@ view: {arg objName, envir, components;
 		prout
 	};
 
-	var srcView = {
-		var dragSink = DragSink()
-		.string_("<-  ")
+	var dragsrc = {
+		var prout = getprout.();
+		var obj = (
+			name:objName,
+			type:\data,
+			dur:1,
+			pattern:prout
+		);
+
+		DragSource()
 		.background_(Color.clear)
-		.canReceiveDragHandler_({
-			var obj = View.currentDrag;
-			true;
-		})
-		.receiveDragHandler_({arg v;
-			var obj = View.currentDrag.value;
-			var name = obj[\name].value;
-			var pbindefkey = (name ++ '_set').asSymbol;
-			contextid = name;
-			context = topEnvironment[contextid];
-			Pbindef(pbindefkey, \degree, getProut.());
-			//context[\degree] = getProut.();
-			v.string = contextid;
-		})
-		.maxHeight_(35)
-		.minWidth_(35);
-		dragSink;
+		.object_(obj)
+		.string_("-->")
+		.fixedWidth_(25)
 	};
 
+	/*
 	var playView = View().layout_(HLayout(
 		NumberBox()
 		.fixedHeight_(15)
@@ -92,6 +84,7 @@ view: {arg objName, envir, components;
 		.value_(3),
 		nil
 	));
+	*/
 
 	var gridView = {
 
@@ -125,10 +118,13 @@ view: {arg objName, envir, components;
 	};
 
 	var view = View().layout_(VLayout(
-		srcView.(),
-		playView.(),
+		dragsrc.(),
 		gridView.()
 	));
+
+	NotificationCenter.register(view, \close, view, {arg msg;
+		msg.debug("clean up");
+	});
 
 	view;
 };

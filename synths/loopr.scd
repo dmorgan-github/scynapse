@@ -11,70 +11,6 @@ view: {arg objName, envir, components;
 	var view, playView, sfv, busView, specsView, dataSinkView;
 	var node = NodeProxy.audio(s, 2);
 
-	/*
-	var seqView = {
-
-		var msv, view, prout, numpos, rnd;
-
-		if (synthEnvir[\positions].isNil) {
-			synthEnvir[\positions] = [0, 0, 0, 0];
-		};
-
-		numpos = NumberBox()
-		.normalColor_(Color.white)
-		.minWidth_(25)
-		.value_(synthEnvir[\positions].size)
-		.action_({arg ctrl;
-			var newsize = ctrl.value;
-			var positions = synthEnvir[\positions];
-			if (newsize > positions.size) {
-				var size = newsize - positions.size;
-				var newvals = Array.fill(size, {0.0});
-				positions = positions ++ newvals;
-			}{
-				positions = positions[0..(newsize.asInt-1)];
-			};
-			synthEnvir[\positions] = positions;
-			msv.value_(synthEnvir[\positions]);
-		});
-
-		rnd = Button().action_({arg ctrl;
-			var positions = synthEnvir[\positions];
-			var new = Array.fill(positions.size, {rrand(0.0, 1.0)});
-			synthEnvir[\positions] = new;
-			msv.valueAction_(synthEnvir[\positions]);
-		});
-
-		msv = MultiSliderView().value_(synthEnvir[\positions])
-		.elasticMode_(1)
-		.showIndex_(true)
-		.value_(synthEnvir[\positions])
-		.thumbSize_(300/synthEnvir[\positions].size)
-		.drawRects_(true)
-		.isFilled_(true)
-		.action_({arg ctrl;
-			synthEnvir[\positions] = ctrl.value;
-		});
-
-		view = View().layout_(VLayout(
-			HLayout(numpos, rnd),
-			msv
-		));
-
-		prout = Prout({
-			inf.do({arg i;
-				var positions = synthEnvir[\positions];
-				var num = i.mod(positions.size);
-				var pos = positions[num];
-				pos.yield;
-				{msv.index = num}.defer;
-			});
-		});
-		[view, prout];
-
-	}.();
-	*/
-
 	var specs = [
 		\atk -> ControlSpec(0, 30, \lin, 0, 0.01),
 		\sustain -> ControlSpec(0, 30, \lin, 0, 0.5),
@@ -116,10 +52,6 @@ view: {arg objName, envir, components;
 
 	Pdef(objName, {arg monitor=true;
 		var key = (objName ++ '_set').asSymbol;
-		//Pbindef(key,
-		//	\data, 0,
-		//	\pos, Pkey(\data),
-		//) <>
 		Pbindef(key,
 			\buf, Pif(Pfunc({synthEnvir[\buf].isNil}), b, Pfunc({synthEnvir[\buf]})),
 			\dur, Pif(Pfunc({synthEnvir[\dur].isNil}), 1, Pfunc({synthEnvir[\dur]})),
