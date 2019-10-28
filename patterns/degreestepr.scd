@@ -76,8 +76,8 @@ view: {arg objName, envir, components;
 				\dur, Pif(Pfunc({synthEnvir[\dur].isNil}), 1, Pfunc({synthEnvir[\dur]})),
 				\legato, Pif(Pfunc({synthEnvir[\legato].isNil}), 1, Pfunc({synthEnvir[\legato]})),
 				\scale, Pif(Pfunc({synthEnvir[\scale].isNil}), Scale.chromatic, Pfunc({synthEnvir[\scale]})),
-				\data, getprout.(),
-				\degree, Pkey(\data),
+				\pitch_data, getprout.(),
+				\degree, Pkey(\pitch_data),
 				\octave, Pif(Pfunc({synthEnvir[\octave].isNil}), 5, Pfunc({synthEnvir[\octave]})),
 				\vel, Pif(Pfunc({synthEnvir[\vel].isNil}), 1, Pfunc({synthEnvir[\vel]})),
 			) <> Pdef(\synthbase) <> (evt:synthEnvir, ndef:ndef, monitor:true)

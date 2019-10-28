@@ -43,7 +43,6 @@ MIDIIn.doNoteOffAction(1, 1, 64, 64); // spoof a note on
 MIDIIn.doControlAction(1, 1, 1, 64); // spoof a cc
 MIDIIn.doControlAction(1, 1, 9, 64);
 MIDIIn.doControlAction(1, 10, 1, 64);
-
 */
 
 /*
@@ -55,9 +54,10 @@ MIDIdef.noteOn(\noteon_learn, {arg ...args;
 	[\note, note, \vel, vel, \chan, chan].postln;
 })
 )
-
 MIDIdef(\noteon_learn).free
 */
+
+//MIDIdef(\midi_1_noteoff).free
 
 (
 view: {arg objName, envir, components;
@@ -65,6 +65,36 @@ view: {arg objName, envir, components;
 	var defs = List.new;
 	var source;
 	var view = View().layout_(VLayout());
+	var outerView = View();//.layout_(VLayout(scrollView));
+	var scrollView = ScrollView();
+	var blinkers = (0..16).collect({
+		StaticText().string_(" ").fixedSize_(10).background_(Color.clear)
+	});
+
+	var registerBlinker = {
+		var key = (objName ++ '_noteon').asSymbol;
+		MIDIdef.noteOn(key, {arg ...args;
+			var chan = args[2] + 1;
+			{
+				blinkers[0].background_(Color.yellow);
+				blinkers[chan].background_(Color.yellow);
+				nil;
+			}.defer;
+		}, srcID: source.uid);
+		defs.add(key);
+
+		key = (objName ++ '_noteoff').asSymbol;
+		MIDIdef.noteOff(key, {arg ...args;
+			var chan = args[2] + 1;
+			{
+				blinkers[0].background_(Color.clear);
+				blinkers[chan].background_(Color.clear);
+				nil;
+			}.defer;
+		}, srcID: source.uid);
+		defs.add(key);
+	};
+
 	var connectView = View().layout_(HLayout(
 		PopUpMenu()
 		.items_([""] ++ MIDIClient.sources.collect(_.name))
@@ -72,6 +102,7 @@ view: {arg objName, envir, components;
 			var val = ctrl.value - 1;
 			source = MIDIClient.sources.at(val);
 			MIDIIn.connect(device:source);
+			registerBlinker.();
 		})
 	));
 	var registerNote = {arg chan, noteOn, noteOff;
@@ -97,6 +128,7 @@ view: {arg objName, envir, components;
 	var registerCc = {arg chan, name, func, spec;
 		var chanlabel = chan ?? "all";
 		var key = (objName ++ '_' ++ chanlabel ++ '_cc').asSymbol;
+		var blinknum = if(chan.isNil){0}{chan+1};
 		MIDIdef.cc(key, {arg val, num, chan, src;
 			var myval = val/127;
 			myval = spec.map(myval);
@@ -110,10 +142,16 @@ view: {arg objName, envir, components;
 			MIDIdef(x).free;
 		});
 	};
+
 	var map_view = {arg chan;
+		var blinknum = if (chan.isNil) {0}{chan+1};
 		View().layout_(
 			VLayout(
-				StaticText().string_("chan: " ++ (chan ?? "all")),
+				HLayout(
+					StaticText().string_("chan: " ++ (chan ?? "all")),
+					blinkers[blinknum],
+					nil
+				).spacing_(5),
 				HLayout(
 					StaticText().string_("note").fixedWidth_(25),
 					Button().string_("x").fixedSize_(10),
@@ -150,73 +188,47 @@ view: {arg objName, envir, components;
 						}
 					})
 				)
-			)
+			).margins_(0).spacing_(0)
 		).background_(Color.rand.alpha_(0.2))
 	};
-	var tab1 = View().layout_(
+	var settings = View().layout_(
 		VLayout(
 			map_view.(nil),
-			GridLayout.rows(
-				[
-					map_view.(1),
-					map_view.(0),
-				],
-				[
-					map_view.(3),
-					map_view.(2),
-				]
-			).margins_(1).spacing_(2),
+			map_view.(0),
+			map_view.(1),
+			map_view.(2),
+			map_view.(3),
+			map_view.(4),
+			map_view.(5),
+			map_view.(6),
+			map_view.(7),
+			map_view.(8),
+			map_view.(9),
+			map_view.(10),
+			map_view.(11),
+			map_view.(12),
+			map_view.(13),
+			map_view.(14),
+			map_view.(15),
+			map_view.(16),
 			nil
 		)
 	);
-	var tab2 = View().layout_(
-		VLayout(
-			map_view.(nil),
-			nil
-		)
-	);
-	var tab3 = View().layout_(
-		VLayout(
-			map_view.(nil),
-			nil
-		)
-	);
-	var tab4 = View().layout_(
-		VLayout(
-			map_view.(nil),
-			nil
-		)
-	);
-	var stackView = StackLayout(tab1, tab2, tab3, tab4).mode_(\stackOne);
 
-	var tabs = HLayout(
-		Button().string_("2x2").action_({
-			//freedefs.();
-			stackView.index = 0;
-		}),
-		Button().string_("5x5").action_({
-			//freedefs.();
-			stackView.index = 1
-		}),
-		Button().string_("4x4").action_({
-			//freedefs.();
-			stackView.index = 2
-		}),
-		Button().string_("1x1").action_({
-			//freedefs.();
-			stackView.index = 3
-		})
-	);
 	view.layout.add(connectView);
-	view.layout.add(tabs);
-	view.layout.add(stackView);
+	view.layout.add(settings);
+	scrollView.canvas = view.background_(Color.clear);
 
-	NotificationCenter.register(view, \close, view, {arg msg;
+	outerView.layout_(VLayout(scrollView));
+
+	NotificationCenter.register(outerView, \close, outerView, {arg msg;
 		freedefs.();
-		MIDIIn.disconnect(device:source);
+		if (source.isNil.not) {
+			MIDIIn.disconnect(device:source);
+		};
 		msg.debug("clean up");
 	});
 
-	view;
+	outerView.minWidth_(250);
 }
 )

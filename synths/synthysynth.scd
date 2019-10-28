@@ -30,19 +30,22 @@ view: {arg objName, envir, components;
 	var containerView = View().layout_(VLayout().margins_(0).spacing_(0));
 
 	var noteOn = {arg midinote, vel=1;
-		var synth = synthEnvir[\synth];
-		var args = [\out, node.bus.index, \gate, 1, \freq, midinote.midicps] ++ synthEnvir.asPairs();
-		var x = Synth(synth.asSymbol, args, target:node.nodeID);
-		synths[midinote] = x;
+		// there should only be one synth per note
+		if (synths[midinote].isNil) {
+			var synth = synthEnvir[\synth];
+			var args = [\out, node.bus.index, \gate, 1, \freq, midinote.midicps] ++ synthEnvir.asPairs();
+			var x = Synth(synth.asSymbol, args, target:node.nodeID);
+			synths[midinote] = x;
+		}
 	};
 
 	var noteOff = {arg midinote;
 		var synth = synths[midinote];
 		synth.set(\gate, 0);
+		synths.removeAt(midinote);
 	};
 
 	var dragsrc = {
-
 		DragSource()
 		.background_(Color.clear)
 		.object_({
@@ -68,7 +71,7 @@ view: {arg objName, envir, components;
 		);
 
 		var black = [1,3,6,8,10];
-		var rows = 24;
+		var rows = 25;
 
 		var keyboard = rows.collect({arg i;
 			var color = Color.grey;
@@ -99,17 +102,26 @@ view: {arg objName, envir, components;
 		.keyDownAction_({arg ctrl, char, mod, uni, keycode, key;
 			var val = map[char.asSymbol];
 			if (val.isNil.not) {
+				var num = rows-1-val;
 				var octave = synthEnvir[\octave] ?? 5;
 				var note = 12 * octave + val;
 				noteOn.(note);
+				if (num < keyboard.size) {
+					keyboard[num].value = 1;
+				}
 			};
+			nil;
 		})
 		.keyUpAction_({arg ctrl, char;
 			var val = map[char.asSymbol];
 			if (val.isNil.not) {
+				var num = rows-1-val;
 				var octave = synthEnvir[\octave] ?? 5;
 				var note = 12 * octave + val;
 				noteOff.(note);
+				if (num < keyboard.size) {
+					keyboard[num].value = 0;
+				}
 			}
 		});
 
