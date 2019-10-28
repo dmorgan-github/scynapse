@@ -109,7 +109,6 @@ SynthDef(\subtractr, {
 	specs:[
 		\atk -> ControlSpec(0, 30, \lin, 0, 0.01),
 		\dec -> ControlSpec(0, 30, \lin, 0, 0.2),
-		\sustain -> ControlSpec(0, 30, \lin, 0, 0.5),
 		\rel -> ControlSpec(0, 30, \lin, 0, 0.29),
 		\suslevel -> ControlSpec(0, 1, \lin, 0, 0.7),
 		\curve -> ControlSpec(-24, 24, \lin, 0, -4),

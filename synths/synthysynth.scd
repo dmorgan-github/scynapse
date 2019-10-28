@@ -1,11 +1,14 @@
 (
 view: {arg objName, envir, components;
 
-	var thesynth = \default;
+	var synths = Order.new;
+	var specs = [];
 
 	var synthEnvir = {
 		if (topEnvironment[objName].isNil){
-			topEnvironment[objName] = ();
+			topEnvironment[objName] = (
+				synth:\default
+			);
 		};
 		topEnvironment[objName];
 	}.();
@@ -22,17 +25,14 @@ view: {arg objName, envir, components;
 		returnval;
 	}).collect({arg desc; desc.name}).asArray;
 
-	var synths = Order.new;
 	var node = NodeProxy.audio(s, 2);
 	var view = View().layout_(VLayout().margins_(1).spacing_(1));
 	var containerView = View().layout_(VLayout().margins_(0).spacing_(0));
 
 	var noteOn = {arg midinote, vel=1;
-		//var init = {
-			//synthEnvir[\vel] = vel;
-		//}.();
+		var synth = synthEnvir[\synth];
 		var args = [\out, node.bus.index, \gate, 1, \freq, midinote.midicps] ++ synthEnvir.asPairs();
-		var x = Synth(thesynth.asSymbol, args, target:node.nodeID);
+		var x = Synth(synth.asSymbol, args, target:node.nodeID);
 		synths[midinote] = x;
 	};
 
@@ -42,16 +42,19 @@ view: {arg objName, envir, components;
 	};
 
 	var dragsrc = {
-		var obj = (
-			name:objName,
-			type:\midi,
-			noteOn:noteOn,
-			noteOff:noteOff
-		);
 
 		DragSource()
 		.background_(Color.clear)
-		.object_(obj)
+		.object_({
+			(
+				name:objName,
+				noteOn:noteOn,
+				noteOff:noteOff,
+				node:node,
+				specs:specs,
+				context:synthEnvir
+			)
+		})
 		.string_("-->")
 		.fixedWidth_(25);
 	};
@@ -80,16 +83,12 @@ view: {arg objName, envir, components;
 			.mouseDownAction_({arg ctrl;
 				var octave = synthEnvir[\octave] ?? 5;
 				var note = 12 * octave + num;
-				//var args = [\out, node.bus.index, \gate, 1, \freq, note.midicps] ++ synthEnvir.asPairs();
-				//var x = Synth(thesynth.asSymbol, args, target:node.nodeID);
 				noteOn.(note);
-				//synths[note] = x;
 				ctrl.value = 1;
 			})
 			.mouseUpAction_({arg ctrl;
 				var octave = synthEnvir[\octave] ?? 5;
 				var note = 12 * octave + num;
-				//synths[note].set(\gate, 0);
 				noteOff.(note);
 				ctrl.value = 1;
 			});
@@ -102,148 +101,69 @@ view: {arg objName, envir, components;
 			if (val.isNil.not) {
 				var octave = synthEnvir[\octave] ?? 5;
 				var note = 12 * octave + val;
-				var args = [\out, node.bus.index, \gate, 1, \freq, note.midicps] ++ synthEnvir.asPairs();
-				var x = Synth(thesynth.asSymbol, args, target:node.nodeID);
-				synths[note] = x;
-				{x.release}.defer(10)
+				noteOn.(note);
 			};
 		})
 		.keyUpAction_({arg ctrl, char;
 			var val = map[char.asSymbol];
-			var octave = synthEnvir[\octave] ?? 5;
-			var note = 12 * octave + val;
-			synths[note].set(\gate, 0);
+			if (val.isNil.not) {
+				var octave = synthEnvir[\octave] ?? 5;
+				var note = 12 * octave + val;
+				noteOff.(note);
+			}
 		});
 
 		view
 	};
 
 	var synthView = {arg envir, name, synth;
-
 		var metadata = SynthDescLib.global.at(synth).metadata;
-		var specs = metadata[\specs];
-		var specsView = components[\pSpecsView].(name, specs, envir, view);
-
-		// TODO: we don't need to recreate this each time
-		Pdef(\synthysynthbase, {arg evt, ndef, monitor=true;
-			var node = Ndef(ndef);
-			var myspecs = specs.collect({arg assoc;
-				var key = assoc.key;
-				var spec = assoc.value;
-				if (evt[key].isNil) {
-					evt[key] = spec.default;
-				};
-				[key, Pfunc({evt[key]})]
-			}).flatten ++ [\instrument, synth, \out, Pfunc({node.bus.index}), \group, Pfunc({node.group})];
-			if (node.isMonitoring.not and: monitor){
-				node.play;
-			};
-			Penvir(evt,
-				Pbind(*myspecs)
-			)
-		});
-		Pdef(objName,
-			Pbindef((objName ++ '_set').asSymbol,
-				\dur, Pif(Pfunc({synthEnvir[\dur].isNil}), 1, Pfunc({synthEnvir[\dur]})),
-				\scale, Pif(Pfunc({synthEnvir[\scale].isNil}), Scale.chromatic, Pfunc({synthEnvir[\scale]})),
-				\data, 0,
-				\degree, Pkey(\data),
-				\octave, Pif(Pfunc({synthEnvir[\octave].isNil}), 5, Pfunc({synthEnvir[\octave]})),
-				\vel, Pif(Pfunc({synthEnvir[\vel].isNil}), 1, Pfunc({synthEnvir[\vel]})),
-			) <> Pdef(\synthysynthbase) <> (evt:synthEnvir, ndef:objName, monitor:true)
-		);
-
-		specsView;
+		specs = metadata[\specs];
+		components[\pSpecsView].(name, specs, envir, view);
 	};
 
-	var playView = View().layout_(HLayout(
-
-		NumberBox()
-		.fixedHeight_(15)
-		.fixedWidth_(40)
-		.stringColor_(Color.white)
-		.normalColor_(Color.white)
-		.action_({arg ctrl;
-			synthEnvir[\dur] = ctrl.value;
-		})
-		.minDecimals_(3)
-		.value_(1),
-
-		Button()
-		.fixedSize_(15)
-		.states_([[">", nil, nil], ["[]", nil, nil]])
-		.action_({arg ctrl;
-			if (ctrl.value == 1) {
-				Pdef(objName).play;
-			}{
-				Pdef(objName).stop;
-			}
-		}),
-		Button()
-		.fixedSize_(15)
-		.states_([["m", nil, nil],["X", nil, nil]])
-		.action_({arg ctrl;
-			if (ctrl.value == 1) {
-				Ndef(objName).play;
-			}{
-				Ndef(objName).stop;
-			}
-		})
-		.value_(1),
-		PopUpMenu()
-		.maxHeight_(15)
-		.items_(["", 3, 4, 5, 6, 7])
-		.action_({arg ctrl;
-			if (ctrl.value > 0) {
-				synthEnvir[\octave] = ctrl.item;
-			}
-		})
-		.value_(3),
-		nil
-	));
-
-	var dataSinkView = {
-		var dragSink = DragSink()
-		.string_("<-  ")
-		.background_(Color.clear)
-		.canReceiveDragHandler_({
-			var obj = View.currentDrag;
-			var type = obj[\type];
-			(type.isNil.not and: (type == \data));
-		})
-		.receiveDragHandler_({arg v;
-			var obj = View.currentDrag.value;
-			var pattern = obj[\pattern].value;
-			var name = obj[\name].value;
-			var key = (objName ++ '_set').asSymbol;
-			v.string = name;
-			Pbindef(key, \data, pattern)
-		})
-		.maxHeight_(35)
-		.minWidth_(35);
-		dragSink;
+	var playView = {
+		View().layout_(HLayout(
+			Button()
+			.fixedSize_(15)
+			.states_([[">", nil, nil],["[]", nil, nil]])
+			.action_({arg ctrl;
+				if (ctrl.value == 1) {
+					Ndef(objName).play;
+				}{
+					Ndef(objName).stop;
+				}
+			})
+			.value_(1),
+			nil
+		));
 	};
 
 	var update = {arg synth;
-		var view = synthView.(synthEnvir, objName, synth);
-		thesynth = synth;
+		var view;
+		synthEnvir[\synth] = synth;
+		view = synthView.(synthEnvir, objName, synth);
 		containerView.removeAll;
 		containerView.layout.add(view);
 	};
 
 	node.play;
 	envir[objName] = node;
-	view.layout.add(PopUpMenu()
+
+	view.layout.add(HLayout(
+		PopUpMenu()
 		.items_([" "] ++ validsynths)
 		.action_({arg ctrl;
 			var name = ctrl.item;
 			update.(name.asSymbol);
-	}));
+		}),
+		dragsrc.()
+	));
 
 	view.layout.add(
 		VLayout(
-			dataSinkView.(),
-			playView,
+			//dragsrc.(),
+			playView.(),
 			HLayout(keyboardView.(), containerView)
 		)
 	);
@@ -251,8 +171,6 @@ view: {arg objName, envir, components;
 		synths.do({arg x;
 			x.free;
 		});
-		Pdef(objName).clear;
-		Pdef((objName ++ '_set').asSymbol).clear;
 		msg.debug("clean up");
 	});
 

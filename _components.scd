@@ -10,7 +10,13 @@
 		var li = LevelIndicator().value_(controlSpec.unmap(myval));
 		var labelView = StaticText().string_(key ++ ": ").font_(font).stringColor_(Color.white);
 		var st = StaticText().string_(myval).font_(font).stringColor_(Color.white);
-		var nb = NumberBox().font_(font).value_(myval).background_(Color.white);
+		var nb = NumberBox()
+		.font_(font)
+		.value_(myval)
+		.background_(Color.white)
+		.minDecimals_(3)
+		.clipLo_(controlSpec.minval)
+		.clipHi_(controlSpec.maxval);
 		var dragsrc;
 
 		envir[key] = myval;
@@ -47,7 +53,6 @@
 					li.value = controlSpec.unmap(val);
 					st.string_(val);
 					nb.value = val;
-					//node.set(key, val);
 					envir[key] = val;
 					cb.(key, val);
 				} {
@@ -57,7 +62,6 @@
 						li.value = val;
 						st.string_(mappedVal);
 						nb.value = mappedVal;
-						//node.set(key, mappedVal);
 						envir[key] = mappedVal;
 						cb.(key, mappedVal);
 					};
@@ -68,7 +72,6 @@
 				var val = ctrl.value;
 				li.value = controlSpec.unmap(val);
 				st.string_(val);
-				//node.set(key, val);
 				envir[key] = val;
 				cb.(key, val);
 				stack.index = 0;

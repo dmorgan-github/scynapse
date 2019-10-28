@@ -2,12 +2,13 @@
 (
 view: {arg objName, envir, components;
 
-	var context;
-	var contextid;
+	var view, specsContainerView = View().layout_(VLayout().margins_(0).spacing_(0));
 	var rows = 24;
 	var cols = 16;
 	var data = rows.collect({ cols.collect({0})});
 	var grid, headers;
+	var synthEnvir;
+	var id;
 
 	var getprout = {
 		var prout = Prout({
@@ -42,60 +43,104 @@ view: {arg objName, envir, components;
 		prout
 	};
 
-	var dragsrc = {
-		var prout = getprout.();
-		var obj = (
-			name:objName,
-			type:\data,
-			dur:1,
-			pattern:prout
+	var build_pattern = {arg context;
+
+		var specs;
+		var ndef, specsView, synth;
+		var synthspecs = context[\specs];
+		id = context[\name];
+		ndef = id;
+		synthEnvir = context[\context];
+		synth = synthEnvir[\synth];
+
+		Pdef(\synthbase, {arg evt, ndef, monitor=true;
+			var node = Ndef(ndef);
+			var myspecs = synthspecs.collect({arg assoc;
+				var key = assoc.key;
+				var spec = assoc.value;
+				if (evt[key].isNil) {
+					evt[key] = spec.default;
+				};
+				[key, Pfunc({evt[key]})]
+			}).flatten ++ [\instrument, synth, \out, Pfunc({node.bus.index}), \group, Pfunc({node.group})];
+			//if (node.isMonitoring.not and: monitor){
+			//	node.play;
+			//};
+			Penvir(evt,
+				Pbind(*myspecs)
+			)
+		});
+
+		Pdef(id,
+			Pbind(
+				\dur, Pif(Pfunc({synthEnvir[\dur].isNil}), 1, Pfunc({synthEnvir[\dur]})),
+				\legato, Pif(Pfunc({synthEnvir[\legato].isNil}), 1, Pfunc({synthEnvir[\legato]})),
+				\scale, Pif(Pfunc({synthEnvir[\scale].isNil}), Scale.chromatic, Pfunc({synthEnvir[\scale]})),
+				\data, getprout.(),
+				\degree, Pkey(\data),
+				\octave, Pif(Pfunc({synthEnvir[\octave].isNil}), 5, Pfunc({synthEnvir[\octave]})),
+				\vel, Pif(Pfunc({synthEnvir[\vel].isNil}), 1, Pfunc({synthEnvir[\vel]})),
+			) <> Pdef(\synthbase) <> (evt:synthEnvir, ndef:ndef, monitor:true)
 		);
 
-		DragSource()
-		.background_(Color.clear)
-		.object_(obj)
-		.string_("-->")
-		.fixedWidth_(25)
+		specs = [
+			\legato -> ControlSpec(1/16, 64, \lin, 0, 1),
+			\dur -> ControlSpec(1/16, 64, \lin, 0, 1),
+			\octave -> ControlSpec(0, 8, \lin, 1, 4)
+		];
+		specsView = components[\pSpecsView].(objName, specs, synthEnvir, view);
+		specsContainerView.removeAll;
+		specsContainerView.layout.add(specsView);
 	};
 
-	/*
-	var playView = View().layout_(HLayout(
-		NumberBox()
-		.fixedHeight_(15)
-		.fixedWidth_(25)
-		.stringColor_(Color.white)
-		.normalColor_(Color.white)
-		.action_({arg ctrl;
-			if (context.isNil.not) {
-				context[\dur] = ctrl.value;
-			}
+	var drag_sink = {
+		DragSink()
+		.string_("<-  ")
+		.background_(Color.clear)
+		.canReceiveDragHandler_({
+			true;
 		})
-		.value_(1),
-		PopUpMenu()
-		.maxHeight_(15)
-		.items_(["", 3, 4, 5, 6, 7])
-		.action_({arg ctrl;
-			if (context.isNil.not){
-				if (ctrl.value > 0) {
-					context[\octave] = ctrl.item;
+		.receiveDragHandler_({arg v;
+			var obj = View.currentDrag.value;
+			build_pattern.(obj);
+			v.string_(obj[\name]);
+		})
+		.maxHeight_(35)
+		.minWidth_(35);
+	};
+
+	var playView = {
+		View().layout_(HLayout(
+			Button()
+			.fixedSize_(15)
+			.states_([[">", nil, nil],["[]", nil, nil]])
+			.action_({arg ctrl;
+				if (ctrl.value == 1) {
+					Pdef(id).play;
+				}{
+					Pdef(id).stop;
 				}
-			}
-		})
-		.value_(3),
-		nil
-	));
-	*/
+			})
+			.value_(0),
+			nil
+		));
+	};
 
 	var gridView = {
 
 		var black = [1,3,6,8,10];
 		var view;
 
+		var nums = cols.collect({arg col;
+			StaticText().string_(col+1).fixedSize_(12);
+		});
+
 		headers = cols.collect({arg col;
 			StaticText().string_("").fixedSize_(12).background_(Color.blue.alpha_(0.3));
 		});
 
 		grid = cols.collect({arg col;
+			[nums[col]] ++
 			[headers[col]] ++
 			rows.collect({arg row;
 				var color = Color.white;
@@ -117,12 +162,14 @@ view: {arg objName, envir, components;
 		view;
 	};
 
-	var view = View().layout_(VLayout(
-		dragsrc.(),
-		gridView.()
+	view = View().layout_(VLayout(
+		drag_sink.(),
+		playView.(),
+		HLayout(gridView.(), specsContainerView)
 	));
 
 	NotificationCenter.register(view, \close, view, {arg msg;
+		Pdef(id).clear;
 		msg.debug("clean up");
 	});
 

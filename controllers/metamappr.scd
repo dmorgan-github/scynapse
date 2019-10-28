@@ -63,26 +63,6 @@ view: {arg objName, envir, components;
 			})
 			.fixedSize_(25),
 			StaticText().string_(obj[\name]),
-			NumberBox().fixedSize_(25).action_({arg ctrl;
-				obj[\min] = ctrl.value;
-			})
-			.clipLo_(spec.minval)
-			.clipHi_(spec.maxval)
-			.normalColor_(Color.white)
-			.value_(spec.minval),
-			NumberBox().fixedSize_(25).action_({arg ctrl;
-				obj[\max] = ctrl.value;
-			})
-			.clipLo_(spec.minval)
-			.clipHi_(spec.maxval)
-			.normalColor_(Color.white)
-			.value_(spec.maxval),
-			NumberBox().fixedSize_(25).action_({arg ctrl;
-				obj[\curve] = ctrl.value;
-			})
-			.clipLo_(-24)
-			.clipHi_(24)
-			.normalColor_(Color.white),
 			nil
 		).margins_(0).spacing_(0))
 		.background_(color.alpha_(0.2));
