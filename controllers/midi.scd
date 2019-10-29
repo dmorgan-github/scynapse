@@ -64,7 +64,7 @@ view: {arg objName, envir, components;
 
 	var defs = List.new;
 	var source;
-	var view = View().layout_(VLayout());
+	var view = View().layout_(VLayout().margins_(0).spacing_(0));
 	var outerView = View();//.layout_(VLayout(scrollView));
 	var scrollView = ScrollView();
 	var blinkers = (0..16).collect({
@@ -116,7 +116,7 @@ view: {arg objName, envir, components;
 		}, chan:chan, srcID: source.uid);
 		defs.add(key);
 
-		key = (objName ++ '_noteOff').asSymbol;
+		key = (objName ++ '_' ++ chanlabel ++ '_noteOff').asSymbol;
 		MIDIdef.noteOff(key, {arg ...args;
 			var note = args[1];
 			var vel = args[0];
@@ -188,7 +188,7 @@ view: {arg objName, envir, components;
 						}
 					})
 				)
-			).margins_(0).spacing_(0)
+			).margins_(0).spacing_(1)
 		).background_(Color.rand.alpha_(0.2))
 	};
 	var settings = View().layout_(
@@ -219,7 +219,7 @@ view: {arg objName, envir, components;
 	view.layout.add(settings);
 	scrollView.canvas = view.background_(Color.clear);
 
-	outerView.layout_(VLayout(scrollView));
+	outerView.layout_(VLayout(scrollView).margins_(0).spacing_(0));
 
 	NotificationCenter.register(outerView, \close, outerView, {arg msg;
 		freedefs.();
@@ -229,6 +229,6 @@ view: {arg objName, envir, components;
 		msg.debug("clean up");
 	});
 
-	outerView.minWidth_(250);
+	outerView.minWidth_(150);
 }
 )

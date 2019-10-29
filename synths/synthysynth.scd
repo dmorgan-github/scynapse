@@ -147,6 +147,14 @@ view: {arg objName, envir, components;
 				}
 			})
 			.value_(1),
+			Button()
+			.fixedSize_(15)
+			.string_("free all")
+			.action_({arg ctrl;
+				synths.do({arg x;
+					x.free;
+				});
+			}),
 			nil
 		));
 	};

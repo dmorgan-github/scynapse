@@ -13,6 +13,7 @@ view: {arg objName, envir, components;
 	var id;
 	var gridlayout;
 	var scale = Scale.at(\major);
+	var tuning = \et12;
 
 	var getprout = {
 		var prout = Prout({
@@ -92,7 +93,7 @@ view: {arg objName, envir, components;
 
 		specs = [
 			\legato -> ControlSpec(1/16, 64, \lin, 0, 1),
-			\strum -> ControlSpec(1/16, 1, \lin, 0, 0),
+			\strum -> ControlSpec(0, 1, \lin, 0, 0),
 			\dur -> ControlSpec(1/16, 64, \lin, 0, 1),
 			\octave -> ControlSpec(0, 8, \lin, 1, 4),
 			\ctranspose -> ControlSpec(0, 11, \lin, 1, 0),
@@ -179,6 +180,18 @@ view: {arg objName, envir, components;
 					scale = Scale.at(ctrl.item.asSymbol);
 				};
 				setscalekeys.(scale);
+			}),
+			PopUpMenu()
+			.items_([""] ++ Tuning.names.select({arg val; (Tuning.at(val).size == 12.0)}))
+			.action_({arg ctrl;
+				if (ctrl.item == "") {
+					tuning = \et12;
+				}{
+					tuning = ctrl.item.asSymbol;
+				};
+				if (synthEnvir.isNil.not) {
+					synthEnvir[\scale] = Scale.chromatic.tuning_(tuning);
+				}
 			}),
 			NumberBox()
 			.step_(1)
