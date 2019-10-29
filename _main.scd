@@ -45,64 +45,6 @@ Fdef(\scynapse, {arg environment, rootpath;
 		});
 	};
 
-	/*
-	var alwaysOnTop = {arg view;
-
-		Button().states_([ ["--"], ["__"] ]).action_({arg ctrl;
-			if (ctrl.value == 1) {
-				view.alwaysOnTop = true;
-			}{
-				view.alwaysOnTop = false;
-			}
-		}).maxSize_(15);
-	};
-	*/
-
-	/*
-	var recordStems = {
-
-		var key = Date.getDate.asSortableString;
-		var envir = getenvir.();
-
-		"recordStems".postln;
-
-		envir.keysValuesDo({arg k,v;
-			if (v.class == NodeProxy) {
-				if (v.rate == \audio) {
-					var rec;
-					var folder = Platform.recordingsDir ++ "/stems/" ++ key ++ "/";
-					//folder.debug("recording stems");
-					if (File.exists(folder).not) {
-						File.mkdir(folder)
-					};
-					rec = v.record(folder ++ k ++ ".aiff");
-					recorders.add(rec);
-				}
-			}
-		});
-
-		{
-			recorders.do({arg rec;
-				rec.unpause;
-			});
-		}.defer(1);
-	};
-	*/
-
-	/*
-	var stopRecordStems = {
-
-		recorders.do({arg rec;
-			rec.pause;
-			rec.close;
-			rec.free;
-			rec = nil;
-		});
-
-		recorders = List.new;
-	};
-	*/
-
 	var doclist = View().layout_(VLayout(nil)).minWidth_(100);
 	var docmap = ();
 
@@ -150,7 +92,10 @@ Fdef(\scynapse, {arg environment, rootpath;
 		var opendoc;
 
 		envir.keysValuesDo({arg k,v;
-			if (v.class == NodeProxy and: k.asString.beginsWith(objName) )  {
+			//if (v.class == NodeProxy and: k.asString.beginsWith(objName) )  {
+			//	count = count + 1;
+			//}
+			if (k.asString.beginsWith(objName) )  {
 				count = count + 1;
 			}
 		});

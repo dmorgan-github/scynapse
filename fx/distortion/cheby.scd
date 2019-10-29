@@ -1,8 +1,8 @@
 (
 view: {arg objName, envir, components;
 
-	var size = 6;
-	var harms = 1.0/[1,2,3,4,5,6];
+	var size = 12;
+	var harms = 1.0/[1,2,3,4,5,6,7,8,9,10,11,12];
 	var buf = {
 		var buf = Buffer.alloc(s, 1024, 1);
 		buf.cheby(harms);
