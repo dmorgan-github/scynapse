@@ -1,8 +1,7 @@
-//
 (
 view: {arg objName, envir, components;
 
-	var clock = TempoClock.new(60/60).permanent_(true);
+	//var clock = TempoClock.new(60/60).permanent_(true);
 	var view, specsContainerView = View().layout_(VLayout().margins_(0).spacing_(0));
 	var rows = 24;
 	var cols = 16;
@@ -23,9 +22,13 @@ view: {arg objName, envir, components;
 				{
 					if (i > 0) {
 						var prev = (i-1).mod(cols);
-						headers[prev].background_(Color.blue.alpha_(0.3));
+						if (headers[prev].isClosed.not) {
+							headers[prev].background_(Color.blue.alpha_(0.3));
+						}
 					};
-					headers[col].background_(Color.white);
+					if (headers[col].isClosed.not) {
+						headers[col].background_(Color.white);
+					}
 				}.defer;
 				degrees.do({arg degree;
 					degree = degree-23*(-1);
@@ -87,7 +90,7 @@ view: {arg objName, envir, components;
 				\ctranspose, Pif(Pfunc({synthEnvir[\ctranspose].isNil}), 0, Pfunc({synthEnvir[\ctranspose]})),
 				\octave, Pif(Pfunc({synthEnvir[\octave].isNil}), 5, Pfunc({synthEnvir[\octave]})),
 				\vel, Pif(Pfunc({synthEnvir[\vel].isNil}), 1, Pfunc({synthEnvir[\vel]})),
-				\tempo, Pif(Pfunc({synthEnvir[\tempo].isNil}), 1, Pfunc({synthEnvir[\tempo]})),
+				//\tempo, Pif(Pfunc({synthEnvir[\tempo].isNil}), 1, Pfunc({synthEnvir[\tempo]})),
 			) <> Pdef(\synthbase) <> (evt:synthEnvir, ndef:ndef, monitor:true)
 		);
 
@@ -97,7 +100,7 @@ view: {arg objName, envir, components;
 			\dur -> ControlSpec(1/16, 64, \lin, 0, 1),
 			\octave -> ControlSpec(0, 8, \lin, 1, 4),
 			\ctranspose -> ControlSpec(0, 11, \lin, 1, 0),
-			\tempo -> ControlSpec(0, 6, \lin, 0, 1),
+			//\tempo -> ControlSpec(0, 6, \lin, 0, 1),
 		];
 		specsView = components[\pSpecsView].(objName, specs, synthEnvir, view);
 		specsContainerView.removeAll;
@@ -164,7 +167,7 @@ view: {arg objName, envir, components;
 			.action_({arg ctrl;
 				if (id.isNil.not) {
 					if (ctrl.value == 1) {
-						Pdef(id).play(argClock:clock);
+						Pdef(id).play();
 					}{
 						Pdef(id).stop;
 					}
@@ -308,16 +311,57 @@ view: {arg objName, envir, components;
 		scrollView;
 	};
 
+	var vel_view = {
+		var data = Array.fill(16, { Slider().fixedWidth_(12).fixedHeight_(25).thumbSize_(5) });
+		View().layout_(GridLayout.rows( data ).margins_(1).spacing_(1))
+	};
+
+	var legato_view = {
+		var data = Array.fill(16, { Slider().fixedWidth_(12).fixedHeight_(25).thumbSize_(5) });
+		View().layout_(GridLayout.rows( data ).margins_(1).spacing_(1))
+	};
+
+	var dur_view = {
+		var data = Array.fill(16, { Slider().fixedWidth_(12).fixedHeight_(25).thumbSize_(5) });
+		View().layout_(GridLayout.rows( data ).margins_(1).spacing_(1))
+	};
+
+	var strum_view = {
+		var data = Array.fill(16, { Slider().fixedWidth_(12).fixedHeight_(25).thumbSize_(5) });
+		View().layout_(GridLayout.rows( data ).margins_(1).spacing_(1))
+	};
+
+	var prob_view = {
+		var data = Array.fill(16, { Slider().fixedWidth_(12).fixedHeight_(25).thumbSize_(5) });
+		View().layout_(GridLayout.rows( data ).margins_(1).spacing_(1))
+	};
+
+	var range_view = {
+		RangeSlider();
+	};
+
 	view = View().layout_(VLayout(
 		drag_sink.(),
 		playView.(),
-		HLayout(gridView.(), specsContainerView)
+		HLayout(
+			VLayout(
+				HLayout(nil, range_view.().orientation_(\horizontal)),
+				HLayout(Button().fixedWidth_(25), gridView.()),
+				HLayout(Button().fixedWidth_(25), vel_view.()),
+				HLayout(Button().fixedWidth_(25), legato_view.()),
+				HLayout(Button().fixedWidth_(25), prob_view.()),
+				HLayout(Button().fixedWidth_(25), dur_view.()),
+				HLayout(Button().fixedWidth_(25), strum_view.())
+			).margins_(1).spacing_(1),
+			specsContainerView
+		)
 	));
 
 	NotificationCenter.register(view, \close, view, {arg msg;
 		if (id.isNil.not) {
 			Pdef(id).clear;
 		};
+		//clock.free;
 		msg.debug("clean up");
 	});
 

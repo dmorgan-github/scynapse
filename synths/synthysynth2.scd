@@ -160,12 +160,33 @@ view: {arg objName, envir, components;
 		));
 	};
 
+	var build_pattern = {
+
+		var synth = synthEnvir[\synth];
+		var myspecs = specs.collect({arg assoc;
+			var key = assoc.key;
+			var spec = assoc.value;
+			if (synthEnvir[key].isNil) {
+				synthEnvir[key] = spec.default;
+			};
+			[key, Pfunc({synthEnvir[key]})]
+		}).flatten ++ [\instrument, synth, \out, Pfunc({node.bus.index}), \group, Pfunc({node.group})];
+
+		Pdef(objName).clear;
+		Pdef(objName,
+			Penvir(synthEnvir,
+				Pbind(*myspecs)
+			)
+		);
+	};
+
 	var update = {arg synth;
 		var view;
 		synthEnvir[\synth] = synth;
 		view = synthView.(synthEnvir, objName, synth);
 		containerView.removeAll;
 		containerView.layout.add(view);
+		build_pattern.();
 	};
 
 	node.play;

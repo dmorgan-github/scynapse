@@ -60,75 +60,118 @@ MIDIdef(\noteon_learn).free
 //MIDIdef(\midi_1_noteoff).free
 
 (
+/*
+TODO:
+x mute
+dynamically add channel
+remove mapping
+implement velocity
+implement cc
+don't automatically disconnect
+midi out
+*/
 view: {arg objName, envir, components;
 
 	var defs = List.new;
 	var source;
 	var view = View().layout_(VLayout().margins_(0).spacing_(0));
-	var outerView = View();//.layout_(VLayout(scrollView));
+	var outerView = View();
 	var scrollView = ScrollView();
 	var blinkers = (0..16).collect({
 		StaticText().string_(" ").fixedSize_(10).background_(Color.clear)
 	});
 
+	var notes = (0..16).collect({
+		StaticText().string_(" ").background_(Color.clear)
+	});
+
+	var asStringWithFrac = {arg float, fracSize = 3;
+		var val;
+		val = float.round( 10 ** (fracSize.neg) );
+		(val.asInt.asString ++ "." ++
+			( val.abs.frac* (10**fracSize) ).round(1).asInt.asStringToBase(10,fracSize));
+	};
+
+	var channels_mute = Array.fill(16, {0});
+
 	var registerBlinker = {
 		var key = (objName ++ '_noteon').asSymbol;
 		MIDIdef.noteOn(key, {arg ...args;
-			var chan = args[2] + 1;
-			{
-				blinkers[0].background_(Color.yellow);
-				blinkers[chan].background_(Color.yellow);
-				nil;
-			}.defer;
+			var note = args[1];
+			var chan = args[2];
+			if (channels_mute[chan] == 0) {
+				{
+					var msg = "% % % hz".format(note.midiname, note, asStringWithFrac.(note.midicps));
+					blinkers[chan].background_(Color.yellow);
+					notes[chan].string_(msg);
+				}.defer;
+			}
 		}, srcID: source.uid);
 		defs.add(key);
 
 		key = (objName ++ '_noteoff').asSymbol;
 		MIDIdef.noteOff(key, {arg ...args;
-			var chan = args[2] + 1;
-			{
-				blinkers[0].background_(Color.clear);
-				blinkers[chan].background_(Color.clear);
-				nil;
-			}.defer;
+			var chan = args[2];
+			if (channels_mute[chan] == 0) {
+				{
+					blinkers[0].background_(Color.clear);
+					blinkers[chan].background_(Color.clear);
+					nil;
+				}.defer;
+			}
 		}, srcID: source.uid);
 		defs.add(key);
 	};
 
-	var connectView = View().layout_(HLayout(
-		PopUpMenu()
-		.items_([""] ++ MIDIClient.sources.collect(_.name))
-		.action_({arg ctrl;
-			var val = ctrl.value - 1;
-			source = MIDIClient.sources.at(val);
-			MIDIIn.connect(device:source);
-			registerBlinker.();
-		})
-	));
+	var source_list = {
+		[""] ++ MIDIClient.sources.collect(_.name);
+	};
+	var source_list_ctrl = PopUpMenu()
+	.items_(source_list.())
+	.action_({arg ctrl;
+		var val = ctrl.value - 1;
+		source = MIDIClient.sources.at(val);
+		MIDIIn.connect(device:source);
+		registerBlinker.();
+	})
+	.mouseDownAction_({arg ctrl;
+		ctrl.items = source_list.();
+	});
+
+	var connectView = View().layout_(HLayout(source_list_ctrl));
+
+	var unregister_note = {arg chan;
+		var key = (objName ++ '_' ++ chan ++ '_noteOn').asSymbol;
+		MIDIdef(key).free;
+		key = (objName ++ '_' ++ chan ++ '_noteOff').asSymbol;
+		MIDIdef(key).free;
+	};
+
 	var registerNote = {arg chan, noteOn, noteOff;
-		var chanlabel = chan ?? "all";
-		var key = (objName ++ '_' ++ chanlabel ++ '_noteOn').asSymbol;
+		var key = (objName ++ '_' ++ chan ++ '_noteOn').asSymbol;
 		MIDIdef.noteOn(key, {arg ...args;
 			var note = args[1];
 			var vel = args[0];
 			var chan = args[2];
-			noteOn.(note, vel, chan);
+			if (channels_mute[chan] == 0) {
+				noteOn.(note, vel, chan);
+			}
 		}, chan:chan, srcID: source.uid);
 		defs.add(key);
 
-		key = (objName ++ '_' ++ chanlabel ++ '_noteOff').asSymbol;
+		key = (objName ++ '_' ++ chan ++ '_noteOff').asSymbol;
 		MIDIdef.noteOff(key, {arg ...args;
 			var note = args[1];
 			var vel = args[0];
 			var chan = args[2];
-			noteOff.(note, chan);
+			if (channels_mute[chan] == 0) {
+				noteOff.(note, chan);
+			}
 		}, chan:chan, srcID: source.uid);
 		defs.add(key);
 	};
 	var registerCc = {arg chan, name, func, spec;
-		var chanlabel = chan ?? "all";
-		var key = (objName ++ '_' ++ chanlabel ++ '_cc').asSymbol;
-		var blinknum = if(chan.isNil){0}{chan+1};
+		var key = (objName ++ '_' ++ chan ++ '_cc').asSymbol;
 		MIDIdef.cc(key, {arg val, num, chan, src;
 			var myval = val/127;
 			myval = spec.map(myval);
@@ -144,18 +187,32 @@ view: {arg objName, envir, components;
 	};
 
 	var map_view = {arg chan;
-		var blinknum = if (chan.isNil) {0}{chan+1};
+		var ds = DragSink();
 		View().layout_(
 			VLayout(
 				HLayout(
-					StaticText().string_("chan: " ++ (chan ?? "all")),
-					blinkers[blinknum],
+					StaticText().string_("chan: " ++ chan),
+					blinkers[chan],
+					notes[chan],
 					nil
 				).spacing_(5),
 				HLayout(
+					Button().states_([["M"], ["U"]])
+					.fixedWidth_(25)
+					.fixedHeight_(15)
+					.action_({arg ctrl;
+						if (ctrl.value == 1) {
+							channels_mute[chan] = 1;
+						} {
+							channels_mute[chan] = 0;
+						}
+					}),
 					StaticText().string_("note").fixedWidth_(25),
-					Button().string_("x").fixedSize_(10),
-					DragSink().string_("<-  ")
+					Button().string_("x").fixedSize_(10).action_({arg ctrl;
+						unregister_note.(chan);
+						ds.string_("<-  ")
+					}),
+					ds.string_("<-  ")
 					.canReceiveDragHandler_({
 						source.isNil.not;
 					})
@@ -171,7 +228,7 @@ view: {arg objName, envir, components;
 					})
 				),
 				HLayout(
-					StaticText().string_("cc").fixedWidth_(25),
+					StaticText().string_("cc").fixedWidth_(50).align_(\right),
 					Button().string_("x").fixedSize_(10),
 					DragSink().string_("<-  ")
 					.canReceiveDragHandler_({
@@ -193,7 +250,6 @@ view: {arg objName, envir, components;
 	};
 	var settings = View().layout_(
 		VLayout(
-			map_view.(nil),
 			map_view.(0),
 			map_view.(1),
 			map_view.(2),
@@ -210,7 +266,6 @@ view: {arg objName, envir, components;
 			map_view.(13),
 			map_view.(14),
 			map_view.(15),
-			map_view.(16),
 			nil
 		)
 	);
@@ -232,3 +287,5 @@ view: {arg objName, envir, components;
 	outerView.minWidth_(150);
 }
 )
+
+

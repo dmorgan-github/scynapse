@@ -5,8 +5,8 @@ SynthDef(\subtractr, {
 	var numvoices = 2;
 	var ddepth = \ddepth.kr(0.1);
 	var drate = \drate.kr(0.1);
-	var detune = LFNoise2.ar(drate.dup(numvoices)).bipolar(ddepth).midiratio;
-	var freq = XLine.ar(\freq.ar - (50 * TWChoose.ar(1, [DC.ar(0), DC.ar(1)], [0.8, 0.2])), \freq.ar, 0.1) * PinkNoise.kr(0.05,1);
+	var detune = [1, 1.01];//LFNoise2.ar(drate.dup(numvoices)).bipolar(ddepth).midiratio;
+	var freq = Vibrato.ar(\freq.ar(261), \vrate.ar(6), \vdepth.ar(0.0));
 
 	var fm = {arg freq;
 		var index = \index.kr(0);
@@ -91,9 +91,9 @@ SynthDef(\subtractr, {
 
 	var sig = [
 		tri.(freq * detune * \trifreqmul.kr(1)) * \tri.kr(1),
-		saw.(freq * detune * \sawfreqmul.kr(2)) * \saw.kr(0.2),
-		square.(freq * detune * \squarefreqmul.kr(4)) * \square.kr(0.1),
-		sine.(freq * detune * \sinefreqmul.kr(1)) * \sine.kr(0.2),
+		saw.(freq * detune * \sawfreqmul.kr(1)) * \saw.kr(0),
+		square.(freq * detune * \squarefreqmul.kr(1)) * \square.kr(0),
+		sine.(freq * detune * \sinefreqmul.kr(1)) * \sine.kr(0),
 		noise.() * \noise.kr(0)
 	].sum;
 	sig = sig * aeg * \vel.kr(1);
@@ -145,6 +145,9 @@ SynthDef(\subtractr, {
 		\ratio -> ControlSpec(0, 100, \lin, 0, 1),
 
 		\noise -> ControlSpec(0, 1, \lin, 0, 0),
+
+		\vrate -> ControlSpec(0, 440, \lin, 0, 6),
+		\vdepth -> ControlSpec(0, 1, \lin, 0, 0),
 		\ddepth -> ControlSpec(0, 1, \lin, 0, 0.1),
 		\drate -> ControlSpec(0.0, 1.0, \lin, 0, 0.1),
 		\pre -> ControlSpec(0, 1, \lin, 0, 1),
@@ -155,5 +158,5 @@ SynthDef(\subtractr, {
 		\amp -> ControlSpec(0, 1, \lin, 0, 0.1)
 	]
 )
-).add;
+).add
 )
