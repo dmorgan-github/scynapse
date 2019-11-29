@@ -9,7 +9,6 @@ view: {arg objName, envir, components;
 	}).add;
 
 	node = NodeProxy.audio(s, 2);
-	//node = NodeProxy.audio(s, 2);
 
 	{
 		var inbus = node.bus;

@@ -13,10 +13,10 @@ var func = {arg numchannels = 2;
 		var sus = \sus.kr(0.1);
 		var atkcurve = \atkcurve.kr(-4);
 		var relcurve = \relcurve.kr(4);
-		var atk = \atk.kr(0.1);
+		var atk = \atk.kr(0.0);
 		var rel = \rel.kr(0.1);
-		var env = Env([0,1,1,0], [atk, 0.8, rel].normalizeSum, [atkcurve,0,relcurve]);
-		env.kr(gate:1, timeScale:sus, doneAction:Done.freeSelf);
+		var env = Env([0,1,1,0], [atk, sus, rel], [atkcurve,0,relcurve]);
+		env.kr(gate:1, doneAction:Done.freeSelf);
 	};
 	sig = sig * aeg.() * \vel.kr(1);
 	sig = sig * \amp.kr(-3.dbamp);
@@ -30,7 +30,7 @@ var specs = [
 	\rev -> ControlSpec(0, 1, \lin, 1, 0),
 	\start -> ControlSpec(0, 1, \lin, 0, 0),
 	\rate -> ControlSpec(0.1, 4.0, \lin, 0, 1),
-	\atk -> ControlSpec(0, 1, \lin, 0, 0.1),
+	\atk -> ControlSpec(0, 1, \lin, 0, 0),
 	\rel -> ControlSpec(0, 1, \lin, 0, 0.1),
 	\sus -> ControlSpec(0.001, 8, \lin, 0, 1),
 	\atkcurve -> ControlSpec(-4,4,\lin,0,4),

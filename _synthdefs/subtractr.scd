@@ -1,6 +1,9 @@
 (
 SynthDef(\subtractr, {
 
+	// TODO:
+	// https://github.com/markwheeler/passersby/blob/master/lib/Engine_Passersby.sc
+	// https://github.com/markwheeler/molly_the_poly/blob/master/lib/Engine_MollyThePoly.sc
 	var gate = \gate.kr(1);
 	var numvoices = 2;
 	var ddepth = \ddepth.kr(0.1);
