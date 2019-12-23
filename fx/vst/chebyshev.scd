@@ -5,7 +5,7 @@ view: {arg objName, envir, components;
 
 	SynthDef.new(objName, {
 		var in = \in.kr(0);
-		ReplaceOut.ar(\in.kr(0), VSTPlugin.ar(In.ar(in, 2), 2));
+		ReplaceOut.ar(\in.kr(0), VSTPlugin.ar(input:In.ar(in, 2), numOut:2, id:objName));
 	}).add;
 
 	node = NodeProxy.audio(s, 2);
@@ -16,12 +16,12 @@ view: {arg objName, envir, components;
 		var group = node.group;
 		//var outbus = node.bus;
 		synth = Synth(objName, [in: inbus], target:group, addAction:\addAfter);
-		vstcntrl = VSTPluginController(synth);
-		vstcntrl.open("/Library/Audio/Plug-Ins/VST/++chebyshev");
+		vstcntrl = VSTPluginController(synth, objName);
+		vstcntrl.open("/Library/Audio/Plug-Ins/VST/++chebyshev", editor:true);
 	}.defer(2);
 
 	view = View().layout_(VLayout());
-	view.layout.add(Button().action_({ vstcntrl.gui; }));
+	view.layout.add(Button().action_({ vstcntrl.editor; }));
 	envir[objName] = node;
 
 	NotificationCenter.register(view, \close, view, {arg msg;

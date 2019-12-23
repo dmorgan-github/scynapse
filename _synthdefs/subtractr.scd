@@ -5,11 +5,12 @@ SynthDef(\subtractr, {
 	// https://github.com/markwheeler/passersby/blob/master/lib/Engine_Passersby.sc
 	// https://github.com/markwheeler/molly_the_poly/blob/master/lib/Engine_MollyThePoly.sc
 	var gate = \gate.kr(1);
-	var numvoices = 2;
-	var ddepth = \ddepth.kr(0.1);
-	var drate = \drate.kr(0.1);
-	var detune = [1, 1.01];//LFNoise2.ar(drate.dup(numvoices)).bipolar(ddepth).midiratio;
-	var freq = Vibrato.ar(\freq.ar(261), \vrate.ar(6), \vdepth.ar(0.0));
+	var in_freq = \freq.ar(261).lag(\glis.kr(0));
+	var detune = \detuneratio.kr(1);
+	var bend = \bend.ar(1);
+	var freqbend = Lag.ar(in_freq * bend, 0.005);
+	// need a better detune algo
+	var freq = Vibrato.ar([freqbend, freqbend * detune], \vrate.ar(6), \vdepth.ar(0.0));
 
 	var fm = {arg freq;
 		var index = \index.kr(0);
@@ -39,7 +40,7 @@ SynthDef(\subtractr, {
 		var fvel = max(\fvel.kr(vel), 0.001);
 		var fcurve = K2A.ar(\fcurve.kr(curve));
 		var fres = \res.kr(res);
-		var feg = aeg.lincurve(0, 1, ffreq, ffreq * fvel, curve:fcurve).clip(20, 20000);
+		var feg = aeg.lincurve(0, 1, ffreq, ffreq * fvel, curve:fcurve).clip(40, 20000);
 		//var feg = Env.perc(0.01, \dec.kr, fcurve).kr(gate:trig, timeScale:\ts.kr(1))
 		//.linlin(0, 1, ffreq, ffreq * fvel).clip(20, 20000);
 		//var feg = Env([ffreq, ffreq, ffreq * fvel], [0, \dec.kr], fcurve).kr(gate:trig).clip(20, 20000);
@@ -65,7 +66,7 @@ SynthDef(\subtractr, {
 
 	var saw = {arg freq;
 		//var sig = Saw.ar(freq);
-		var timbre = \sawtimbre.ar(0);
+		var timbre = \sawtimbre.ar(0); // not sure if this really works as intended
 		var sawcurve = \sawcurve.ar(0);
 		var sig = SyncSaw.ar(freq, freq + timbre).lincurve(-1, 1, -1, 1, sawcurve);
 		sig * AmpCompA.kr(freq);
@@ -124,21 +125,21 @@ SynthDef(\subtractr, {
 		\freqamt -> ControlSpec(0, 4, \lin, 0, 0),
 
 		\tri -> ControlSpec(0, 1, \lin, 0, 1),
-		\trifreqmul -> ControlSpec(0, 12, \lin, 0, 1),
+		\trifreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
 		\triwidth -> ControlSpec(0, 1, \lin, 0, 0.5),
 		\trifold -> ControlSpec(1, 10, \lin, 0, 1),
 
 		\saw -> ControlSpec(0, 1, \lin, 0, 0),
-		\sawfreqmul -> ControlSpec(0, 12, \lin, 0, 1),
+		\sawfreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
 		\sawtimbre -> ControlSpec(0, 1, \lin, 0, 0.1),
 		\sawcurve -> ControlSpec(-4, 4, \lin, 0, 0),
 
 		\square -> ControlSpec(0, 1, \lin, 0, 0),
-		\squarefreqmul -> ControlSpec(0, 12, \lin, 0, 1),
+		\squarefreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
 		\squarewidth -> ControlSpec(0, 1, \lin, 0, 0.5),
 
 		\sine -> ControlSpec(0, 1, \lin, 0, 0),
-		\sinefreqmul -> ControlSpec(0, 12, \lin, 0, 1),
+		\sinefreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
 		\sinefm -> ControlSpec(0, 1, \lin, 0, 0),
 		\sinefold -> ControlSpec(1, 10, \lin, 0, 1),
 
