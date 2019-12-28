@@ -10,13 +10,14 @@ var func = {arg numchannels = 2;
 	var sig = PlayBuf.ar(numchannels, buf, BufRateScale.kr(buf) * rate * dir, 1, numframes * start, loop);
 
 	var aeg = {
-		var sus = \sus.kr(0.1);
+		var suslevel = \suslevel.kr(1);
+		var gate = \gate.kr(1);
 		var atkcurve = \atkcurve.kr(-4);
 		var relcurve = \relcurve.kr(4);
 		var atk = \atk.kr(0.0);
 		var rel = \rel.kr(0.1);
-		var env = Env([0,1,1,0], [atk, sus, rel], [atkcurve,0,relcurve]);
-		env.kr(gate:1, doneAction:Done.freeSelf);
+		var env = Env.asr(atk, suslevel, rel, [atkcurve, relcurve]);
+		env.kr(gate:gate, doneAction:Done.freeSelf);
 	};
 	sig = sig * aeg.() * \vel.kr(1);
 	sig = sig * \amp.kr(-3.dbamp);
@@ -32,7 +33,7 @@ var specs = [
 	\rate -> ControlSpec(0.1, 4.0, \lin, 0, 1),
 	\atk -> ControlSpec(0, 1, \lin, 0, 0),
 	\rel -> ControlSpec(0, 1, \lin, 0, 0.1),
-	\sus -> ControlSpec(0.001, 8, \lin, 0, 1),
+	\suslevel -> ControlSpec(0, 1, \lin, 0, 1),
 	\atkcurve -> ControlSpec(-4,4,\lin,0,4),
 	\relcurve -> ControlSpec(-4,4,\lin,0,-4),
 	\vel -> ControlSpec(0, 1, \lin, 0, 1),
