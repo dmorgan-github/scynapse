@@ -1,8 +1,17 @@
 (
 var func = {arg numchannels = 2;
+
+	var debug = \debug.kr(0);
+	var detected, hasFreq;
 	var buf = \buf.kr(0);
 	var numframes = BufFrames.kr(buf);
-	var rate = \rate.kr(1);
+	var root = \root.kr(0).midiratio;
+	var base = \basefreq.kr(261) * root;
+	var freq = \freq.kr(261);
+	// either constant pitch
+	// or keytrack
+	var freqmode = \freqmode.kr(0);
+	var rate = Select.kr(freqmode, [1, freq/base]);
 	var start = \start.kr(0);
 	var rev = \rev.kr(0);
 	var loop = \loop.kr(0);
@@ -19,6 +28,10 @@ var func = {arg numchannels = 2;
 		var env = Env.asr(atk, suslevel, rel, [atkcurve, relcurve]);
 		env.kr(gate:gate, doneAction:Done.freeSelf);
 	};
+
+	# detected, hasFreq = Tartini.kr(sig);
+	Poll.kr(Impulse.kr(10) * debug, detected, \samplr_freq);
+
 	sig = sig * aeg.() * \vel.kr(1);
 	sig = sig * \amp.kr(-3.dbamp);
 	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));
