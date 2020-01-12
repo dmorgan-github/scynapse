@@ -1,22 +1,24 @@
 (
 var func = {arg numchannels = 2;
 
+	var trig = \trig.tr(1);
 	var debug = \debug.kr(0);
 	var detected, hasFreq;
 	var buf = \buf.kr(0);
 	var numframes = BufFrames.kr(buf);
 	var root = \root.kr(0).midiratio;
 	var base = \basefreq.kr(261) * root;
-	var freq = \freq.kr(261);
+	var bend = \bend.kr(0);
+	var freq = \freq.kr(261).lag(\glis.kr(0)) + bend;
 	// either constant pitch
 	// or keytrack
 	var freqmode = \freqmode.kr(0);
 	var rate = Select.kr(freqmode, [1, freq/base]);
-	var start = \start.kr(0);
+	var start = \start.kr(0).lag(0.001);
 	var rev = \rev.kr(0);
 	var loop = \loop.kr(0);
-	var dir = TWChoose.kr(1, [-1, 1], [rev, 1-rev]);
-	var sig = PlayBuf.ar(numchannels, buf, BufRateScale.kr(buf) * rate * dir, 1, numframes * start, loop);
+	var dir = TWChoose.kr(trig, [-1, 1], [rev, 1-rev]);
+	var sig = PlayBuf.ar(numchannels, buf, BufRateScale.kr(buf) * rate * dir, trig, numframes * start, loop);
 
 	var aeg = {
 		var suslevel = \suslevel.kr(1);
@@ -32,6 +34,8 @@ var func = {arg numchannels = 2;
 	# detected, hasFreq = Tartini.kr(sig);
 	Poll.kr(Impulse.kr(10) * debug, detected, \samplr_freq);
 
+	// want to smooth when retriggered
+	sig = sig * Env([0, 0, 1], [0, \trigatk.kr(0.001)], \trigcurve.kr(-4)).kr(gate:trig);
 	sig = sig * aeg.() * \vel.kr(1);
 	sig = sig * \amp.kr(-3.dbamp);
 	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));
@@ -41,6 +45,10 @@ var func = {arg numchannels = 2;
 };
 
 var specs = [
+	\root -> ControlSpec(-12, 12, \lin, 1, 0),
+	\glis -> ControlSpec(0, 1, \lin, 0, 0),
+	\loop -> ControlSpec(0, 1, \lin, 1, 1),
+	\freqmode -> ControlSpec(0, 1, \lin, 1, 0),
 	\rev -> ControlSpec(0, 1, \lin, 1, 0),
 	\start -> ControlSpec(0, 1, \lin, 0, 0),
 	\rate -> ControlSpec(0.1, 4.0, \lin, 0, 1),
