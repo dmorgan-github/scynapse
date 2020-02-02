@@ -8,7 +8,7 @@ var func = {arg numchannels = 2;
 	var numframes = BufFrames.kr(buf);
 	var root = \root.kr(0).midiratio;
 	var base = \basefreq.kr(261) * root;
-	var bend = \bend.kr(0);
+	var bend = \bend.kr(0); // in cents
 	var freq = \freq.kr(261).lag(\glis.kr(0)) + bend;
 	// either constant pitch
 	// or keytrack
@@ -35,11 +35,11 @@ var func = {arg numchannels = 2;
 	Poll.kr(Impulse.kr(10) * debug, detected, \samplr_freq);
 
 	// want to smooth when retriggered
+	sig = LeakDC.ar(sig);
 	sig = sig * Env([0, 0, 1], [0, \trigatk.kr(0.001)], \trigcurve.kr(-4)).kr(gate:trig);
 	sig = sig * aeg.() * \vel.kr(1);
 	sig = sig * \amp.kr(-3.dbamp);
 	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));
-	sig = LeakDC.ar(sig);
 	sig = Balance2.ar(sig[0], sig[1], \pan.kr(0));
 	Out.ar(\out.kr(0), sig);
 };

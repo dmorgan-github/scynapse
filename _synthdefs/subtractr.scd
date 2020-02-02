@@ -4,55 +4,78 @@ SynthDef(\subtractr, {
 	// TODO:
 	// https://github.com/markwheeler/passersby/blob/master/lib/Engine_Passersby.sc
 	// https://github.com/markwheeler/molly_the_poly/blob/master/lib/Engine_MollyThePoly.sc
-	var gate = \gate.kr(1);
+	var trig = Trig1.kr(\trig.tr(1), \sustain.kr(1));
+	var gate = Select.kr(\retrig.kr(0), [\gate.kr(1), trig]);
 	var in_freq = \freq.ar(261).lag(\glis.kr(0));
 	var detune = \detuneratio.kr(1);
+
+	// bend by semitones...
 	var bend = \bend.ar(1);
-	var freqbend = Lag.ar(in_freq * bend, 0.005);
+	var freqbend = in_freq * bend;
 	// need a better detune algo
 	var freq = Vibrato.ar([freqbend, freqbend * detune], \vrate.ar(6), \vdepth.ar(0.0));
 
+	/*
 	var fm = {arg freq;
 		var index = \index.kr(0);
 		var ivel = \ivel.kr(0.1);
 		var idur = \idur.kr(0.1);
 		var ratio = \ratio.kr(2);
-		var iline = Line.ar(index, index * ivel, idur) * freq * ratio;
-		var mod = SinOsc.ar(freq * ratio) * iline;
+		var iline = Line.ar(index, index * ivel, idur);// * freq * ratio;
+		var mod = SinOsc.ar(freq * ratio) * iline * index.reciprocal.sqrt;
 		mod;
 	};
+	*/
 
 	var adsr = {
-		var da = Done.freeSelf;
+		var da = Done.none;
 		var atk = \atk.kr(0.01);
 		var dec = \dec.kr(0.1);
 		var rel = \rel.kr(0.1);
 		var curve = \curve.kr(-4);
 		var suslevel = \suslevel.kr(0.5);
 		var ts = \ts.kr(1);
-		var env = Env.adsr(atk, dec, suslevel, rel, curve:curve).ar(doneAction:da, gate:gate, timeScale:ts);
-		env;
+		var atkcurve = \atkcurve.kr(-4);
+		var deccurve = \deccurve.kr(-4);
+		var relcurve = \relcurve.kr(-4);
+		var env = Env.adsr(
+			attackTime:atk, decayTime:dec, sustainLevel:suslevel, releaseTime:rel,
+			curve:-4
+			//[atkcurve, deccurve, relcurve]
+		);
+		var aeg = env.kr(doneAction:da, gate:gate, timeScale:ts);
+
+		// control life cycle of synth
+		env.kr(doneAction:Done.freeSelf, gate:\gate.kr, timeScale:ts);
+
+		aeg;
 	};
 
-	var filter = {arg sig, aeg, cutoff=1200, vel=1, res=0, freqamt=0, curve=(-4);
-		var famt = \freqamt.kr(freqamt);
-		var ffreq = \cutoff.kr(cutoff) + (freq * famt);
-		var fvel = max(\fvel.kr(vel), 0.001);
-		var fcurve = K2A.ar(\fcurve.kr(curve));
-		var fres = \res.kr(res);
-		var feg = aeg.lincurve(0, 1, ffreq, ffreq * fvel, curve:fcurve).clip(40, 20000);
-		//var feg = Env.perc(0.01, \dec.kr, fcurve).kr(gate:trig, timeScale:\ts.kr(1))
-		//.linlin(0, 1, ffreq, ffreq * fvel).clip(20, 20000);
-		//var feg = Env([ffreq, ffreq, ffreq * fvel], [0, \dec.kr], fcurve).kr(gate:trig).clip(20, 20000);
+	var filter = {arg sig;
+		var famt = \freqamt.kr(0);
+		var ffreq = \cutoff.kr(100) + (freq * famt);
+		var fvel = max(\fvel.kr(10), 0.001);
+		var fres = \res.kr(0.5);
 
-		sig = MoogFF.ar(sig, feg, fres.linlin(0, 1, 0, 4)) * 4;
-		//sig = MoogLadder.ar(sig, feg, fres) * 4;
-		//sig = MoogVCF.ar(sig, feg, res);
-		//sig = SVF.ar(sig, feg, fres, 1, 1, 0, 1, 0);
+		var fatk = \fatk.kr(0.01);
+		var fdec = \fdec.kr(0.21);
+		var fsuslevel = \fsuslevel.kr(0.3);
+		var frel = \frel.kr(0.1);
+		var atkcurve = \fatkcurve.kr(-4);
+		var deccurve = \fdeccurve.kr(-4);
+		var relcurve = \frelcurve.kr(-4);
+		var ts = \fts.kr(1);
+		var feg = Env(
+			[0, 1, fsuslevel, 0],
+			[fatk, fdec, frel],
+			[atkcurve, deccurve, relcurve],
+			releaseNode:2
+		).ar(gate:gate, timeScale:ts)
+		.linlin(0, 1, ffreq, ffreq * fvel).clip(20, 20000);
+
+		sig = MoogFF.ar(sig, feg, fres.linlin(0, 1, 0.001, 4)) * 4;
 		//sig = DFM1.ar(sig, feg, fres.clip(0.001, 1.0)) * 1;
 		//sig = RLPF.ar(sig, feg, (1-fres).clip(0.001, 1.0));
-		//sig = BLowPass4.ar(sig, feg, (1-fres).clip(0.001, 1.0));
-		//sig = BLowPass.ar(sig, feg, (1-fres).clip(0.001, 1.0));
 		sig;
 	};
 
@@ -65,21 +88,19 @@ SynthDef(\subtractr, {
 	};
 
 	var saw = {arg freq;
-		//var sig = Saw.ar(freq);
-		var timbre = \sawtimbre.ar(0); // not sure if this really works as intended
-		var sawcurve = \sawcurve.ar(0);
-		var sig = SyncSaw.ar(freq, freq + timbre).lincurve(-1, 1, -1, 1, sawcurve);
+		var sync = \sawsync.ar(1);
+		var sig = SyncSaw.ar(freq, freq * sync);
 		sig * AmpCompA.kr(freq);
 	};
 
-	var square = {arg freq;
-		var sig = Pulse.ar(freq, \squarewidth.ar(0.5));
+	var pulse = {arg freq;
+		var sig = Pulse.ar(freq, \pulsewidth.ar(0.5));
 		sig * AmpCompA.kr(freq);
 	};
 
 	var sine = {arg freq;
-		var mod = fm.(freq) * \sinefm.kr(0);
-		var sig = SinOsc.ar(freq + mod);
+		//var mod = fm.(freq) * \sinefm.kr(0);
+		var sig = SinOscFB.ar(freq, \sineskew.kr(0));
 		var fold = \sinefold.kr(1);
 		sig = (sig * fold).fold(-1, 1) * fold.reciprocal.sqrt;
 		sig = LeakDC.ar(sig);
@@ -87,7 +108,7 @@ SynthDef(\subtractr, {
 	};
 
 	var noise = {
-		var sig = WhiteNoise.ar;
+		var sig = PinkNoise.ar;
 		sig;
 	};
 
@@ -96,18 +117,18 @@ SynthDef(\subtractr, {
 	var sig = [
 		tri.(freq * detune * \trifreqmul.kr(1)) * \tri.kr(1),
 		saw.(freq * detune * \sawfreqmul.kr(1)) * \saw.kr(0),
-		square.(freq * detune * \squarefreqmul.kr(1)) * \square.kr(0),
+		pulse.(freq * detune * \pulsefreqmul.kr(1)) * \pulse.kr(0),
 		sine.(freq * detune * \sinefreqmul.kr(1)) * \sine.kr(0),
 		noise.() * \noise.kr(0)
 	].sum;
-	sig = sig * aeg * \vel.kr(1);
 	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));
 	sig = LeakDC.ar(sig);
 
-	sig = filter.(sig, aeg);
+	sig = filter.(sig);
 	sig = Balance2.ar(sig[0], sig[1], \pan.kr(0));
+	sig = sig * aeg * \vel.kr(1);
 	sig = sig * \amp.kr(-3.dbamp);
-	Out.ar(\out.kr(0), sig);
+	Out.ar(\out.kr(0), sig.softclip);
 
 }, metadata:(
 	specs:[
@@ -115,14 +136,23 @@ SynthDef(\subtractr, {
 		\dec -> ControlSpec(0, 30, \lin, 0, 0.2),
 		\rel -> ControlSpec(0, 30, \lin, 0, 0.29),
 		\suslevel -> ControlSpec(0, 1, \lin, 0, 0.7),
-		\curve -> ControlSpec(-24, 24, \lin, 0, -4),
+		\atkcurve -> ControlSpec(-24, 24, \lin, 0, -4),
+		\deccurve -> ControlSpec(-24, 24, \lin, 0, -4),
+		\relcurve -> ControlSpec(-24, 24, \lin, 0, -4),
 		\ts -> ControlSpec(0, 100, \lin, 0, 1),
 
-		\cutoff -> ControlSpec(1, 18000, 'exp', 0, 100),
-		\fvel -> ControlSpec(0, 20, \lin, 0, 10),
-		\fcurve -> ControlSpec(-24, 24, \lin, 0, -4),
+		\cutoff -> ControlSpec(20, 18000, \exp, 0, 100),
+		\fvel -> ControlSpec(0.001, 20, \lin, 0, 10),
 		\res -> ControlSpec(0, 1, \lin, 0, 0.5),
 		\freqamt -> ControlSpec(0, 4, \lin, 0, 0),
+		\fatk -> ControlSpec(0, 30, \lin, 0, 0.01),
+		\fdec -> ControlSpec(0, 30, \lin, 0, 0.2),
+		\frel -> ControlSpec(0, 30, \lin, 0, 0.29),
+		\fsuslevel -> ControlSpec(0, 1, \lin, 0, 0.7),
+		\fatkcurve -> ControlSpec(-24, 24, \lin, 0, -4),
+		\fdeccurve -> ControlSpec(-24, 24, \lin, 0, -4),
+		\frelcurve -> ControlSpec(-24, 24, \lin, 0, -4),
+		\fts -> ControlSpec(0, 100, \lin, 0, 1),
 
 		\tri -> ControlSpec(0, 1, \lin, 0, 1),
 		\trifreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
@@ -131,30 +161,22 @@ SynthDef(\subtractr, {
 
 		\saw -> ControlSpec(0, 1, \lin, 0, 0),
 		\sawfreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
-		\sawtimbre -> ControlSpec(0, 1, \lin, 0, 0.1),
-		\sawcurve -> ControlSpec(-4, 4, \lin, 0, 0),
+		\sawsync -> ControlSpec(1, 5, \lin, 0, 1),
 
-		\square -> ControlSpec(0, 1, \lin, 0, 0),
-		\squarefreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
-		\squarewidth -> ControlSpec(0, 1, \lin, 0, 0.5),
+		\pulse -> ControlSpec(0, 1, \lin, 0, 0),
+		\pulsefreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
+		\pulsewidth -> ControlSpec(0, 1, \lin, 0, 0.5),
 
 		\sine -> ControlSpec(0, 1, \lin, 0, 0),
 		\sinefreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
-		\sinefm -> ControlSpec(0, 1, \lin, 0, 0),
+		\sineskew -> ControlSpec(-1, 1, \lin, 0, 0),
 		\sinefold -> ControlSpec(1, 10, \lin, 0, 1),
-
-		\index -> ControlSpec(0, 100, \lin, 0.0, 1),
-		\ivel -> ControlSpec(0, 100, \lin, 0, 1),
-		\idur -> ControlSpec(0, 1, \lin, 0, 1),
-		\ratio -> ControlSpec(0, 100, \lin, 0, 1),
 
 		\noise -> ControlSpec(0, 1, \lin, 0, 0),
 
+		\bend -> ControlSpec(-12.midiratio, 12.midiratio, \lin, 0, 0.midiratio),
 		\vrate -> ControlSpec(0, 440, \lin, 0, 6),
 		\vdepth -> ControlSpec(0, 1, \lin, 0, 0),
-		\ddepth -> ControlSpec(0, 1, \lin, 0, 0.1),
-		\drate -> ControlSpec(0.0, 1.0, \lin, 0, 0.1),
-		\pre -> ControlSpec(0, 1, \lin, 0, 1),
 		\vel -> ControlSpec(0, 1, \lin, 0, 1),
 		\spread -> ControlSpec(0, 1, \lin, 0, 1),
 		\center -> ControlSpec(0, 1, \lin, 0, 0),
@@ -164,3 +186,4 @@ SynthDef(\subtractr, {
 )
 ).add
 )
+
