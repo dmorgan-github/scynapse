@@ -7,13 +7,12 @@ SynthDef(\subtractr, {
 	var trig = Trig1.kr(\trig.tr(1), \sustain.kr(1));
 	var gate = Select.kr(\retrig.kr(0), [\gate.kr(1), trig]);
 	var in_freq = \freq.ar(261).lag(\glis.kr(0));
-	var detune = \detuneratio.kr(1);
+	var detune = \detunehz.kr(0.6) * PinkNoise.ar.range(0.8, 1.2);
 
 	// bend by semitones...
-	var bend = \bend.ar(1);
+	var bend = \bend.ar(0).midiratio;
 	var freqbend = in_freq * bend;
-	// need a better detune algo
-	var freq = Vibrato.ar([freqbend, freqbend * detune], \vrate.ar(6), \vdepth.ar(0.0));
+	var freq = Vibrato.ar([freqbend + detune.neg, freqbend + detune], \vrate.ar(6), \vdepth.ar(0.0));
 
 	/*
 	var fm = {arg freq;
@@ -32,7 +31,6 @@ SynthDef(\subtractr, {
 		var atk = \atk.kr(0.01);
 		var dec = \dec.kr(0.1);
 		var rel = \rel.kr(0.1);
-		var curve = \curve.kr(-4);
 		var suslevel = \suslevel.kr(0.5);
 		var ts = \ts.kr(1);
 		var atkcurve = \atkcurve.kr(-4);
@@ -40,11 +38,10 @@ SynthDef(\subtractr, {
 		var relcurve = \relcurve.kr(-4);
 		var env = Env.adsr(
 			attackTime:atk, decayTime:dec, sustainLevel:suslevel, releaseTime:rel,
-			curve:-4
-			//[atkcurve, deccurve, relcurve]
+			curve:[atkcurve, deccurve, relcurve]
 		);
 		var aeg = env.kr(doneAction:da, gate:gate, timeScale:ts);
-
+		aeg = aeg * \aeglfo.kr(1);
 		// control life cycle of synth
 		env.kr(doneAction:Done.freeSelf, gate:\gate.kr, timeScale:ts);
 
@@ -57,6 +54,9 @@ SynthDef(\subtractr, {
 		var fvel = max(\fvel.kr(10), 0.001);
 		var fres = \res.kr(0.5);
 
+		var f1, f2;
+		var which = \fwhich.kr(0);
+		var focus = \ffocus.kr(1);
 		var fatk = \fatk.kr(0.01);
 		var fdec = \fdec.kr(0.21);
 		var fsuslevel = \fsuslevel.kr(0.3);
@@ -71,11 +71,13 @@ SynthDef(\subtractr, {
 			[atkcurve, deccurve, relcurve],
 			releaseNode:2
 		).ar(gate:gate, timeScale:ts)
-		.linlin(0, 1, ffreq, ffreq * fvel).clip(20, 20000);
+		.linlin(0, 1, ffreq, ffreq * fvel);
 
-		sig = MoogFF.ar(sig, feg, fres.linlin(0, 1, 0.001, 4)) * 4;
-		//sig = DFM1.ar(sig, feg, fres.clip(0.001, 1.0)) * 1;
-		//sig = RLPF.ar(sig, feg, (1-fres).clip(0.001, 1.0));
+		feg = feg * \feglfo.kr(1);
+		feg = feg.clip(20, 20000);
+		f1 = MoogFF.ar(sig, feg, fres.linlin(0, 1, 0.001, 4)) * 4;
+		f2 = DFM1.ar(sig, feg, fres.clip(0.001, 1.0));
+		sig = SelectXFocus.ar(which, [f1, f2], focus);
 		sig;
 	};
 
@@ -114,15 +116,18 @@ SynthDef(\subtractr, {
 
 	var aeg = adsr.();
 
+	var vols = [\tri.kr(1), \saw.kr(0), \pulse.kr(0), \sine.kr(0)].normalizeSum.max(0);
+
 	var sig = [
-		tri.(freq * detune * \trifreqmul.kr(1)) * \tri.kr(1),
-		saw.(freq * detune * \sawfreqmul.kr(1)) * \saw.kr(0),
-		pulse.(freq * detune * \pulsefreqmul.kr(1)) * \pulse.kr(0),
-		sine.(freq * detune * \sinefreqmul.kr(1)) * \sine.kr(0),
+		tri.(freq * \trifreqmul.kr(1)) * vols[0],
+		saw.(freq * \sawfreqmul.kr(1)) * vols[1],
+		pulse.(freq * \pulsefreqmul.kr(1)) * vols[2],
+		sine.(freq * \sinefreqmul.kr(1)) * vols[3],
 		noise.() * \noise.kr(0)
 	].sum;
-	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));
+
 	sig = LeakDC.ar(sig);
+	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));
 
 	sig = filter.(sig);
 	sig = Balance2.ar(sig[0], sig[1], \pan.kr(0));
@@ -140,6 +145,7 @@ SynthDef(\subtractr, {
 		\deccurve -> ControlSpec(-24, 24, \lin, 0, -4),
 		\relcurve -> ControlSpec(-24, 24, \lin, 0, -4),
 		\ts -> ControlSpec(0, 100, \lin, 0, 1),
+		\aeglfo -> ControlSpec(1, 1, \lin, 1, 1),
 
 		\cutoff -> ControlSpec(20, 18000, \exp, 0, 100),
 		\fvel -> ControlSpec(0.001, 20, \lin, 0, 10),
@@ -153,6 +159,9 @@ SynthDef(\subtractr, {
 		\fdeccurve -> ControlSpec(-24, 24, \lin, 0, -4),
 		\frelcurve -> ControlSpec(-24, 24, \lin, 0, -4),
 		\fts -> ControlSpec(0, 100, \lin, 0, 1),
+		\fwhich -> ControlSpec(0, 1, \lin, 0, 0),
+		\ffocus -> ControlSpec(0, 1, \lin, 0, 1),
+		\feglfo -> ControlSpec(1, 1, \lin, 1, 1),
 
 		\tri -> ControlSpec(0, 1, \lin, 0, 1),
 		\trifreqmul -> ControlSpec(0.0001, 12, \lin, 0, 1),
@@ -174,7 +183,8 @@ SynthDef(\subtractr, {
 
 		\noise -> ControlSpec(0, 1, \lin, 0, 0),
 
-		\bend -> ControlSpec(-12.midiratio, 12.midiratio, \lin, 0, 0.midiratio),
+		\detunehz -> ControlSpec(0, 100, \lin, 0, 0),
+		\bend -> ControlSpec(-12, 12, \lin, 0, 0), // semitones
 		\vrate -> ControlSpec(0, 440, \lin, 0, 6),
 		\vdepth -> ControlSpec(0, 1, \lin, 0, 0),
 		\vel -> ControlSpec(0, 1, \lin, 0, 1),
