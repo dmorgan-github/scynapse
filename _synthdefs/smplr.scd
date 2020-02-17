@@ -36,7 +36,7 @@ var func = {arg numchannels = 2;
 
 	// want to smooth when retriggered
 	sig = LeakDC.ar(sig);
-	sig = sig * Env([0, 0, 1], [0, \trigatk.kr(0.001)], \trigcurve.kr(-4)).kr(gate:trig);
+	//sig = sig * Env([0, 0, 1], [0, \trigatk.kr(0.001)], \trigcurve.kr(-4)).kr(gate:trig);
 	sig = sig * aeg.() * \vel.kr(1);
 	sig = sig * \amp.kr(-3.dbamp);
 	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));

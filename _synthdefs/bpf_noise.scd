@@ -1,23 +1,40 @@
 (
 SynthDef(\bpf_noise, {
 
-	var gate = \gate.kr(1);
-	var numvoices = 2;
-	var ddepth = \ddepth.kr(0.1);
-	var drate = \drate.kr(0.1);
-	var detune = [1, 1.01];//LFNoise2.ar(drate.dup(numvoices)).bipolar(ddepth).midiratio;
-	var freq = Vibrato.ar(\freq.ar(261), \vrate.ar(6), \vdepth.ar(0.0));
+
+	// TODO:
+	// https://github.com/markwheeler/passersby/blob/master/lib/Engine_Passersby.sc
+	// https://github.com/markwheeler/molly_the_poly/blob/master/lib/Engine_MollyThePoly.sc
+	var trig = Trig1.kr(\trig.tr(1), \sustain.kr(1));
+	var gate = Select.kr(\retrig.kr(0), [\gate.kr(1), trig]);
+	var in_freq = \freq.ar(261).lag(\glis.kr(0));
+	var detune = \detunehz.kr(0.6) * PinkNoise.ar.range(0.8, 1.2);
+
+	// bend by semitones...
+	var bend = \bend.ar(0).midiratio;
+	var freqbend = in_freq * bend;
+	var freq = Vibrato.ar([freqbend + detune.neg, freqbend + detune], \vrate.ar(6), \vdepth.ar(0.0));
 
 	var adsr = {
-		var da = Done.freeSelf;
+		var da = Done.none;
 		var atk = \atk.kr(0.01);
 		var dec = \dec.kr(0.1);
 		var rel = \rel.kr(0.1);
-		var curve = \curve.kr(-4);
 		var suslevel = \suslevel.kr(0.5);
 		var ts = \ts.kr(1);
-		var env = Env.adsr(atk, dec, suslevel, rel, curve:curve).ar(doneAction:da, gate:gate, timeScale:ts);
-		env;
+		var atkcurve = \atkcurve.kr(-4);
+		var deccurve = \deccurve.kr(-4);
+		var relcurve = \relcurve.kr(-4);
+		var env = Env.adsr(
+			attackTime:atk, decayTime:dec, sustainLevel:suslevel, releaseTime:rel,
+			curve:[atkcurve, deccurve, relcurve]
+		);
+		var aeg = env.kr(doneAction:da, gate:gate, timeScale:ts);
+		aeg = aeg * \aeglfo.kr(1);
+		// control life cycle of synth
+		env.kr(doneAction:Done.freeSelf, gate:\gate.kr, timeScale:ts);
+
+		aeg;
 	};
 
 	var osc1 = {arg freq;
@@ -29,14 +46,15 @@ SynthDef(\bpf_noise, {
 	};
 
 	var filter = {arg sig;
-		LPF.ar(sig, 880);
+		LPF.ar(sig, \lpf.kr(880));
 	};
 
 	var aeg = adsr.();
 
 	var sig = [
-		osc1.(freq * detune)
+		osc1.(freq)
 	].sum;
+
 	sig = sig * aeg * \vel.kr(1);
 	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));
 	sig = LeakDC.ar(sig);
