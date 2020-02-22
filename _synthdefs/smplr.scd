@@ -1,15 +1,23 @@
 (
 var func = {arg numchannels = 2;
 
-	var trig = \trig.tr(1);
+	var trig = Trig1.kr(\trig.tr(1), \sustain.kr(1));
+	var gate = Select.kr(\retrig.kr(0), [\gate.kr(1), trig]);
+	var in_freq = \freq.ar(261).lag(\glis.kr(0));
+	var detune = \detunehz.kr(0.6) * PinkNoise.ar.range(0.8, 1.2);
+	var ctrllag = 0.005;
 	var debug = \debug.kr(0);
 	var detected, hasFreq;
 	var buf = \buf.kr(0);
 	var numframes = BufFrames.kr(buf);
 	var root = \root.kr(0).midiratio;
 	var base = \basefreq.kr(261) * root;
-	var bend = \bend.kr(0); // in cents
-	var freq = \freq.kr(261).lag(\glis.kr(0)) + bend;
+
+	// bend by semitones...
+	var bend = \bend.ar(0).midiratio;
+	var freqbend = in_freq * bend;
+	var freq = Vibrato.ar([freqbend + detune.neg, freqbend + detune], \vrate.ar(6), \vdepth.ar(0.0));
+
 	// either constant pitch
 	// or keytrack
 	var freqmode = \freqmode.kr(0);
@@ -18,26 +26,65 @@ var func = {arg numchannels = 2;
 	var rev = \rev.kr(0);
 	var loop = \loop.kr(0);
 	var dir = TWChoose.kr(trig, [-1, 1], [rev, 1-rev]);
-	var sig = PlayBuf.ar(numchannels, buf, BufRateScale.kr(buf) * rate * dir, trig, numframes * start, loop);
+	var sig = PlayBufCF.ar(numchannels, buf, BufRateScale.kr(buf) * rate * dir, trig, numframes * start, loop);
 
-	var aeg = {
-		var suslevel = \suslevel.kr(1);
-		var gate = \gate.kr(1);
-		var atkcurve = \atkcurve.kr(-4);
-		var relcurve = \relcurve.kr(4);
-		var atk = \atk.kr(0.0);
+	var adsr = {
+		var da = Done.none;
+		var atk = \atk.kr(0.01);
+		var dec = \dec.kr(0.1);
 		var rel = \rel.kr(0.1);
-		var env = Env.asr(atk, suslevel, rel, [atkcurve, relcurve]);
-		env.kr(gate:gate, doneAction:Done.freeSelf);
+		var suslevel = \suslevel.kr(1);
+		var ts = \ts.kr(1);
+		var atkcurve = \atkcurve.kr(-4);
+		var deccurve = \deccurve.kr(-4);
+		var relcurve = \relcurve.kr(-4);
+		var env = Env.adsr(
+			attackTime:atk, decayTime:dec, sustainLevel:suslevel, releaseTime:rel,
+			curve:[atkcurve, deccurve, relcurve]
+		);
+		var aeg = env.kr(doneAction:da, gate:gate, timeScale:ts);
+		aeg = aeg * \aeglfo.kr(1);
+		// control life cycle of synth
+		env.kr(doneAction:Done.freeSelf, gate:\gate.kr, timeScale:ts);
+
+		aeg;
+	};
+
+	var filter = {arg sig;
+		var famt = \freqamt.kr(0).lag(ctrllag);
+		var ffreq = \cutoff.kr(100).lag(ctrllag) + (freq * famt);
+		var fvel = max(\fvel.kr(10).lag(ctrllag), 0.001);
+		var fres = 1-\res.kr(0.5).lag(ctrllag);
+
+		var f1, f2;
+		var fatk = \fatk.kr(0.01).lag(ctrllag);
+		var fdec = \fdec.kr(0.21).lag(ctrllag);
+		var fsuslevel = \fsuslevel.kr(1).lag(ctrllag);
+		var frel = \frel.kr(0.1).lag(ctrllag);
+		var atkcurve = \fatkcurve.kr(-4).lag(ctrllag);
+		var deccurve = \fdeccurve.kr(-4).lag(ctrllag);
+		var relcurve = \frelcurve.kr(-4).lag(ctrllag);
+		var ts = \fts.kr(1).lag(ctrllag);
+		var feg = Env(
+			[0, 1, fsuslevel, 0],
+			[fatk, fdec, frel],
+			[atkcurve, deccurve, relcurve],
+			releaseNode:2
+		).ar(gate:gate, timeScale:ts)
+		.linlin(0, 1, ffreq, ffreq * fvel);
+
+		feg = feg * \feglfo.kr(1);
+		feg = feg.clip(20, 20000);
+		sig = RLPF.ar(sig, feg, fres.clip(0.001, 1.0));
+		sig;
 	};
 
 	# detected, hasFreq = Tartini.kr(sig);
 	Poll.kr(Impulse.kr(10) * debug, detected, \samplr_freq);
 
-	// want to smooth when retriggered
+	sig = filter.(sig);
 	sig = LeakDC.ar(sig);
-	//sig = sig * Env([0, 0, 1], [0, \trigatk.kr(0.001)], \trigcurve.kr(-4)).kr(gate:trig);
-	sig = sig * aeg.() * \vel.kr(1);
+	sig = sig * adsr.() * AmpCompA.kr(freq) * \vel.kr(1);
 	sig = sig * \amp.kr(-3.dbamp);
 	sig = Splay.ar(sig, \spread.kr(0), center:\center.kr(0));
 	sig = Balance2.ar(sig[0], sig[1], \pan.kr(0));
@@ -52,11 +99,31 @@ var specs = [
 	\rev -> ControlSpec(0, 1, \lin, 1, 0),
 	\start -> ControlSpec(0, 1, \lin, 0, 0),
 	\rate -> ControlSpec(0.1, 4.0, \lin, 0, 1),
-	\atk -> ControlSpec(0, 1, \lin, 0, 0),
-	\rel -> ControlSpec(0, 1, \lin, 0, 0.1),
-	\suslevel -> ControlSpec(0, 1, \lin, 0, 1),
-	\atkcurve -> ControlSpec(-4,4,\lin,0,4),
-	\relcurve -> ControlSpec(-4,4,\lin,0,-4),
+
+	\atk -> ControlSpec(0, 1, \lin, 0, 0.01),
+	\dec -> ControlSpec(0, 1, \lin, 0, 0.2),
+	\rel -> ControlSpec(0, 8, \lin, 0, 0.29),
+	\suslevel -> ControlSpec(0, 1, \lin, 0, 0.7),
+	\atkcurve -> ControlSpec(-8, 8, \lin, 0, -4),
+	\deccurve -> ControlSpec(-8, 8, \lin, 0, -4),
+	\relcurve -> ControlSpec(-8, 8, \lin, 0, -4),
+	\ts -> ControlSpec(0.001, 100, \lin, 0, 1),
+	\aeglfo -> ControlSpec(1, 1, \lin, 1, 1),
+
+	\cutoff -> ControlSpec(20, 18000, \exp, 0, 18000),
+	\fvel -> ControlSpec(0.001, 20, \lin, 0, 1),
+	\res -> ControlSpec(0, 1, \lin, 0, 0),
+	\freqamt -> ControlSpec(0, 4, \lin, 0, 0),
+	\fatk -> ControlSpec(0, 1, \lin, 0, 0.0),
+	\fdec -> ControlSpec(0, 1, \lin, 0, 0.0),
+	\frel -> ControlSpec(0, 8, \lin, 0, 0.29),
+	\fsuslevel -> ControlSpec(0, 1, \lin, 0, 1),
+	\fatkcurve -> ControlSpec(-8, 8, \lin, 0, -4),
+	\fdeccurve -> ControlSpec(-8, 8, \lin, 0, -4),
+	\frelcurve -> ControlSpec(-8, 8, \lin, 0, -4),
+	\fts -> ControlSpec(0.001, 100, \lin, 0, 1),
+	\feglfo -> ControlSpec(1, 1, \lin, 1, 1),
+
 	\vel -> ControlSpec(0, 1, \lin, 0, 1),
 	\spread -> ControlSpec(0, 1, \lin, 0, 1),
 	\center -> ControlSpec(0, 1, \lin, 0, 0),

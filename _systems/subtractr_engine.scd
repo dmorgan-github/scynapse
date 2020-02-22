@@ -303,63 +303,7 @@
 )
 
 
-
-
-~current.key;
-~current.set(\dur, 0.25);
-~current.set(\legato, 0.9)
-~current.set(\octave, Pbjorklund(3, 8).linlin(0, 1, 3, 4));
-~current.set(\glis, Pseries(0, 0.001).fold(0, 0.1).stutter(4))
-~current.set(\harmonic, 1);
-~current.set(\vel, Pwhite(0.8, 1.0) * 1)
-
-(
-~current.set(\degree, [
-	Pseries(0, 1).fold(0, 4).take(8),
-	[
-		[-4, -3, -2 -1].pseq.take(5),
-		[-1, -2, -3, 1].pseq.take(8)
-	].pseq.take(13)
-
-].pseq
-)
-)
-
-~current.pdef(mono:true).play;
-~current.pdef.stop;
-~current.key;
-~current.node.stop;
-
-App.scynapse
-
-
-/////////////////////////////////////////
-// \cizoxcrv
-(
-MidiCtrl(\cizoxcrv, \roli_usb).note(
-
-	{arg note, vel;
-		var myvel = vel/127;
-		~current.on(note, myvel);
-	},
-	{arg note;
-		~current.off(note);
-		Ndef(\bend).set(\bend, 1);
-	}
-)
-.bend({arg val, chan;
-	var bdepth = 3; // semitones
-	var bend = val.linlin(0, 16383, bdepth.neg, bdepth);
-	Ndef(\bend).set(\bend, bend);
-})
-)
-
-
-
-/////////////////////////////////////////
-// record
-App.saveWorkspace("s1", rec:true);
-s.stopRecording;
-
-
-
+~current.set(\dur, 0.25)
+~current.set(\degree, Pseries(0, 1).fold(0, 4))
+~current.play;
+~current.stop;
