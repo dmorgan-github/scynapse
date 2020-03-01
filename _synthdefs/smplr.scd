@@ -22,10 +22,11 @@ var func = {arg numchannels = 2;
 	// or keytrack
 	var freqmode = \freqmode.kr(0);
 	var rate = Select.kr(freqmode, [1, freq/base]);
-	var start = \start.kr(0).lag(0.001);
+	var start = \start.kr(0).lag(0.001) * BufFrames.kr(buf);
 	var rev = \rev.kr(0);
 	var loop = \loop.kr(0);
 	var dir = TWChoose.kr(trig, [-1, 1], [rev, 1-rev]);
+
 	var sig = PlayBufCF.ar(numchannels, buf, BufRateScale.kr(buf) * rate * dir, trig, numframes * start, loop);
 
 	var adsr = {

@@ -66,6 +66,7 @@ SynthDef(\subtractr, {
 		var deccurve = \fdeccurve.kr(-4).lag(ctrllag);
 		var relcurve = \frelcurve.kr(-4).lag(ctrllag);
 		var ts = \fts.kr(1).lag(ctrllag);
+
 		var feg = Env(
 			[0, 1, fsuslevel, 0],
 			[fatk, fdec, frel],
@@ -141,59 +142,59 @@ SynthDef(\subtractr, {
 
 }, metadata:(
 	specs:[
-		\atk -> ControlSpec(0, 1, \lin, 0, 0.01),
-		\dec -> ControlSpec(0, 1, \lin, 0, 0.2),
-		\rel -> ControlSpec(0, 8, \lin, 0, 0.29),
-		\suslevel -> ControlSpec(0, 1, \lin, 0, 0.7),
-		\atkcurve -> ControlSpec(-8, 8, \lin, 0, -4),
-		\deccurve -> ControlSpec(-8, 8, \lin, 0, -4),
-		\relcurve -> ControlSpec(-8, 8, \lin, 0, -4),
-		\ts -> ControlSpec(0.001, 100, \lin, 0, 1),
+		\atk -> [0, 1, \lin, 0, 0.01],
+		\dec -> [0, 1, \lin, 0, 0.2],
+		\rel -> [0, 8, \lin, 0, 0.29],
+		\suslevel -> [0, 1, \lin, 0, 0.7],
+		\atkcurve -> [-8, 8, \lin, 0, -4],
+		\deccurve -> [-8, 8, \lin, 0, -4],
+		\relcurve -> [-8, 8, \lin, 0, -4],
+		\ts -> [0.001, 100, \lin, 0, 1],
 
-		\cutoff -> ControlSpec(20, 18000, \exp, 0, 100),
-		\fvel -> ControlSpec(0.001, 20, \lin, 0, 10),
-		\res -> ControlSpec(0, 1, \lin, 0, 0.5),
-		\freqamt -> ControlSpec(0, 4, \lin, 0, 0),
-		\fatk -> ControlSpec(0, 1, \lin, 0, 0.01),
-		\fdec -> ControlSpec(0, 1, \lin, 0, 0.2),
-		\frel -> ControlSpec(0, 8, \lin, 0, 0.29),
-		\fsuslevel -> ControlSpec(0, 1, \lin, 0, 1),
-		\fatkcurve -> ControlSpec(-8, 8, \lin, 0, -4),
-		\fdeccurve -> ControlSpec(-8, 8, \lin, 0, -4),
-		\frelcurve -> ControlSpec(-8, 8, \lin, 0, -4),
-		\fts -> ControlSpec(0.001, 100, \lin, 0, 1),
-		\fwhich -> ControlSpec(0, 1, \lin, 0, 0),
-		\ffocus -> ControlSpec(0, 1, \lin, 0, 1),
+		\cutoff -> [20, 20000, \exp, 0, 100],
+		\fvel -> [0.001, 20, \lin, 0, 10],
+		\res -> [0, 1, \lin, 0, 0.5],
+		\freqamt -> [0, 4, \lin, 0, 0],
+		\fatk -> [0, 1, \lin, 0, 0.01],
+		\fdec -> [0, 1, \lin, 0, 0.2],
+		\frel -> [0, 8, \lin, 0, 0.29],
+		\fsuslevel -> [0, 1, \lin, 0, 1],
+		\fatkcurve -> [-8, 8, \lin, 0, -4],
+		\fdeccurve -> [-8, 8, \lin, 0, -4],
+		\frelcurve -> [-8, 8, \lin, 0, -4],
+		\fts -> [0.001, 100, \lin, 0, 1],
+		\fwhich -> [0, 1, \lin, 0, 0],
+		\ffocus -> [0, 1, \lin, 0, 1],
 
-		\tri -> ControlSpec(0, 1, \lin, 0, 1),
-		\trifreqmul -> ControlSpec(-24.midiratio, 24.midiratio, \lin, 0, 0.midiratio),
-		\triwidth -> ControlSpec(0, 1, \lin, 0, 0.5),
-		\trifold -> ControlSpec(1, 10, \lin, 0, 1),
+		\tri -> [0, 1, \lin, 0, 1],
+		\trifreqmul -> [-24.midiratio, 24.midiratio, \lin, 0, 0.midiratio],
+		\triwidth -> [0, 1, \lin, 0, 0.5],
+		\trifold -> [1, 10, \lin, 0, 1],
 
-		\saw -> ControlSpec(0, 1, \lin, 0, 0),
-		\sawfreqmul -> ControlSpec(-24.midiratio, 24.midiratio, \lin, 0, 0.midiratio),
-		\sawsync -> ControlSpec(1, 5, \lin, 0, 1),
+		\saw -> [0, 1, \lin, 0, 0],
+		\sawfreqmul -> [-24.midiratio, 24.midiratio, \lin, 0, 0.midiratio],
+		\sawsync -> [1, 5, \lin, 0, 1],
 
-		\pulse -> ControlSpec(0, 1, \lin, 0, 0),
-		\pulsefreqmul -> ControlSpec(-24.midiratio, 24.midiratio, \lin, 0, 0.midiratio),
-		\pulsewidth -> ControlSpec(0, 1, \lin, 0, 0.5),
+		\pulse -> [0, 1, \lin, 0, 0],
+		\pulsefreqmul -> [-24.midiratio, 24.midiratio, \lin, 0, 0.midiratio],
+		\pulsewidth -> [0, 1, \lin, 0, 0.5],
 
-		\sine -> ControlSpec(0, 1, \lin, 0, 0),
-		\sinefreqmul -> ControlSpec(-24.midiratio, 24.midiratio, \lin, 0, 0.midiratio),
-		\sineskew -> ControlSpec(-1, 1, \lin, 0, 0),
-		\sinefold -> ControlSpec(1, 10, \lin, 0, 1),
+		\sine -> [0, 1, \lin, 0, 0],
+		\sinefreqmul -> [-24.midiratio, 24.midiratio, \lin, 0, 0.midiratio],
+		\sineskew -> [-1, 1, \lin, 0, 0],
+		\sinefold -> [1, 10, \lin, 0, 1],
 
-		\noise -> ControlSpec(0, 1, \lin, 0, 0),
+		\noise -> [0, 1, \lin, 0, 0],
 
-		\detunehz -> ControlSpec(0, 10, \lin, 0, 0),
-		\bend -> ControlSpec(-12, 12, \lin, 0, 0), // semitones
-		\vrate -> ControlSpec(0, 440, \lin, 0, 6),
-		\vdepth -> ControlSpec(0, 1, \lin, 0, 0),
-		\vel -> ControlSpec(0, 1, \lin, 0, 1),
-		\spread -> ControlSpec(0, 1, \lin, 0, 1),
-		\center -> ControlSpec(0, 1, \lin, 0, 0),
-		\pan -> ControlSpec(-1, 1, \lin, 0, 0),
-		\amp -> ControlSpec(0, 1, \lin, 0, -10.dbamp)
+		\detunehz -> [0, 10, \lin, 0, 0],
+		\bend -> [-12, 12, \lin, 0, 0], // semitones
+		\vrate -> [0, 440, \lin, 0, 6],
+		\vdepth -> [0, 1, \lin, 0, 0],
+		\vel -> [0, 1, \lin, 0, 1],
+		\spread -> [0, 1, \lin, 0, 1],
+		\center -> [0, 1, \lin, 0, 0],
+		\pan -> [-1, 1, \lin, 0, 0],
+		\amp -> [0, 1, \lin, 0, -10.dbamp]
 	]
 )
 ).add
