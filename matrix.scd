@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, components;
+Fdef(\scynapse_matrix, {arg objName, envir;
 
 	var load;
 	var map = Order.new;
@@ -38,7 +38,7 @@ view: {arg objName, envir, components;
 	});
 
 	var ctrls = View().layout_(GridLayout().margins_(0).spacing_(0));
-	var playView = components[\playView].(objName, proxy, view);
+	var playView = Fdef(\scynapse_components_playview).(objName, proxy, view);
 	var size = 30;
 
 	load = {
@@ -173,5 +173,11 @@ view: {arg objName, envir, components;
 	});
 
 	view;
-}
+
+});
+
+(
+view: Fdef(\scynapse_matrix)
+)
+
 )

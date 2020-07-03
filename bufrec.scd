@@ -1,5 +1,5 @@
 (
-view: {arg name, envir, components;
+view: {arg name, envir;
 
 	var specsView, inputView;
 	var filterSlot = 100;
@@ -46,8 +46,8 @@ view: {arg name, envir, components;
 		\input -> [0, 10, \lin, 0, 1]
 	];
 
-	specsView = components[\specsView].(name, specs, envir[name], envir, view);
-	inputView = components[\multiInputsView].(envir[name], view);
+	specsView = Fdef(\scynapse_components_specsview).(name, specs, envir[name], envir, view);
+	inputView = Fdef(\scynapse_components_multiinputsview).(envir[name], view);
 
 	view.layout.add(inputView);
 

@@ -1,5 +1,5 @@
 (
-view: {arg name, envir, config, components;
+view: {arg name, envir, config;
 
 	var view, horizontalView, inputs, controls, eq;
 	var height = 20;
@@ -19,7 +19,7 @@ view: {arg name, envir, config, components;
 	config[\init].value(config);
 	envir[name][filterSlot] = \filter -> func.value;
 	view = View().layout_(VLayout().margins_(2).spacing_(2));
-	controls = components[\specsView].(name, config[\specs], envir[name], envir, view);
+	controls = Fdef(\scynapse_components_specsview).(name, config[\specs], envir[name], envir, view);
 
 	horizontalView = View().layout_(HLayout().margins_(2).spacing_(2));
 	horizontalView.layout.add(controls);

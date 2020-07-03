@@ -1,7 +1,6 @@
 (
 Fdef(\scynapse, {arg environment, rootpath;
 
-	//var rootpath = PathName(Document.current.path).parentPath;
 	var viewsPath = rootpath ++ "_views/";
 	var palette = QPalette.auto(Color.grey, Color.black);
 	var recorders = List.new;
@@ -84,7 +83,6 @@ Fdef(\scynapse, {arg environment, rootpath;
 
 		var view, count = 1, viewPath;
 		var objName = PathName(file).fileNameWithoutExtension;
-		var components = File.open(rootpath ++ "_components.scd", "r").readAllString.interpret;
 		var win, obj;
 		var status = StaticText().string_("").font_(Font().size_(9));
 		var color = Color.rand;
@@ -92,9 +90,6 @@ Fdef(\scynapse, {arg environment, rootpath;
 		var opendoc;
 
 		envir.keysValuesDo({arg k,v;
-			//if (v.class == NodeProxy and: k.asString.beginsWith(objName) )  {
-			//	count = count + 1;
-			//}
 			if (k.asString.beginsWith(objName) )  {
 				count = count + 1;
 			}
@@ -106,13 +101,13 @@ Fdef(\scynapse, {arg environment, rootpath;
 		// we can load it directly
 		obj = File.open(file, "r").readAllString.interpret;
 		if (obj[\view].isNil.not) {
-			view = obj[\view].(objName, envir, components);
+			view = obj[\view].(objName, envir);
 		} {
 			// otherwise we will search for an appropriate view
 			var viewObj;
 			viewPath = findView.(file);
 			viewObj = File.open(viewPath, "r").readAllString.interpret;
-			view = viewObj[\view].(objName, envir, obj, components);
+			view = viewObj[\view].(objName, envir, obj);
 		};
 
 		if (view.isNil) {
@@ -229,54 +224,10 @@ Fdef(\scynapse, {arg environment, rootpath;
 		var envir = getenvir.();
 
 		var ctrlView = View().layout_(HLayout(
-
-			/*
-			Button()
-			.states_([ ["--"], ["__"] ]).action_({arg ctrl;
-				if (ctrl.value == 1) {
-					view.alwaysOnTop = true;
-				}{
-					view.alwaysOnTop = false;
-				}
-			})
-			.fixedSize_(20@20),
-			*/
-
 			Button()
 			.states_([ ["rec"], ["stop", Color.red] ] )
 			.action_({arg ctrl; if (ctrl.value == 1) {s.record} {s.stopRecording} })
 			.fixedSize_(35@20),
-
-			/*
-			Button()
-			.states_([ ["stems"], ["stop", Color.red] ] )
-			.action_({arg ctrl;
-				if (ctrl.value == 1) {
-					recordStems.();
-				} {
-					stopRecordStems.();
-				}
-			})
-			.fixedSize_(40@20),
-			*/
-
-			/*
-			NumberBox().action_({arg ctrl;
-				fadeTime = ctrl.value;
-			})
-			.value_(fadeTime)
-			.normalColor_(Color.white)
-			.fixedSize_(25@20),
-			*/
-
-			/*
-			Button().states_([["[]"]]).action_({
-				envir.keysValuesDo({arg k, v;
-					v.stop(fadeTime:fadeTime);
-				})
-			})
-			.fixedSize_(20@20);
-			*/
 		));
 
 		scrollView = ScrollView()
@@ -357,7 +308,3 @@ Fdef(\scynapse, {arg environment, rootpath;
 	show.(rootpath);
 });
 )
-
-
-
-

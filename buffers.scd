@@ -1,5 +1,5 @@
 (
-view: {arg objName, envir, components;
+view: {arg objName, envir;
 
 	var bufs = envir[\bufs];
 
