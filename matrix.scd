@@ -1,5 +1,6 @@
 (
-Fdef(\scynapse_matrix, {arg objName, envir;
+var size = 25;
+Fdef(\scynapse_matrix, {arg objName, envir, win;
 
 	var load;
 	var map = Order.new;
@@ -8,8 +9,8 @@ Fdef(\scynapse_matrix, {arg objName, envir;
 	var view = View().layout_(VLayout().margins_(1).spacing_(1));
 	var slotoffset = 50;
 
-	var dragsink = TextField()// DragSink()
-	.background_(Color.clear)
+	var dragsink = TextField()
+	.background_(Color.grey)
 	.canReceiveDragHandler_({
 		true;
 	})
@@ -37,7 +38,7 @@ Fdef(\scynapse_matrix, {arg objName, envir;
 		}
 	});
 
-	var ctrls = View().layout_(GridLayout().margins_(0).spacing_(0));
+	var ctrls = View().layout_(GridLayout().margins_(1).spacing_(1));
 	var playView = Fdef(\scynapse_components_playview).(objName, proxy, view);
 	var size = 30;
 
@@ -49,7 +50,17 @@ Fdef(\scynapse_matrix, {arg objName, envir;
 		var node = map[currentSlot][\node];
 		var controls = map[currentSlot][\controls];
 		var issignal = (node[0].class == Function);
-		var header = StaticText().string_(key).font_(Font(size:8));
+		var label = if (key.asString.size > 15) {
+			key.asString.split($_).collect({arg val; val[0]}).join("");
+		}{
+			key;
+		};
+
+		var header = StaticText()
+		.string_(label)
+		.font_(Font(size:8))
+		.minWidth_(40)
+		.maxWidth_(40);
 		var temp, rowheader;
 
 		proxy[slotoffset + currentSlot] = \mix -> {node.ar};
@@ -79,7 +90,7 @@ Fdef(\scynapse_matrix, {arg objName, envir;
 				});
 			})
 			.fixedSize_(15),
-			StaticText().string_("(" ++ (slotoffset + currentSlot) ++ ") " + key).font_(Font(size:8)),
+			StaticText().string_(label).font_(Font(size:8)).minWidth_(100),
 			Knob()
 			.mode_(\vert)
 			.action_({arg ctrl;
@@ -87,9 +98,9 @@ Fdef(\scynapse_matrix, {arg objName, envir;
 				proxy.set(key, ctrl.value);
 			})
 			.value_(1)
-			.fixedSize_(25)
+			.fixedSize_(size)
 		).margins_(1).spacing_(1)).background_(Color.rand.alpha_(0.2));
-		ctrls.layout.add(rowheader.fixedWidth_(100), currentSlot + 1, 0, align:\left);
+		ctrls.layout.add(rowheader, currentSlot + 1, 0, align:\left);
 		controls.add(rowheader);
 
 		// add row controls
@@ -97,7 +108,7 @@ Fdef(\scynapse_matrix, {arg objName, envir;
 
 			var disable = ((issignal && (i == j)) || (map[keyj][\node][0].class == Function));
 			temp = Knob()
-			.fixedSize_(35)
+			.fixedSize_(size)
 			.mode_(\vert)
 			.enabled_(disable == false)
 			.action_({arg ctrl;
@@ -126,6 +137,12 @@ Fdef(\scynapse_matrix, {arg objName, envir;
 			controls.add(temp);
 		});
 
+		{
+			var width = win.sizeHint.width;
+			var height = win.sizeHint.height;
+			win.resizeTo(width + size, height);
+		}.defer(0.2);
+
 		// add new control to existing columns
 		map.indicesDo({arg val, keyi, i;
 
@@ -133,7 +150,7 @@ Fdef(\scynapse_matrix, {arg objName, envir;
 
 				temp = Knob()
 				.mode_(\vert)
-				.fixedSize_(35)
+				.fixedSize_(size)
 				.enabled_(issignal == false)
 				.action_({arg ctrl;
 
